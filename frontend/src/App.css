@@ -1,0 +1,44 @@
+.App {
+  text-align: center;
+  /* background-image: linear-gradient(rgb(204, 204, 236), rgb(177, 177, 238)) */
+  background-image: url(https://i.pinimg.com/736x/bb/30/46/bb3046885eb22b8c7a5507e5911f8462.jpg);
+  background-attachment: fixed;
+  background-position: top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.hotProduct-title {
+  font-size: 40px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.slide {
+  box-shadow: inset 0 -20px 100px 50px #000;
+}
+
+.GrapperOne {
+  animation: hovering 4s ease-in-out infinite;
+}
+
+.GrapperTwo {
+  animation: hovering 4s ease-in-out infinite ;
+  animation-delay: 0.15s;
+}
+
+.GrapperThree {
+  animation: hovering 4s ease-in-out infinite ;
+  animation-delay: 0.25s;
+}
+
+@keyframes hovering {
+  0% {
+    transform: 0;
+  }
+  50% {
+    transform: translateY(-25px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}

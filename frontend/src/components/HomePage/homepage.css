@@ -1,0 +1,66 @@
+.introduce {
+    height:654px;
+    position: relative;
+    padding-top: 74px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center
+}
+
+.introduce-title {
+    font-size:80px;
+    text-align: left;
+    padding-left: 170px;
+    font-family: sans-serif
+}
+
+.introduce2 {
+    height:600px;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-image: url(../../img/image_nen-powerpoint-trang-3.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    /* filter: drop-shadow(10px 10px 10px rgba(0, 0, 0, 0.5)); */
+}
+
+.cloudBackground {
+    position: absolute;
+    content: "";
+    width: 400px;
+    bottom: 0;
+    right: 0;
+    z-index: 2;
+    animation: moveRightToLeft 40s linear infinite; /* Thực hiện hoạt ảnh */
+}
+
+.cloudBackground2 {
+    position: absolute;
+    content: "";
+    width: 400px;
+    bottom: -28%;
+    right: 0;
+    z-index: 2;
+    animation: moveRightToLeft 50s linear infinite; /* Thực hiện hoạt ảnh */
+}
+
+.cloudBackground3 {
+    position: absolute;
+    content: "";
+    width: 400px;
+    bottom: 0;
+    right: 0;
+    z-index: 0;
+    animation: moveRightToLeft 120s linear infinite; /* Thực hiện hoạt ảnh */
+}
+
+@keyframes moveRightToLeft {
+    0% {
+        transform: translateX(100vw) translateY(-50%); /* Bắt đầu từ ngoài màn hình bên phải */
+    }
+    100% {
+        transform: translateX(-100vw) translateY(-50%); /* Kết thúc ở ngoài màn hình bên trái */
+    }
+}
