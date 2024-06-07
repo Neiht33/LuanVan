@@ -57,6 +57,13 @@
     align-items: center;
     gap: 30px;
   }
+
+  .breadcrumb-btn {
+    position: absolute;
+    content: "";
+    right: 0;
+    margin-right: 10px;
+  }
   
   @keyframes rotation_481 {
     0% {

@@ -14,7 +14,7 @@
     font-family: sans-serif
 }
 
-.introduce2 {
+.introduce2{
     height:600px;
     position: relative;
     display: flex;
@@ -23,7 +23,21 @@
     background-image: url(../../img/image_nen-powerpoint-trang-3.jpg);
     background-repeat: no-repeat;
     background-size: cover;
-    /* filter: drop-shadow(10px 10px 10px rgba(0, 0, 0, 0.5)); */
+}
+
+.introduce3 {
+    height:600px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-image: url(https://trainghiemso.vn/wp-content/uploads/2020/04/1249349.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.introduce3-img {
+    width: 1000px;
+    float: right;
 }
 
 .cloudBackground {
@@ -56,6 +70,10 @@
     animation: moveRightToLeft 120s linear infinite; /* Thực hiện hoạt ảnh */
 }
 
+.pd-56{
+    padding-top: 56px;
+}
+
 @keyframes moveRightToLeft {
     0% {
         transform: translateX(100vw) translateY(-50%); /* Bắt đầu từ ngoài màn hình bên phải */
@@ -64,3 +82,42 @@
         transform: translateX(-100vw) translateY(-50%); /* Kết thúc ở ngoài màn hình bên trái */
     }
 }
+
+.explore-btn {
+    width: 10.5em;
+    height: 3.3em;
+    margin: 0.5em;
+    background: #3949ab;
+    color: #fff;
+    border: none;
+    border-radius: 0.625em;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+   }
+   
+   .explore-btn:hover {
+    color: #000;
+   }
+   
+   .explore-btn:after {
+    content: "";
+    background: #fff;
+    position: absolute;
+    z-index: -1;
+    left: -20%;
+    right: -20%;
+    top: 0;
+    bottom: 0;
+    transform: skewX(-45deg) scale(0, 1);
+    transition: all 0.5s;
+   }
+   
+   .explore-btn:hover:after {
+    transform: skewX(-45deg) scale(1, 1);
+    -webkit-transition: all 0.5s;
+    transition: all 0.5s;
+   }

@@ -7,7 +7,7 @@ import img from '../../img/cloud1.png'
 import img2 from '../../img/cloud2.png'
 import img3 from '../../img/homepage.png'
 import img4 from '../../img/cloud3.png'
-
+import img5 from '../../img/mbti.jpg'
 
 export function HomePage() {
 
@@ -55,7 +55,7 @@ export function HomePage() {
               </Typography>
               <div className="flex justify-center gap-2">
                 <Link to={'/Product'}>
-                  <Button size="lg" color="white">
+                  <Button className='explore-btn' size="lg" color="white" >
                     Khám Phá Ngay
                   </Button>
                 </Link>
@@ -154,6 +154,9 @@ export function HomePage() {
       </div>
       <h1 className='hotProduct-title mb-5 text-white py-5 '>DANH MỤC ĐỒ CHƠI</h1>
       <CardMain/>
+      {/* <div className='introduce3 w-full bg-white my-5 over flex justify-end'>
+        <img className='introduce3-img' src={img5} alt='img'/>
+      </div> */}
     </div>
   );
 }
