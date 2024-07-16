@@ -1,0 +1,137 @@
+.introduce {
+    height: calc(100vh - 100px);
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 32px;
+}
+
+.introduce-title {
+    font-size: 48px;
+    text-align: left;
+    font-family: 'Courier New', Courier, monospace
+}
+
+.introduce-title2 {
+    font-size: 30px;
+    font-family: cursive;
+}
+
+.introduce-content {
+    font-size: 30px;
+    text-align: left;
+    font-family: 'Courier New', Courier, monospace
+}
+
+.hotProduct-title {
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif
+}
+
+.introduce2 {
+    height: 100vh;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* background-image: url(../../img/hinh\ nen\ powerpoint.webp); */
+    background-repeat: no-repeat;
+    background-size: cover;
+    --tw-bg-opacity: 0;
+}
+
+.introduce3 {
+    height: 600px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-image: url(https://trainghiemso.vn/wp-content/uploads/2020/04/1249349.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.introduce3-img {
+    width: 1000px;
+    float: right;
+}
+
+.page-title {
+    background: linear-gradient(to right, #000000, #d2d0d0);
+    -webkit-background-clip: text;
+    color: transparent;
+    font-size: 90px;
+}
+
+.pd-56 {
+    padding-top: 56px;
+}
+
+.explore-btn {
+    width: 10.5em;
+    height: 3.3em;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    box-shadow: 10px 5px 5px #444;
+}
+
+.explore-btn:hover {
+    color: #000;
+}
+
+.explore-btn:after {
+    content: "";
+    background: #fff;
+    position: absolute;
+    z-index: -1;
+    left: -20%;
+    right: -20%;
+    top: 0;
+    bottom: 0;
+    transform: skewX(-45deg) scale(0, 1);
+    transition: all 0.5s;
+}
+
+.explore-btn:hover:after {
+    transform: skewX(-45deg) scale(1, 1);
+    -webkit-transition: all 0.5s;
+    transition: all 0.5s;
+}
+
+.typing-text {
+    overflow: hidden;
+    /* Để ẩn phần văn bản vượt ra ngoài khi typing */
+    border-right: .15em solid rgb(0, 0, 0);
+    /* Viền để làm dấu nháy */
+    white-space: nowrap;
+    /* Để ngăn chặn văn bản xuống dòng */
+    animation: typing 3s steps(40, end), blink-caret .75s step-end infinite;
+}
+
+@keyframes typing {
+    from {
+        width: 0
+    }
+
+    to {
+        width: 100%
+    }
+}
+
+@keyframes blink-caret {
+
+    from,
+    to {
+        border-color: transparent
+    }
+
+    50% {
+        border-color: rgb(0, 0, 0)
+    }
+}

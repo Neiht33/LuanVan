@@ -1,0 +1,13 @@
+.Cart-detail_container {
+    border-bottom: 4px solid #ccc;
+}
+
+.Cart-detail_title {
+    padding: 10px 0;
+    border-bottom: 4px solid #ccc;
+}
+
+.Cart-detail_total-price {
+    padding: 10px 0;
+    border-top: 4px solid #ccc;
+}
