@@ -37,6 +37,32 @@ export function CircularPagination() {
         className: "rounded-full",
     });
 
+    const formatCurrency = (amount) => {
+        const formatter = new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        });
+
+        return formatter.format(amount);
+    };
+
+    function formatNumber(number) {
+        // Chuyển số thành chuỗi và đảo ngược chuỗi
+        let reversedNumberString = String(number).split('').reverse().join('');
+        let formattedNumber = '';
+
+        // Thêm dấu chấm ngăn cách vào mỗi 3 ký tự
+        for (let i = 0; i < reversedNumberString.length; i++) {
+            if (i !== 0 && i % 3 === 0) {
+                formattedNumber += '.';
+            }
+            formattedNumber += reversedNumberString[i];
+        }
+
+        // Đảo ngược lại chuỗi đã được định dạng
+        return formattedNumber.split('').reverse().join('');
+    }
+
     const next = () => {
         if (active === 5) return;
 
