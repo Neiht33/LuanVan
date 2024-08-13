@@ -20,7 +20,7 @@ import { Link } from "react-router-dom";
 
 export default function Sidebar() {
     return (
-        <Card className="h-[calc(100vh-2rem)] w-full px-4 shadow-xl shadow-blue-gray-900/5">
+        <Card className="h-[calc(100vh-2rem)] w-full px-4 shadow-transparent">
             <Typography
                 as="a"
                 href="/"

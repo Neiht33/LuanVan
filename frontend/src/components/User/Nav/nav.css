@@ -52,3 +52,18 @@
 .brand-name {
   font-family: monospace;
 }
+
+.cart-itemName {
+  display: -webkit-box;
+  height: 52px;
+  line-height: 26px;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cart-info {
+  height: 52px;
+  line-height: 26px;
+}

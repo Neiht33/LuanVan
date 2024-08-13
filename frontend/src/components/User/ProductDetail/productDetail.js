@@ -1,5 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import './productDetail.css'
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import {
     Typography, Button, Tabs,
     TabsHeader,
@@ -9,91 +12,257 @@ import {
     Card,
     CardHeader,
     CardBody,
+    Breadcrumbs,
 } from '@material-tailwind/react';
-import { Flex, InputNumber, ConfigProvider, Col, Row } from 'antd';
+import { Flex, InputNumber, ConfigProvider, Col, Row, notification, Space } from 'antd';
+import { Link, useParams } from 'react-router-dom';
+import axios from 'axios';
 
 
-export default function ProductDetail({ language }) {
-    const [activeTab, setActiveTab] = React.useState("mota");
-    const data = [
-        {
-            imgelink:
-                "https://images.unsplash.com/photo-1499696010180-025ef6e1a8f9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
-        },
-        {
-            imgelink:
-                "https://images.unsplash.com/photo-1432462770865-65b70566d673?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-        },
-        {
-            imgelink:
-                "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2940&q=80",
-        },
-    ];
+export default function ProductDetail({ language, getApiCartDetail }) {
+    const { id } = useParams()
+    const [activeTab, setActiveTab] = useState("mota");
+    const [product, setProduct] = useState({})
+    const [productRelated, setProductRelated] = useState([])
+    const [supportImg, setSupportImg] = useState([])
+    const [active, setActive] = useState("");
+    const [quantity, setQuantity] = useState(1);
 
-    const [active, setActive] = React.useState(
-        "https://images.unsplash.com/photo-1499696010180-025ef6e1a8f9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
-    );
+    useLayoutEffect(() => {
+        getApiProductByID(id.match(/[^-]*$/))
+    }, [id])
 
     useEffect(() => {
-        const productAdd = document.querySelector('.translate-add')
-        const productBuy = document.querySelector('.translate-buy')
-        const productDescription = document.querySelector('.translate-description')
-        const productRating = document.querySelector('.translate-rating')
-        const productRelated = document.querySelector('.translate-related')
+        document.querySelector('.product-description').innerHTML = product.description
+    }, [product])
 
-        if (language == 1) {
-            productAdd.textContent = 'THÊM VÀO GIỎ HÀNG'
-            productBuy.textContent = 'MUA NGAY'
-            productDescription.textContent = 'Mô tả'
-            productRating.textContent = 'Đánh giá'
-            productRelated.textContent = 'Sản phẩm liên quan'
-        } else {
-            productAdd.textContent = 'ADD TO CART'
-            productBuy.textContent = 'BUY NOW'
-            productDescription.textContent = 'Product Description'
-            productRating.textContent = 'Product Rating'
-            productRelated.textContent = 'Related products'
+    const [api, contextHolder] = notification.useNotification();
+    const openNotification = (type) => {
+        api[type]({
+            message: 'Đã thêm vào giỏ hàng',
+            placement: 'top'
+        });
+    };
+
+    const getApiProductByID = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/products/productdetail/${id}`);
+            const data = await response.json();
+            if (data) {
+                setProduct(data[0]);
+                setActive(`http://localhost:8080/images/${data[0].img}`)
+                getApiProductSupport(data[0].id)
+                getApiProductRelated(data[0].category)
+            }
+        } catch (error) {
+            console.log('Đã xảy ra lỗi:', error);
         }
-    }, [language])
+    }
+
+    const getApiProductSupport = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/products/supportImg/${id}`);
+            const data = await response.json();
+            if (data) {
+                setSupportImg(data)
+            }
+        } catch (error) {
+            console.log('Đã xảy ra lỗi:', error);
+        }
+    }
+
+    const getApiProductRelated = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/products/catalog/main?page=1&id=${id}`);
+            const data = await response.json();
+            if (data) {
+                setProductRelated(data);
+            }
+        } catch (error) {
+            console.log('Đã xảy ra lỗi:', error);
+        }
+    }
+
+    function formatNumber(number) {
+        // Chuyển số thành chuỗi và đảo ngược chuỗi
+        let reversedNumberString = String(number).split('').reverse().join('');
+        let formattedNumber = '';
+
+        // Thêm dấu chấm ngăn cách vào mỗi 3 ký tự
+        for (let i = 0; i < reversedNumberString.length; i++) {
+            if (i !== 0 && i % 3 === 0) {
+                formattedNumber += '.';
+            }
+            formattedNumber += reversedNumberString[i];
+        }
+
+        // Đảo ngược lại chuỗi đã được định dạng
+        return formattedNumber.split('').reverse().join('');
+    }
+
+    function removeVietnameseAccents(str) {
+        if (str) {
+            let withoutAccents = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            // Thay thế khoảng trắng bằng dấu gạch ngang
+            return withoutAccents.replace(/\s+/g, '-');
+        }
+    }
+
+    const handleScrollUp = () => {
+        window.scrollTo({
+            top: 0
+        });
+    }
+
+    const handleAddCart = (productID, quantity, total) => {
+        const formSubmit = {
+            productID: productID,
+            quantity: quantity,
+            total: total,
+            accountID: JSON.parse(window.localStorage.getItem('User')).id
+        }
+
+        axios.put(`http://localhost:8080/api/cart`, formSubmit, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                // Xử lý kết quả từ server
+                getApiCartDetail(JSON.parse(window.localStorage.getItem('User')).id)
+                openNotification('success')
+                console.log(response.data);
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error(error);
+            });
+    }
+
+    const settings = {
+        dots: false,
+        speed: 200,
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        cssEase: "linear", // Đảm bảo rằng cssEase được đặt thành "linear"
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 3,
+                    slidesToScroll: 1,
+                    infinite: true,
+                    dots: false
+                }
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1,
+                    initialSlide: 2
+                }
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1
+                }
+            }
+        ]
+    };
 
     return (
         <>
+            <div className="w-full bg-white" >
+                <Breadcrumbs style={{ backgroundColor: 'transparent' }}>
+                    <Link to={'/'} className="opacity-60">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                        >
+                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                        </svg>
+                    </Link>
+                    <Link to={'/Product'} className="opacity-60">
+                        {language == 1 ? 'Tất cả sản phẩm' : 'All product'}
+                    </Link>
+                    <Link to={`#`} className="opacity-60">
+                        {product.name}
+                    </Link>
+                </Breadcrumbs>
+            </div>
             <div className="ProductDetail">
                 <div className='img-container relative p-8'>
                     <div className="grid gap-4">
-                        <div>
+                        <div className='bg-white rounded-lg p-4 flex justify-center items-center h-[580px] w-[692px]'>
                             <img
-                                className="h-auto w-full max-w-full rounded-lg object-cover object-center md:h-[480px]"
+                                className="h-full rounded-lg object-center"
                                 src={active}
                                 alt=""
                             />
                         </div>
                         <div className="flex justify-center gap-4">
-                            {data.map(({ imgelink }, index) => (
-                                <div key={index}>
-                                    <img
-                                        onClick={() => setActive(imgelink)}
-                                        src={imgelink}
-                                        className="h-20 max-w-full cursor-pointer rounded-lg object-cover object-center"
-                                        alt="gallery-image"
-                                    />
+                            <Slider {...settings} className='flex justify-center' style={{ margin: '40px', width: '600px' }} >
+                                <div>
+                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                        <div className={`bg-white rounded-lg p-1 flex justify-center items-center h-[160px] w-[160px] cursor-pointer ${active != `http://localhost:8080/images/${product.img}` ? 'opacity-50' : ''}`}>
+                                            <img
+                                                onClick={() => setActive(`http://localhost:8080/images/${product.img}`)}
+                                                src={`http://localhost:8080/images/${product.img}`}
+                                                className="h-full rounded-lg object-center"
+                                                alt="gallery-image"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                            ))}
+                                {supportImg.map((item, index) => (
+                                    <div>
+                                        <div style={{ display: 'flex', justifyContent: 'center' }} key={index}>
+                                            <div className={`bg-white rounded-lg p-1 flex justify-center items-center h-[160px] w-[160px] cursor-pointer ${active != `http://localhost:8080/images/${item.supportImg}` ? 'opacity-50' : ''}`}>
+                                                <img
+                                                    onClick={() => setActive(`http://localhost:8080/images/${item.supportImg}`)}
+                                                    src={`http://localhost:8080/images/${item.supportImg}`}
+                                                    className="h-full rounded-lg object-center"
+                                                    alt="gallery-image"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </Slider>
                         </div>
                     </div>
                     <div className='img-container_absolute absolute'></div>
                 </div>
                 <div className='infomation-container rounded-tl-[200px]'>
-                    <Typography className='mb-6' variant="h2">Bear Brick</Typography>
+                    <Typography className='mb-6 font-medium' variant="h2">{product.name}</Typography>
                     <div className='product-rate mb-6 flex items-center'>
                         <svg className='mr-2' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#ffeb0f" d="m7.625 6.4l2.8-3.625q.3-.4.713-.587T12 2t.863.188t.712.587l2.8 3.625l4.25 1.425q.65.2 1.025.738t.375 1.187q0 .3-.088.6t-.287.575l-2.75 3.9l.1 4.1q.025.875-.575 1.475t-1.4.6q-.05 0-.55-.075L12 19.675l-4.475 1.25q-.125.05-.275.063T6.975 21q-.8 0-1.4-.6T5 18.925l.1-4.125l-2.725-3.875q-.2-.275-.288-.575T2 9.75q0-.625.363-1.162t1.012-.763z"></path></svg>
                         <span className='product-rate__score font-bold'>4/5</span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#d1d1d1" d="M12 7a5 5 0 1 1-4.995 5.217L7 12l.005-.217A5 5 0 0 1 12 7"></path></svg>
                         <span className='product-rate__view text-gray-500'>15 Review</span>
                     </div>
-                    <div className='product-ingo mb-6 text-gray-600'>Gấu bearbrick hay Be@rbrick là một mô hình gấu bụng phệ. Đây là sản phẩm đồ chơi do công ty MediCom Toy của Nhật Bản sở hữu và sản xuất. Sản phẩm này được sản xuất nhằm vinh danh đạo diễn nổi tiếng Stanley Kubrick nhưng sau đó vì sức hút khó cưỡng mà bearbrick đã được lan rộng ra toàn thế giới.</div>
-                    <div className='product-price mb-6 font-bold text-2xl'>329.000đ</div>
-                    <div className='mb-6'>
+                    <div className='product-info mb-6 text-gray-600'>
+                        <div className='mb-2 text-black flex items-center text-gray-500'>
+                            <svg className='text-2xl mr-2' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#000000" d="m9.55 15.15l8.475-8.475q.3-.3.7-.3t.7.3t.3.713t-.3.712l-9.175 9.2q-.3.3-.7.3t-.7-.3L4.55 13q-.3-.3-.288-.712t.313-.713t.713-.3t.712.3z"></path></svg>
+                            Hàng Chính Hãng
+                        </div>
+                        <div className='mb-2 text-black flex items-center text-gray-500'>
+                            <svg className='text-2xl mr-2' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#000000" d="m9.55 15.15l8.475-8.475q.3-.3.7-.3t.7.3t.3.713t-.3.712l-9.175 9.2q-.3.3-.7.3t-.7-.3L4.55 13q-.3-.3-.288-.712t.313-.713t.713-.3t.712.3z"></path></svg>
+                            Miễn Phí Giao Hàng Toàn Quốc Đơn 500k
+                        </div>
+                        <div className='mb-2 text-black flex items-center text-gray-500'>
+                            <svg className='text-2xl mr-2' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#000000" d="m9.55 15.15l8.475-8.475q.3-.3.7-.3t.7.3t.3.713t-.3.712l-9.175 9.2q-.3.3-.7.3t-.7-.3L4.55 13q-.3-.3-.288-.712t.313-.713t.713-.3t.712.3z"></path></svg>
+                            Kiểm Tra Khi Nhận Hàng Và Hoàn Trả Nếu Sản Phẩm Lỗi
+                        </div>
+                    </div>
+                    <div className='product-price mb-6 font-bold text-2xl text-red-400'>{formatNumber(product.price)}đ</div>
+                    <div className='my-6 flex items-center'>
+                        <span className='mr-2'>Số lượng:</span>
                         <ConfigProvider
                             theme={{
                                 components: {
@@ -106,13 +275,26 @@ export default function ProductDetail({ language }) {
                             }}
                         >
                             <Flex vertical gap={12}>
-                                <InputNumber min={1} max={100} defaultValue={1} mouseEnterDelay={0} />
+                                <InputNumber onChange={setQuantity} min={1} max={product.quantity} defaultValue={1} mouseEnterDelay={0} />
                             </Flex>
                         </ConfigProvider>
+                        <span className='ml-4 text-gray-500'>{product.wareHouse} {language == 1 ? 'sản phẩm có sẵn' : 'pieces availabel'}</span>
                     </div>
                     <div className="flex w-max gap-4">
-                        <Button className='translate-add' variant="outlined">THÊM VÀO GIỎ HÀNG</Button>
-                        <Button className='translate-buy' variant="filled">MUA NGAY</Button>
+                        <Button className='translate-add w-[170px]' variant="outlined" onClick={() => {
+                            if (!window.localStorage.getItem('User')) {
+                                window.location.href = 'http://localhost:3000/SignIn'
+                            } else handleAddCart(product.id, quantity, quantity * product.price)
+                        }}>
+                            {language == 1 ? 'THÊM VÀO GIỎ HÀNG' : 'ADD TO CART'}
+                        </Button>
+                        <Button className='translate-buy' variant="filled" onClick={() => {
+                            if (!window.localStorage.getItem('User')) {
+                                window.location.href = 'http://localhost:3000/SignIn'
+                            }
+                        }}>
+                            {language == 1 ? 'MUA NGAY' : 'BUY NOW'}
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -131,7 +313,7 @@ export default function ProductDetail({ language }) {
                             onClick={() => setActiveTab('mota')}
                             className={`py-4 ${activeTab === 'mota' ? "text-gray-900" : ""}`}
                         >
-                            <span className='translate-description'>Mô tả</span>
+                            <span className='text-2xl translate-description'>{language == 1 ? 'Mô tả sản phẩm' : 'Product Description'}</span>
                         </Tab>
                         <Tab
                             key='danhgia'
@@ -139,12 +321,12 @@ export default function ProductDetail({ language }) {
                             onClick={() => setActiveTab('danhgia')}
                             className={`py-4 ${activeTab === 'danhgia' ? "text-gray-900" : ""}`}
                         >
-                            <span className='translate-rating'>Đánh giá</span>
+                            <span className='text-2xl translate-rating'>{language == 1 ? 'Đánh giá' : 'Product Rating'}</span>
                         </Tab>
                     </TabsHeader>
                     <TabsBody>
-                        <TabPanel key='mota' value='mota'>
-                            Tượng gấu Bearbrick bao gồm hai nửa được ghép bằng một thanh gỗ lớn. Bức tượng được thiết kế để trông giống như một con gấu đang nằm úp đầu vào chân và hai chân trước duỗi ra trước mặt như thể nó đang ngủ.
+                        <TabPanel className='text-start product-description' key='mota' value='mota'>
+
                         </TabPanel>
                         <TabPanel key='danhgia' value='danhgia'>
                             danhgia
@@ -153,70 +335,50 @@ export default function ProductDetail({ language }) {
                 </Tabs>
             </div>
             <div className='product-related bg-white bg-opacity-0'>
-                <Typography className='translate-related mb-6 relate-title' variant="h2">Related Product</Typography>
+                <Typography className='translate-related mb-6 relate-title' variant="h2">
+                    {language == 1 ? 'Sản phẩm liên quan' : 'Related product'}
+                </Typography>
                 <Row className='pr-[58px]'>
-                    <Col className="" xl={{ span: 5, offset: 1 }} sm={{ span: 7, offset: 1 }} xs={{ span: 12 }}>
-                        <Card className="w-full">
-                            <CardHeader floated={false} style={{ maxHeight: '248px' }}>
-                                <img src="https://docs.material-tailwind.com/img/team-3.jpg" alt="profile-picture" />
-                            </CardHeader>
-                            <CardBody className="text-center">
-                                <Typography variant="h4" color="blue-gray" className="mb-2">
-                                    Natalie Paisley
-                                </Typography>
-                                <Typography color="blue-gray" className="font-medium" textGradient>
-                                    CEO / Co-Founder
-                                </Typography>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                    <Col className="" xl={{ span: 5, offset: 1 }} sm={{ span: 7, offset: 1 }} xs={{ span: 12 }}>
-                        <Card className="w-full">
-                            <CardHeader floated={false} style={{ maxHeight: '248px' }}>
-                                <img src="https://docs.material-tailwind.com/img/team-3.jpg" alt="profile-picture" />
-                            </CardHeader>
-                            <CardBody className="text-center">
-                                <Typography variant="h4" color="blue-gray" className="mb-2">
-                                    Natalie Paisley
-                                </Typography>
-                                <Typography color="blue-gray" className="font-medium" textGradient>
-                                    CEO / Co-Founder
-                                </Typography>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                    <Col className="" xl={{ span: 5, offset: 1 }} sm={{ span: 7, offset: 1 }} xs={{ span: 12 }}>
-                        <Card className="w-full">
-                            <CardHeader floated={false} style={{ maxHeight: '248px' }}>
-                                <img src="https://docs.material-tailwind.com/img/team-3.jpg" alt="profile-picture" />
-                            </CardHeader>
-                            <CardBody className="text-center">
-                                <Typography variant="h4" color="blue-gray" className="mb-2">
-                                    Natalie Paisley
-                                </Typography>
-                                <Typography color="blue-gray" className="font-medium" textGradient>
-                                    CEO / Co-Founder
-                                </Typography>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                    <Col className="" xl={{ span: 5, offset: 1 }} sm={{ span: 7, offset: 1 }} xs={{ span: 12 }}>
-                        <Card className="w-full">
-                            <CardHeader floated={false} style={{ maxHeight: '248px' }}>
-                                <img src="https://docs.material-tailwind.com/img/team-3.jpg" alt="profile-picture" />
-                            </CardHeader>
-                            <CardBody className="text-center">
-                                <Typography variant="h4" color="blue-gray" className="mb-2">
-                                    Natalie Paisley
-                                </Typography>
-                                <Typography color="blue-gray" className="font-medium" textGradient>
-                                    CEO / Co-Founder
-                                </Typography>
-                            </CardBody>
-                        </Card>
-                    </Col>
+                    {productRelated.map((product, index) => {
+                        if (product.id != id.match(/[^-]*$/) && index < 5) {
+                            return (
+                                <Col className="" xl={{ span: 5, offset: 1 }} sm={{ span: 7, offset: 1 }} xs={{ span: 12 }}>
+                                    <Link to={`/Product/Productdetail/${removeVietnameseAccents(product.name)}-${product.id}`} onClick={() => handleScrollUp()}>
+                                        <Card className="w-full" style={{ border: '3px solid black' }}>
+                                            <CardHeader floated={false} className="h-[300px] p-4 flex">
+                                                <img className="h-full m-auto" src={`http://localhost:8080/images/${product.img}`} alt="profile-picture" />
+                                            </CardHeader>
+                                            <CardBody className="p-4 text-start h-[182px]">
+                                                <Typography variant="h7" color="blue-gray" className="mb-2 text-gray-600 product-name">
+                                                    {product.name}
+                                                </Typography>
+                                                <Typography variant="h5" color="red" className="font-semibold my-4" textGradient>
+                                                    {formatNumber(product.price)} đ
+                                                </Typography>
+                                                <Button color="red" className="w-[240px]" onClick={() => {
+                                                    if (!window.localStorage.getItem('User')) {
+                                                        window.location.href = 'http://localhost:3000/SignIn'
+                                                    } else handleAddCart(product.id, 1, product.price)
+                                                }}>
+                                                    {language == 1 ? 'THÊM VÀO GIỎ HÀNG' : 'ADD TO CART'}
+                                                </Button>
+                                            </CardBody>
+                                        </Card>
+                                    </Link>
+                                </Col>
+                            )
+                        } else if (index == 5) return
+                    })}
                 </Row>
             </div>
+            <>
+                {contextHolder}
+                <Space className="hidden">
+                    <Button type="primary" onClick={() => openNotification('top')}>
+                        top
+                    </Button>
+                </Space>
+            </>
         </>
     );
 }

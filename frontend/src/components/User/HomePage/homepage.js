@@ -73,7 +73,7 @@ export function HomePage({ language }) {
         </div>
       </div>
       <div className='breakPage min-h-screen'>
-        <h1 className='hotProduct-title'>SẢN PHẨM NỔI BẬT</h1>
+        <h1 className='hotProduct-title my-10'>SẢN PHẨM NỔI BẬT</h1>
         <div className='min-h-screen xl:px-32 xl:py-12 lg:px-12 lg:py-12 sm:px-12 sm:py-12'>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             <div className="grid gap-4 z-10">
@@ -151,18 +151,18 @@ export function HomePage({ language }) {
         </div>
       </div>
       <div className='introduce2 px-5'>
-        <img src={img1} />
+        <img className='GrapperOne' src={img1} />
         <div className='pl-[84px]'>
-          <div className='mb-6 introduce-title'>
+          <div className='mb-6 introduce-title text-white'>
             Khám phá tiềm năng bên trong
           </div>
-          <div className='introduce-content'>
+          <div className='introduce-content text-white'>
             Chọn những sản phẩm phù hợp có thể giúp bộc lộ tiềm năng, tài năng tiềm ẩn và phát huy tính sáng tạo.
           </div>
         </div>
       </div>
       <div className='min-h-screen'>
-        <h1 className='hotProduct-title mb-5 py-5 '>DANH MỤC ĐỒ CHƠI</h1>
+        <h1 className='hotProduct-title mb-5 py-20 '>DANH MỤC ĐỒ CHƠI</h1>
         <CardMain language={language} />
       </div>
       <div className='introduce3 w-full bg-white my-5 over flex justify-end'>

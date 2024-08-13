@@ -2,12 +2,10 @@ import React, { useLayoutEffect, useRef, useState } from "react";
 import axios from 'axios';
 import { Breadcrumbs, Button, Card, Input, Option, Radio, Select, Textarea, Typography, IconButton } from "@material-tailwind/react";
 import { ArrowRightIcon, ArrowLeftIcon } from "@heroicons/react/24/outline"
-import { Col, Image, InputNumber, notification, Row, Space, Upload } from "antd";
+import { Col, Image, notification, Row, Space, Upload } from "antd";
 import { Link } from "react-router-dom";
-import FormList from "antd/es/form/FormList";
 
-export function AddProduct({ setCurrentTab, getAPIProduct, openNotificationSuccess }) {
-    const [api, contextHolder] = notification.useNotification();
+export function AddProduct({ setCurrentTab, getAPIProduct, openNotificationSuccess, openNotificationError }) {
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileIMG, setFileIMG] = useState([]);
@@ -66,6 +64,11 @@ export function AddProduct({ setCurrentTab, getAPIProduct, openNotificationSucce
         const productPrice = document.querySelector('.productPrice')
         const productDescription = document.querySelector('.productDescription')
 
+        if (productName.value == '' || productQuantity.value == '' || productPrice.value == '' || productDescription == '' || !selectedOptionAge || !selectedOptionCategory || fileIMG.length == 0) {
+            openNotificationError('error')
+            return;
+        }
+
         // Chuyển giá trị xuống dòng của Description thành html
         var formattedContent = productDescription.value.replace(/\n/g, '<br>');
 
@@ -91,7 +94,6 @@ export function AddProduct({ setCurrentTab, getAPIProduct, openNotificationSucce
                 console.log(response.data);
                 getAPIProduct()
                 openNotificationSuccess('success')
-                // document.querySelector('.notifyBoxSuccess').click()
                 setCurrentTab('AllProduct')
             })
             .catch(error => {
@@ -281,6 +283,7 @@ export function AddProduct({ setCurrentTab, getAPIProduct, openNotificationSucce
 export function AddCategory({ setCurrentTab }) {
     const TABLE_HEAD = ["Danh Mục", "Nhóm Danh Mục", "Tùy Chỉnh", ""];
 
+    const [openSkeleton, setOpenSkeleton] = useState(true)
     const [selectedOption, setSelectedOption] = useState();
     const [category, setCategory] = useState([])
     const [api, contextHolder] = notification.useNotification();
@@ -365,6 +368,7 @@ export function AddCategory({ setCurrentTab }) {
             const response = await fetch(`http://localhost:8080/api/category`);
             const data = await response.json();
             if (data) {
+                setOpenSkeleton(false)
                 setCategory(data);
             }
         } catch (error) {
@@ -419,7 +423,44 @@ export function AddCategory({ setCurrentTab }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {category.map(({ name, group }, index) => {
+                                {openSkeleton && <div className="w-full animate-pulse m-4">
+                                    <Typography
+                                        as="div"
+                                        variant="h1"
+                                        className="mb-4 h-3 w-56 rounded-full bg-gray-300"
+                                    >
+                                        &nbsp;
+                                    </Typography>
+                                    <Typography
+                                        as="div"
+                                        variant="paragraph"
+                                        className="mb-2 h-2 w-72 rounded-full bg-gray-300"
+                                    >
+                                        &nbsp;
+                                    </Typography>
+                                    <Typography
+                                        as="div"
+                                        variant="paragraph"
+                                        className="mb-2 h-2 w-72 rounded-full bg-gray-300"
+                                    >
+                                        &nbsp;
+                                    </Typography>
+                                    <Typography
+                                        as="div"
+                                        variant="paragraph"
+                                        className="mb-2 h-2 w-72 rounded-full bg-gray-300"
+                                    >
+                                        &nbsp;
+                                    </Typography>
+                                    <Typography
+                                        as="div"
+                                        variant="paragraph"
+                                        className="mb-2 h-2 w-72 rounded-full bg-gray-300"
+                                    >
+                                        &nbsp;
+                                    </Typography>
+                                </div>}
+                                {!openSkeleton && category.map(({ name, group }, index) => {
                                     const isLast = index === category.length - 1;
                                     const classes = isLast ? "p-4" : "p-4 border-b border-blue-gray-50";
                                     if (index >= (active * 5 - 5) && index < (active * 5)) {

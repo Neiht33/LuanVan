@@ -34,9 +34,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* background-image: url(../../img/hinh\ nen\ powerpoint.webp); */
+    background-image: url(../../../../public//moon.jpg);
     background-repeat: no-repeat;
     background-size: cover;
+    background-position: top;
     --tw-bg-opacity: 0;
 }
 
@@ -107,7 +108,7 @@
 .typing-text {
     overflow: hidden;
     /* Để ẩn phần văn bản vượt ra ngoài khi typing */
-    border-right: .15em solid rgb(0, 0, 0);
+    border-right: .15em solid rgb(255, 255, 255);
     /* Viền để làm dấu nháy */
     white-space: nowrap;
     /* Để ngăn chặn văn bản xuống dòng */
@@ -132,6 +133,6 @@
     }
 
     50% {
-        border-color: rgb(0, 0, 0)
+        border-color: rgb(255, 255, 255)
     }
 }
