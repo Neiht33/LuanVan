@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './homepage.css';
 import { Route, Routes } from 'react-router-dom';
 // import SpeedDial from '../components/User/SpeedDial/speedDial.js';
@@ -12,22 +12,51 @@ import Customer from '../Customer/customer';
 
 
 export default function Admin() {
-    // const [openSpeedDial, setOpenSpeedDial] = React.useState(false)
+    const [account, setAccount] = useState([])
+    const [product, setProduct] = useState([])
+    const [order, setOrder] = useState([]);
 
-    // const handleScroll = () => {
-    //     if ((window.scrollY > window.innerHeight)) {
-    //         setOpenSpeedDial(true)
-    //     } else {
-    //         setOpenSpeedDial(false)
-    //     }
-    // }
+    useEffect(() => {
+        getApiAccount()
+        getAPIProduct()
+        getApiOrder()
+    }, [])
 
-    // React.useEffect(() => {
-    //     window.addEventListener(
-    //         "scroll",
-    //         () => handleScroll(),
-    //     );
-    // }, []);
+    const getApiAccount = async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/account`);
+            const data = await response.json();
+            if (data) {
+                setAccount(data)
+            }
+        } catch (error) {
+            console.log('Đã xảy ra lỗi:', error);
+        }
+    }
+
+    const getAPIProduct = async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/products`);
+            const data = await response.json();
+            if (data) {
+                setProduct(data.reverse());
+            }
+        } catch (error) {
+            console.log('Đã xảy ra lỗi:', error);
+        }
+    }
+
+    const getApiOrder = async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/order`);
+            const data = await response.json();
+            if (data) {
+                setOrder(data)
+            }
+        } catch (error) {
+            console.log('Đã xảy ra lỗi:', error);
+        }
+    }
 
     return (
         <div className="Admin">
@@ -42,10 +71,10 @@ export default function Admin() {
                         </Col>
                         <Col className="px-8" xl={{ span: 24, offset: 0 }}>
                             <Routes>
-                                <Route path='/' element={<Dashboard />} />
-                                <Route path='/Order' element={<Order />} />
-                                <Route path='/Product/*' element={<Product />} />
-                                <Route path='/Customer' element={<Customer />} />
+                                <Route path='/' element={<Dashboard account={account} product={product.length} order={order.length} />} />
+                                <Route path='/Order' element={<Order getApiOrder={getApiOrder} order={order} />} />
+                                <Route path='/Product/*' element={<Product product={product} getAPIProduct={getAPIProduct} />} />
+                                <Route path='/Customer' element={<Customer account={account} />} />
                             </Routes>
                         </Col>
                     </Row>

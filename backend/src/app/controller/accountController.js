@@ -15,7 +15,7 @@ class accountController {
     async findAccountByPhone(req, res) {
         let phone = req.query.phone
         let password = req.query.password
-        let account = await customerService.findOneByPhone(phone)
+        let account = await customerService.findOneByPhoneHadAccount(phone)
         if (account[0]) {
             bcrypt.compare(password, account[0].password, function (err, result) {
                 account[0].password = ''

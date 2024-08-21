@@ -14,7 +14,7 @@ import {
     CardBody,
     Breadcrumbs,
 } from '@material-tailwind/react';
-import { Flex, InputNumber, ConfigProvider, Col, Row, notification, Space } from 'antd';
+import { Flex, InputNumber, ConfigProvider, Col, Row, notification, Space, Rate } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 
@@ -27,9 +27,12 @@ export default function ProductDetail({ language, getApiCartDetail }) {
     const [supportImg, setSupportImg] = useState([])
     const [active, setActive] = useState("");
     const [quantity, setQuantity] = useState(1);
+    const [feedback, setFeedback] = useState([]);
+    const [displayImg, setDisplayImg] = useState(3)
 
     useLayoutEffect(() => {
-        getApiProductByID(id.match(/[^-]*$/))
+        getApiProductByID(id.match(/[^-]*$/)[0])
+        getApiProductFeedback(id.match(/[^-]*$/)[0])
     }, [id])
 
     useEffect(() => {
@@ -64,7 +67,20 @@ export default function ProductDetail({ language, getApiCartDetail }) {
             const response = await fetch(`http://localhost:8080/api/products/supportImg/${id}`);
             const data = await response.json();
             if (data) {
+                if (data.length == 0 || data.length == 1) setDisplayImg(2)
                 setSupportImg(data)
+            }
+        } catch (error) {
+            console.log('Đã xảy ra lỗi:', error);
+        }
+    }
+
+    const getApiProductFeedback = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/rated/productID/${id}`);
+            const data = await response.json();
+            if (data) {
+                setFeedback(data)
             }
         } catch (error) {
             console.log('Đã xảy ra lỗi:', error);
@@ -142,14 +158,14 @@ export default function ProductDetail({ language, getApiCartDetail }) {
     const settings = {
         dots: false,
         speed: 200,
-        slidesToShow: 3,
+        slidesToShow: displayImg,
         slidesToScroll: 1,
         cssEase: "linear", // Đảm bảo rằng cssEase được đặt thành "linear"
         responsive: [
             {
                 breakpoint: 1024,
                 settings: {
-                    slidesToShow: 3,
+                    slidesToShow: displayImg,
                     slidesToScroll: 1,
                     infinite: true,
                     dots: false
@@ -158,7 +174,7 @@ export default function ProductDetail({ language, getApiCartDetail }) {
             {
                 breakpoint: 600,
                 settings: {
-                    slidesToShow: 2,
+                    slidesToShow: displayImg,
                     slidesToScroll: 1,
                     initialSlide: 2
                 }
@@ -166,12 +182,14 @@ export default function ProductDetail({ language, getApiCartDetail }) {
             {
                 breakpoint: 480,
                 settings: {
-                    slidesToShow: 1,
+                    slidesToShow: displayImg,
                     slidesToScroll: 1
                 }
             }
         ]
     };
+
+    console.log(supportImg);
 
     return (
         <>
@@ -205,7 +223,7 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                                 alt=""
                             />
                         </div>
-                        <div className="flex justify-center gap-4">
+                        <div className="flex justify-center">
                             <Slider {...settings} className='flex justify-center' style={{ margin: '40px', width: '600px' }} >
                                 <div>
                                     <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -242,9 +260,9 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                     <Typography className='mb-6 font-medium' variant="h2">{product.name}</Typography>
                     <div className='product-rate mb-6 flex items-center'>
                         <svg className='mr-2' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#ffeb0f" d="m7.625 6.4l2.8-3.625q.3-.4.713-.587T12 2t.863.188t.712.587l2.8 3.625l4.25 1.425q.65.2 1.025.738t.375 1.187q0 .3-.088.6t-.287.575l-2.75 3.9l.1 4.1q.025.875-.575 1.475t-1.4.6q-.05 0-.55-.075L12 19.675l-4.475 1.25q-.125.05-.275.063T6.975 21q-.8 0-1.4-.6T5 18.925l.1-4.125l-2.725-3.875q-.2-.275-.288-.575T2 9.75q0-.625.363-1.162t1.012-.763z"></path></svg>
-                        <span className='product-rate__score font-bold'>4/5</span>
+                        <span className='product-rate__score font-bold'>{feedback.length > 0 ? (feedback.reduce((total, value, index, par) => total + par[index].rate, 0) / feedback.length) : '0'}/5</span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#d1d1d1" d="M12 7a5 5 0 1 1-4.995 5.217L7 12l.005-.217A5 5 0 0 1 12 7"></path></svg>
-                        <span className='product-rate__view text-gray-500'>15 Review</span>
+                        <span className='product-rate__view text-gray-500'>{feedback.length} Review</span>
                     </div>
                     <div className='product-info mb-6 text-gray-600'>
                         <div className='mb-2 text-black flex items-center text-gray-500'>
@@ -321,15 +339,38 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                             onClick={() => setActiveTab('danhgia')}
                             className={`py-4 ${activeTab === 'danhgia' ? "text-gray-900" : ""}`}
                         >
-                            <span className='text-2xl translate-rating'>{language == 1 ? 'Đánh giá' : 'Product Rating'}</span>
+                            <span className='text-2xl translate-rating'>{language == 1 ? 'Đánh giá' : 'Product Rating'} ({feedback.length})</span>
                         </Tab>
                     </TabsHeader>
                     <TabsBody>
                         <TabPanel className='text-start product-description' key='mota' value='mota'>
-
                         </TabPanel>
                         <TabPanel key='danhgia' value='danhgia'>
-                            danhgia
+                            {feedback.map((user, index) => (
+                                <Card color="transparent" shadow={false} className="w-full">
+                                    <CardHeader
+                                        color="transparent"
+                                        floated={false}
+                                        shadow={false}
+                                        className="mx-0 flex items-center gap-4 pt-0 mb-1"
+                                    >
+                                        <div className="flex w-full flex-col gap-0.5">
+                                            <div className="flex items-center justify-between">
+                                                <Typography variant="h6" color="blue-gray">
+                                                    {user.name}
+                                                </Typography>
+
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <Rate disabled allowHalf defaultValue={user.rate} className='text-start mb-2' />
+                                    <CardBody className="mb-6 p-0">
+                                        <Typography className='text-start'>
+                                            {user.comment}
+                                        </Typography>
+                                    </CardBody>
+                                </Card>
+                            ))}
                         </TabPanel>
                     </TabsBody>
                 </Tabs>

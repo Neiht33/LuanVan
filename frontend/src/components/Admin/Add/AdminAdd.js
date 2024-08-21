@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useRef, useState } from "react";
 import axios from 'axios';
 import { Breadcrumbs, Button, Card, Input, Option, Radio, Select, Textarea, Typography, IconButton } from "@material-tailwind/react";
 import { ArrowRightIcon, ArrowLeftIcon } from "@heroicons/react/24/outline"
-import { Col, Image, notification, Row, Space, Upload } from "antd";
+import { Col, Image, notification, Pagination, Row, Space, Upload } from "antd";
 import { Link } from "react-router-dom";
 
 export function AddProduct({ setCurrentTab, getAPIProduct, openNotificationSuccess, openNotificationError }) {
@@ -363,11 +363,13 @@ export function AddCategory({ setCurrentTab }) {
             })
 
     }
+
     const getApiDataCategory = async () => {
         try {
             const response = await fetch(`http://localhost:8080/api/category`);
             const data = await response.json();
             if (data) {
+                console.log(data);
                 setOpenSkeleton(false)
                 setCategory(data);
             }
@@ -536,4 +538,98 @@ export function AddCategory({ setCurrentTab }) {
             </>
         </div>
     );
+}
+
+export function Discount({ product, getAPIProduct }) {
+
+    const TABLE_HEAD = ["Tên sản phẩm", "Danh mục", "Giá", ""];
+    const [currentPage, setCurrentPage] = useState({
+        page: 1,
+        size: 10
+    })
+
+    function formatNumber(number) {
+        // Chuyển số thành chuỗi và đảo ngược chuỗi
+        let reversedNumberString = String(number).split('').reverse().join('');
+        let formattedNumber = '';
+
+        // Thêm dấu chấm ngăn cách vào mỗi 3 ký tự
+        for (let i = 0; i < reversedNumberString.length; i++) {
+            if (i !== 0 && i % 3 === 0) {
+                formattedNumber += '.';
+            }
+            formattedNumber += reversedNumberString[i];
+        }
+
+        // Đảo ngược lại chuỗi đã được định dạng
+        return formattedNumber.split('').reverse().join('');
+    }
+
+    const onChangePagination = (pageNumber, pageSize) => {
+        setCurrentPage({
+            page: pageNumber,
+            size: pageSize
+        })
+    };
+
+    return (
+        <div className="w-full">
+            <Card className="h-full w-full overflow-scroll mt-8">
+                <table className="w-full min-w-max table-auto text-left">
+                    <thead>
+                        <tr>
+                            {TABLE_HEAD.map((head, index) => (
+                                <th key={head} className={`border-b border-blue-gray-100 bg-blue-gray-50 p-4 ${index >= 2 ? 'text-center' : ''}`}>
+                                    <Typography
+                                        variant="small"
+                                        color="blue-gray"
+                                        className="font-normal leading-none opacity-70"
+                                    >
+                                        {head}
+                                    </Typography>
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {product.map((product, index) => {
+                            if (index >= (currentPage.page * currentPage.size - currentPage.size) && index < (currentPage.page * currentPage.size)) {
+                                return (
+                                    <tr key={index} className="even:bg-blue-gray-50/50">
+                                        <td className="p-4">
+                                            <Typography variant="small" color="blue-gray" className="font-normal text-start flex justify-start items-center">
+                                                <div className='product-info_img h-full w-[50px] mr-2' >
+                                                    <img className='h-[50px] m-auto' src={`http://localhost:8080/images/${product.img}`} alt='anh' />
+                                                </div>
+                                                {product.name}
+                                            </Typography>
+                                        </td>
+                                        <td className="p-4">
+                                            <Typography variant="small" color="blue-gray" className="font-normal">
+                                                {product.categoryName}
+                                            </Typography>
+                                        </td>
+                                        <td className="p-4 text-center">
+                                            <Typography variant="small" color="blue-gray" className="font-normal">
+                                                {formatNumber(product.price)} đ
+                                            </Typography>
+                                        </td>
+                                        <td className="p-4 text-center">
+                                            <Typography as="a" href="#" variant="small" color="blue-gray" className="font-medium">
+
+                                            </Typography>
+                                        </td>
+                                    </tr>
+                                )
+                            } else
+                                if (index >= (currentPage.page * currentPage.size)) return
+                        })}
+                    </tbody>
+                </table>
+                <div className="flex justify-center">
+                    <Pagination className="py-4" showQuickJumper defaultCurrent={1} total={product.length} onChange={onChangePagination} pageSizeOptions={[10, 20, 30, 50]} />
+                </div>
+            </Card>
+        </div>
+    )
 }

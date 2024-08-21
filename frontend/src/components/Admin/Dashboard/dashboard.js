@@ -6,8 +6,67 @@ import {
 import { Col, Row } from "antd";
 import Linechart from "../Linechart/linechart";
 import Barchart from "../Barchart/barchart";
+import { useEffect, useState } from "react";
 
-export default function Dashboard() {
+export default function Dashboard({ account, product, order }) {
+
+    const [statistics, setStatistics] = useState({})
+
+    useEffect(() => {
+        getApiStatisticByDay()
+    }, [])
+
+    const getApiStatisticByDay = async () => {
+        try {
+            let response = await fetch('http://localhost:8080/api/order/statisticsByDay')
+            const data = await response.json();
+            if (data) {
+                setStatistics(data[0])
+            }
+        } catch (error) {
+            console.log('Đã xảy ra lỗi:', error);
+        }
+    }
+
+    function formatNumber(number) {
+        // Chuyển số thành chuỗi và đảo ngược chuỗi
+        let reversedNumberString = String(number).split('').reverse().join('');
+        let formattedNumber = '';
+
+        // Thêm dấu chấm ngăn cách vào mỗi 3 ký tự
+        for (let i = 0; i < reversedNumberString.length; i++) {
+            if (i !== 0 && i % 3 === 0) {
+                formattedNumber += '.';
+            }
+            formattedNumber += reversedNumberString[i];
+        }
+
+        // Đảo ngược lại chuỗi đã được định dạng
+        return formattedNumber.split('').reverse().join('');
+    }
+
+    function getDaysInCurrentMonth() {
+        // Lấy ngày hiện tại
+        const now = new Date();
+
+        // Tạo đối tượng Date cho ngày đầu tiên của tháng hiện tại
+        const firstDayOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        // Tạo đối tượng Date cho ngày đầu tiên của tháng kế tiếp
+        const firstDayOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+        // Tính số ngày trong tháng hiện tại
+        const daysInMonth = (firstDayOfNextMonth - firstDayOfCurrentMonth) / (1000 * 60 * 60 * 24);
+
+        const arrContainer = [];
+
+        for (let i = 1; i <= daysInMonth; i++) {
+            arrContainer.push(i)
+        }
+
+        return arrContainer;
+    }
+
     return (
         <Row>
             <Col xl={{ span: 24, offset: 0 }} sm={{ span: 11, offset: 1 }} xs={{ span: 12 }}>
@@ -23,7 +82,7 @@ export default function Dashboard() {
                                 Tổng khách hàng
                             </Typography>
                             <Typography variant="h5" color="blue-gray" className="mb-2">
-                                112
+                                {account.length}
                             </Typography>
                         </div>
                         <div className=" flex justify-center items-center bg-black w-[50px] h-[50px] text-3xl rounded-xl">
@@ -40,7 +99,7 @@ export default function Dashboard() {
                                 Tổng Sản Phẩm
                             </Typography>
                             <Typography variant="h5" color="blue-gray" className="mb-2">
-                                2.948
+                                {product}
                             </Typography>
                         </div>
                         <div className=" flex justify-center items-center bg-black w-[50px] h-[50px] text-3xl rounded-xl">
@@ -57,7 +116,7 @@ export default function Dashboard() {
                                 Tổng Đơn Hàng
                             </Typography>
                             <Typography variant="h5" color="blue-gray" className="mb-2">
-                                849
+                                {order}
                             </Typography>
                         </div>
                         <div className=" flex justify-center items-center bg-black w-[50px] h-[50px] text-3xl rounded-xl">
@@ -71,10 +130,10 @@ export default function Dashboard() {
                     <CardBody className="flex justify-between items-start text-start px-4">
                         <div>
                             <Typography variant="h6" className="mb-2 text-gray-500">
-                                Tổng Doanh Thu
+                                Tổng Doanh Thu Hôm Nay
                             </Typography>
                             <Typography variant="h5" color="blue-gray" className="mb-2">
-                                35.200.000
+                                {statistics ? formatNumber(statistics.total) : '0'} đ
                             </Typography>
                         </div>
                         <div className=" flex justify-center items-center bg-black w-[50px] h-[50px] text-3xl rounded-xl">
@@ -84,10 +143,10 @@ export default function Dashboard() {
                 </Card>
             </Col>
             <Col xl={{ span: 11, offset: 0 }} sm={{ span: 11, offset: 1 }} xs={{ span: 12 }}>
-                <Linechart />
+                <Linechart getDaysInCurrentMonth={getDaysInCurrentMonth} />
             </Col>
             <Col xl={{ span: 12, offset: 1 }} sm={{ span: 11, offset: 1 }} xs={{ span: 12 }}>
-                <Barchart />
+                <Barchart getDaysInCurrentMonth={getDaysInCurrentMonth} />
             </Col>
         </Row>
     );

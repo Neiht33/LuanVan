@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     Card,
     CardBody,
@@ -12,298 +12,7 @@ import {
 } from "@material-tailwind/react";
 import Chart from "react-apexcharts";
 
-const chartConfigYear = {
-    type: "line",
-    height: 240,
-    series: [
-        {
-            name: "Sales",
-            data: [500, 40, 300, 320, 500, 350, 200, 230, 500, 200, 230, 500],
-        },
-    ],
-    options: {
-        chart: {
-            toolbar: {
-                show: false,
-            },
-        },
-        title: {
-            show: "",
-        },
-        dataLabels: {
-            enabled: false,
-        },
-        colors: ["#020617"],
-        stroke: {
-            lineCap: "round",
-            curve: "smooth",
-        },
-        markers: {
-            size: 0,
-        },
 
-        xaxis: {
-            axisTicks: {
-                show: false,
-            },
-            axisBorder: {
-                show: false,
-            },
-            labels: {
-                style: {
-                    colors: "#616161",
-                    fontSize: "12px",
-                    fontFamily: "inherit",
-                    fontWeight: 400,
-                },
-            },
-            categories: [
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-                "11",
-                "12",
-            ],
-        },
-        yaxis: {
-            labels: {
-                style: {
-                    colors: "#616161",
-                    fontSize: "12px",
-                    fontFamily: "inherit",
-                    fontWeight: 400,
-                },
-            },
-        },
-        grid: {
-            show: true,
-            borderColor: "#dddddd",
-            strokeDashArray: 5,
-            xaxis: {
-                lines: {
-                    show: true,
-                },
-            },
-            padding: {
-                top: 5,
-                right: 20,
-            },
-        },
-        fill: {
-            opacity: 0.8,
-        },
-        tooltip: {
-            theme: "dark",
-        },
-    },
-};
-
-const chartConfigMonth = {
-    type: "line",
-    height: 240,
-    series: [
-        {
-            name: "Sales",
-            data: [50, 40, 300, 320, 500, 350, 200, 50, 40, 300, 320, 500, 350, 200, 50, 40, 300, 320, 500, 350, 200, 50, 40, 300, 320, 500, 350, 200, 400, 300, 275],
-        },
-    ],
-    options: {
-        chart: {
-            toolbar: {
-                show: false,
-            },
-        },
-        title: {
-            show: "",
-        },
-        dataLabels: {
-            enabled: false,
-        },
-        colors: ["#020617"],
-        stroke: {
-            lineCap: "round",
-            curve: "smooth",
-        },
-        markers: {
-            size: 0,
-        },
-
-        xaxis: {
-            axisTicks: {
-                show: false,
-            },
-            axisBorder: {
-                show: false,
-            },
-            labels: {
-                style: {
-                    colors: "#616161",
-                    fontSize: "12px",
-                    fontFamily: "inherit",
-                    fontWeight: 400,
-                },
-            },
-            categories: [
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-                "11",
-                "12",
-                "13",
-                "14",
-                "15",
-                "16",
-                "17",
-                "18",
-                "19",
-                "20",
-                "21",
-                "21",
-                "22",
-                "23",
-                "24",
-                "25",
-                "26",
-                "27",
-                "28",
-                "29",
-                "30",
-            ],
-        },
-        yaxis: {
-            labels: {
-                style: {
-                    colors: "#616161",
-                    fontSize: "12px",
-                    fontFamily: "inherit",
-                    fontWeight: 400,
-                },
-            },
-        },
-        grid: {
-            show: true,
-            borderColor: "#dddddd",
-            strokeDashArray: 5,
-            xaxis: {
-                lines: {
-                    show: true,
-                },
-            },
-            padding: {
-                top: 5,
-                right: 20,
-            },
-        },
-        fill: {
-            opacity: 0.8,
-        },
-        tooltip: {
-            theme: "dark",
-        },
-    },
-};
-
-const chartConfigWeek = {
-    type: "line",
-    height: 240,
-    series: [
-        {
-            name: "Sales",
-            data: [50, 40, 300, 320, 500, 350, 200],
-        },
-    ],
-    options: {
-        chart: {
-            toolbar: {
-                show: false,
-            },
-        },
-        title: {
-            show: "",
-        },
-        dataLabels: {
-            enabled: false,
-        },
-        colors: ["#020617"],
-        stroke: {
-            lineCap: "round",
-            curve: "smooth",
-        },
-        markers: {
-            size: 0,
-        },
-
-        xaxis: {
-            axisTicks: {
-                show: false,
-            },
-            axisBorder: {
-                show: false,
-            },
-            labels: {
-                style: {
-                    colors: "#616161",
-                    fontSize: "12px",
-                    fontFamily: "inherit",
-                    fontWeight: 400,
-                },
-            },
-            categories: [
-                "Hai",
-                "Ba",
-                "Tư",
-                "Năm",
-                "Sáu",
-                "Bảy",
-                "Chủ nhật"
-            ],
-        },
-        yaxis: {
-            labels: {
-                style: {
-                    colors: "#616161",
-                    fontSize: "12px",
-                    fontFamily: "inherit",
-                    fontWeight: 400,
-                },
-            },
-        },
-        grid: {
-            show: true,
-            borderColor: "#dddddd",
-            strokeDashArray: 5,
-            xaxis: {
-                lines: {
-                    show: true,
-                },
-            },
-            padding: {
-                top: 5,
-                right: 20,
-            },
-        },
-        fill: {
-            opacity: 0.8,
-        },
-        tooltip: {
-            theme: "dark",
-        },
-    },
-};
 
 const data = [
     {
@@ -320,8 +29,329 @@ const data = [
     }
 ];
 
-export default function Linechart() {
-    const [activeTab, setActiveTab] = React.useState("Year");
+export default function Linechart({ getDaysInCurrentMonth }) {
+    const [activeTab, setActiveTab] = useState("Year");
+
+    const [statisticsYear, setStatisticsYear] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    const [statisticsMonth, setStatisticsMonth] = useState(getDaysInCurrentMonth().map((item, index) => item = 0))
+    const [statisticsDayOfWeek, setStatisticsDayOfWeek] = useState([0, 0, 0, 0, 0, 0, 0])
+
+    useEffect(() => {
+        getApiStatisticByMonth()
+        getApiStatisticByDayOfWeek()
+        getApiStatisticByDayInMonth()
+    }, [])
+
+    const getApiStatisticByMonth = async () => {
+        try {
+            let response = await fetch('http://localhost:8080/api/order/statisticsOrderByMonth')
+            const data = await response.json();
+            if (data) {
+                const arrContainer = statisticsYear
+                data.forEach((item, index) => {
+                    arrContainer[item.month - 1] = item.quantity
+                });
+                setStatisticsYear(arrContainer)
+            }
+        } catch (error) {
+            console.log('Đã xảy ra lỗi:', error);
+        }
+    }
+
+    const getApiStatisticByDayInMonth = async () => {
+        try {
+            let response = await fetch('http://localhost:8080/api/order/statisticsOrderByDayInMonth')
+            const data = await response.json();
+            if (data) {
+                const arrContainer = statisticsMonth
+                data.forEach((item, index) => {
+                    arrContainer[item.day - 1] = item.quantity
+                });
+                setStatisticsMonth(arrContainer)
+            }
+        } catch (error) {
+            console.log('Đã xảy ra lỗi:', error);
+        }
+    }
+
+    const getApiStatisticByDayOfWeek = async () => {
+        try {
+            let response = await fetch('http://localhost:8080/api/order/statisticsOrderByDayOfWeek')
+            const data = await response.json();
+            if (data) {
+                const arrContainer = statisticsDayOfWeek
+                data.forEach((item, index) => {
+                    if (item.day != 1) {
+                        arrContainer[item.day - 2] = item.quantity
+                    } else arrContainer[6] = item.quantity
+                });
+                setStatisticsDayOfWeek(arrContainer)
+            }
+        } catch (error) {
+            console.log('Đã xảy ra lỗi:', error);
+        }
+    }
+
+    const chartConfigYear = {
+        type: "line",
+        height: 240,
+        series: [
+            {
+                name: "Sales",
+                data: statisticsYear,
+            },
+        ],
+        options: {
+            chart: {
+                toolbar: {
+                    show: false,
+                },
+            },
+            title: {
+                show: "",
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            colors: ["#020617"],
+            stroke: {
+                lineCap: "round",
+                curve: "smooth",
+            },
+            markers: {
+                size: 0,
+            },
+
+            xaxis: {
+                axisTicks: {
+                    show: false,
+                },
+                axisBorder: {
+                    show: false,
+                },
+                labels: {
+                    style: {
+                        colors: "#616161",
+                        fontSize: "12px",
+                        fontFamily: "inherit",
+                        fontWeight: 400,
+                    },
+                },
+                categories: [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7",
+                    "8",
+                    "9",
+                    "10",
+                    "11",
+                    "12",
+                ],
+            },
+            yaxis: {
+                labels: {
+                    style: {
+                        colors: "#616161",
+                        fontSize: "12px",
+                        fontFamily: "inherit",
+                        fontWeight: 400,
+                    },
+                },
+            },
+            grid: {
+                show: true,
+                borderColor: "#dddddd",
+                strokeDashArray: 5,
+                xaxis: {
+                    lines: {
+                        show: true,
+                    },
+                },
+                padding: {
+                    top: 5,
+                    right: 20,
+                },
+            },
+            fill: {
+                opacity: 0.8,
+            },
+            tooltip: {
+                theme: "dark",
+            },
+        },
+    };
+
+    const chartConfigMonth = {
+        type: "line",
+        height: 240,
+        series: [
+            {
+                name: "Sales",
+                data: statisticsMonth,
+            },
+        ],
+        options: {
+            chart: {
+                toolbar: {
+                    show: false,
+                },
+            },
+            title: {
+                show: "",
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            colors: ["#020617"],
+            stroke: {
+                lineCap: "round",
+                curve: "smooth",
+            },
+            markers: {
+                size: 0,
+            },
+
+            xaxis: {
+                axisTicks: {
+                    show: false,
+                },
+                axisBorder: {
+                    show: false,
+                },
+                labels: {
+                    style: {
+                        colors: "#616161",
+                        fontSize: "12px",
+                        fontFamily: "inherit",
+                        fontWeight: 400,
+                    },
+                },
+                categories: getDaysInCurrentMonth(),
+            },
+            yaxis: {
+                labels: {
+                    style: {
+                        colors: "#616161",
+                        fontSize: "12px",
+                        fontFamily: "inherit",
+                        fontWeight: 400,
+                    },
+                },
+            },
+            grid: {
+                show: true,
+                borderColor: "#dddddd",
+                strokeDashArray: 5,
+                xaxis: {
+                    lines: {
+                        show: true,
+                    },
+                },
+                padding: {
+                    top: 5,
+                    right: 20,
+                },
+            },
+            fill: {
+                opacity: 0.8,
+            },
+            tooltip: {
+                theme: "dark",
+            },
+        },
+    };
+
+    const chartConfigWeek = {
+        type: "line",
+        height: 240,
+        series: [
+            {
+                name: "Sales",
+                data: statisticsDayOfWeek,
+            },
+        ],
+        options: {
+            chart: {
+                toolbar: {
+                    show: false,
+                },
+            },
+            title: {
+                show: "",
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            colors: ["#020617"],
+            stroke: {
+                lineCap: "round",
+                curve: "smooth",
+            },
+            markers: {
+                size: 0,
+            },
+
+            xaxis: {
+                axisTicks: {
+                    show: false,
+                },
+                axisBorder: {
+                    show: false,
+                },
+                labels: {
+                    style: {
+                        colors: "#616161",
+                        fontSize: "12px",
+                        fontFamily: "inherit",
+                        fontWeight: 400,
+                    },
+                },
+                categories: [
+                    "Hai",
+                    "Ba",
+                    "Tư",
+                    "Năm",
+                    "Sáu",
+                    "Bảy",
+                    "Chủ nhật"
+                ],
+            },
+            yaxis: {
+                labels: {
+                    style: {
+                        colors: "#616161",
+                        fontSize: "12px",
+                        fontFamily: "inherit",
+                        fontWeight: 400,
+                    },
+                },
+            },
+            grid: {
+                show: true,
+                borderColor: "#dddddd",
+                strokeDashArray: 5,
+                xaxis: {
+                    lines: {
+                        show: true,
+                    },
+                },
+                padding: {
+                    top: 5,
+                    right: 20,
+                },
+            },
+            fill: {
+                opacity: 0.8,
+            },
+            tooltip: {
+                theme: "dark",
+            },
+        },
+    };
 
     return (
         <Card>

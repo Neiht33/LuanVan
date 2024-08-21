@@ -112,7 +112,7 @@ export default function Account({ language }) {
                     </List>
                 </Card>
             </Col>
-            <Col className="bg-white min-h-[200px] w-full rounded" xl={{ span: 17, offset: 0 }} sm={{ span: 11, offset: 1 }} xs={{ span: 12 }}>
+            <Col className="min-h-[200px] w-full rounded" xl={{ span: 17, offset: 0 }} sm={{ span: 11, offset: 1 }} xs={{ span: 12 }}>
                 <Routes>
                     <Route path="/" element={<UserProfile user={user} language={language} />} />
                     <Route path="/address" element={<UserAddress user={user} language={language} />} />

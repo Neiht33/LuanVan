@@ -726,12 +726,14 @@ export default function ProductByCategory({ language, getApiCartDetail }) {
                                                 <img className="h-full m-auto" src={`http://localhost:8080/images/${product.img}`} alt="profile-picture" />
                                             </CardHeader>
                                             <CardBody className="p-4 text-start h-[182px]">
-                                                <Typography variant="h7" color="blue-gray" className="mb-2 text-gray-600">
-                                                    {product.name}
-                                                </Typography>
-                                                <Typography variant="h5" color="red" className="font-semibold my-4" textGradient>
-                                                    {formatNumber(product.price)} đ
-                                                </Typography>
+                                                <div className="h-[112px]">
+                                                    <Typography variant="h6" color="blue-gray" className="text-gray-600 product-name">
+                                                        {product.name}
+                                                    </Typography>
+                                                    <Typography variant="h5" color="red" className="font-semibold mb-4 mt-2" textGradient>
+                                                        {formatNumber(product.price)} đ
+                                                    </Typography>
+                                                </div>
                                                 <Button color="red" className="w-[240px]" onClick={(e) => {
                                                     e.preventDefault()
                                                     if (!window.localStorage.getItem('User')) {

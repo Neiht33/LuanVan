@@ -5,7 +5,7 @@ export default function UserAddress({ language, user }) {
 
 
     return (
-        <div className="p-4">
+        <div className="p-4 bg-white">
             <div className="flex justify-between items-center pb-4" style={{ borderBottom: '1px solid #ccc' }}>
                 <Typography variant="h4" className="font-normal">
                     {language == 1 ? 'Địa Chỉ Của Tôi' : 'My Address'}

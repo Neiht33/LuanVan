@@ -4,9 +4,9 @@ class productService {
 
     findAll() {
         return new Promise((resolve, reject) => {
-            con.query(`Select c.*, count(d.category) as quantity from product d 
-                inner join category c on c.id = d.category
-                group by (d.category);`, function (error, result, fields) {
+            con.query(`Select c.*, count(c.id) as quantity from category c
+                left join product d on d.category = c.id
+                group by c.id;`, function (error, result, fields) {
                 if (error) {
                     reject(error);
                     return;

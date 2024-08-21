@@ -14,6 +14,53 @@ class orderController {
         res.json(data)
     }
 
+    async findOrderDetailByOrderID(req, res) {
+        let orderID = req.params.id
+        let data = await orderService.findOrderDetailByOrderID(orderID)
+        res.json(data)
+    }
+
+    async findOrderDetailByAccountID(req, res) {
+        let accountID = req.params.id
+        let data = await orderService.findOrderDetailByAccountID(accountID)
+        res.json(data)
+    }
+
+    async statisticsByDay(req, res) {
+        let data = await orderService.statisticsByDay()
+        res.json(data)
+    }
+
+    async statisticsByMonth(req, res) {
+        let data = await orderService.statisticsByMonth()
+        res.json(data)
+    }
+
+    async statisticsByDayInMonth(req, res) {
+        let data = await orderService.statisticsByDayInMonth()
+        res.json(data)
+    }
+
+    async statisticsOrderByMonth(req, res) {
+        let data = await orderService.statisticsOrderByMonth()
+        res.json(data)
+    }
+
+    async statisticsOrderByDayInMonth(req, res) {
+        let data = await orderService.statisticsOrderByDayInMonth()
+        res.json(data)
+    }
+
+    async statisticsByDayOfWeek(req, res) {
+        let data = await orderService.statisticsByDayOfWeek()
+        res.json(data)
+    }
+
+    async statisticsOrderByDayOfWeek(req, res) {
+        let data = await orderService.statisticsOrderByDayOfWeek()
+        res.json(data)
+    }
+
     async create(req, res) {
         let order = req.body
         if (order) {
@@ -28,6 +75,12 @@ class orderController {
             await cartService.deleteCartDetail(cartID[0].id)
             res.json(result)
         } else res.json('Thất bại')
+    }
+
+    async updateStatus(req, res) {
+        let order = req.body
+        let data = await orderService.updateStatus(order.orderID, order.status, order.paymentStatus)
+        res.json(data)
     }
 }
 

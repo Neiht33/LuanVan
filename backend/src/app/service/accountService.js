@@ -4,7 +4,12 @@ class accountService {
 
     findAll() {
         return new Promise((resolve, reject) => {
-            con.query(`Select a.*, c.*  from account a inner join customer c on c.id = a.customerID;`, function (error, result, fields) {
+            con.query(`select count(a.id) as quantity, a.date, c.*, o.accountID, d.district, t.city from orderproduct o
+                right join account a on a.id = o.accountID
+                inner join customer c on c.id = a.customerID
+                inner join addressdistrict d on d.id = c.districtID
+                inner join addresscity t on t.id = d.cityID
+                group by a.id;`, function (error, result, fields) {
                 if (error) {
                     reject(error);
                     return;
@@ -53,6 +58,18 @@ class accountService {
     getDistrictFromCity(id) {
         return new Promise((resolve, reject) => {
             con.query(`Select * from addressdistrict a where a.cityID = ${id} order by district;`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
+    deleteAccount(productID, cartID) {
+        return new Promise((resolve, reject) => {
+            con.query(`Delete from cartdetail where productID = ${productID} and cartID = ${cartID};`, function (error, result, fields) {
                 if (error) {
                     reject(error);
                     return;

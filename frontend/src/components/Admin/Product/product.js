@@ -3,14 +3,13 @@ import { Breadcrumbs, Button, ButtonGroup, Dialog, DialogBody, DialogFooter, Dia
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import img1 from '../../../img/bearbrick.png'
 import { Link } from "react-router-dom";
-import { AddCategory, AddProduct } from "../Add/AdminAdd";
+import { AddCategory, AddProduct, Discount } from "../Add/AdminAdd";
 
-export default function Product() {
+export default function Product({ product, getAPIProduct }) {
     const TABLE_HEAD = ["Tên sản phẩm", "Danh mục", "Giá", "Đã bán", "Số lượng tồn kho", ""];
     const [api, contextHolder] = notification.useNotification();
     const [openDelete, setOpenDelete] = useState(false);
     const [currentTab, setCurrentTab] = useState('AllProduct')
-    const [product, setProduct] = useState([])
     const [currentPage, setCurrentPage] = useState({
         page: 1,
         size: 10
@@ -19,18 +18,6 @@ export default function Product() {
     useLayoutEffect(() => {
         getAPIProduct()
     }, [])
-
-    const getAPIProduct = async () => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/products`);
-            const data = await response.json();
-            if (data) {
-                setProduct(data.reverse());
-            }
-        } catch (error) {
-            console.log('Đã xảy ra lỗi:', error);
-        }
-    }
 
     function formatNumber(number) {
         // Chuyển số thành chuỗi và đảo ngược chuỗi
@@ -83,7 +70,7 @@ export default function Product() {
                 <ButtonGroup variant="outlined" fullWidth>
                     <Button onClick={() => setCurrentTab('AddProduct')}>THÊM SẢN PHẨM</Button>
                     <Button onClick={() => setCurrentTab('AddCategory')}>THÊM DANH MỤC</Button>
-                    <Button color="black" variant="filled">GIẢM GIÁ</Button>
+                    <Button onClick={() => setCurrentTab('Discount')} color="black" variant="filled">GIẢM GIÁ</Button>
                 </ButtonGroup>
             </Col>
             {(currentTab == 'AllProduct') && <>
@@ -134,7 +121,7 @@ export default function Product() {
                                             </td>
                                             <td className="p-4 text-center">
                                                 <Typography as="a" href="#" variant="small" color="blue-gray" className="font-medium">
-                                                    {product.quantity}
+                                                    {product.wareHouse}
                                                 </Typography>
                                             </td>
                                             <td className="p-4 text-center">
@@ -156,6 +143,7 @@ export default function Product() {
             </>}
             {(currentTab == 'AddProduct') && <AddProduct setCurrentTab={setCurrentTab} getAPIProduct={getAPIProduct} openNotificationSuccess={openNotificationSuccess} openNotificationError={openNotificationError} />}
             {(currentTab == 'AddCategory') && <AddCategory setCurrentTab={setCurrentTab} />}
+            {(currentTab == 'Discount') && <Discount setCurrentTab={setCurrentTab} product={product} getAPIProduct={getAPIProduct} />}
             <>
                 {contextHolder}
                 <Space>

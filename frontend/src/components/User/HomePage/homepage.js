@@ -4,9 +4,7 @@ import { Carousel, Typography, Button } from "@material-tailwind/react";
 import { Link } from 'react-router-dom';
 import CardMain from '../Card/Card.js'
 import img1 from '../../../img/homepage.png'
-import img2 from '../../../img/mbti.jpg'
 import img3 from '../../../img/bearbrick.png'
-import { calc } from 'antd/es/theme/internal.js';
 
 export function HomePage({ language }) {
 
@@ -164,9 +162,6 @@ export function HomePage({ language }) {
       <div className='min-h-screen'>
         <h1 className='hotProduct-title mb-5 py-20 '>DANH MỤC ĐỒ CHƠI</h1>
         <CardMain language={language} />
-      </div>
-      <div className='introduce3 w-full bg-white my-5 over flex justify-end'>
-        <img className='introduce3-img' src={img2} alt='img' />
       </div>
     </div>
   );

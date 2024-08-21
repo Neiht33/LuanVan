@@ -132,7 +132,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
             .then(response => {
                 // Xử lý kết quả từ server
                 setOpen(!open)
-                getApiCartDetail()
+                getApiCartDetail(JSON.parse(window.localStorage.getItem('User')).id)
                 openNotification('success')
                 window.location.href = 'http://localhost:3000/Account/order'
             })
