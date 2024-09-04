@@ -21,8 +21,9 @@ export default function SignIn({ language }) {
     const [api, contextHolder] = notification.useNotification();
     const [city, setCity] = useState([])
     const [district, setDistrict] = useState([])
+    const [selectedCity, setSelectedCity] = useState();
     const [selectedDistrict, setSelectedDistrict] = useState();
-    const [account, setAccount] = useState();
+    const [selectedDistrictID, setSelectedDistrictID] = useState();
 
     useEffect(() => {
         getApiCity()
@@ -86,7 +87,7 @@ export default function SignIn({ language }) {
             phoneNumber: signUp_phoneNumber.value,
             address: signUp_address.value,
             password: signUp_pass.value,
-            district: selectedDistrict
+            district: selectedDistrictID
         }
 
         if (signUp_address.value == '' || signUp_name.value == '' || signUp_pass.value == '' || signUp_phoneNumber.value == '' || signUp_repass.value == '' || selectedDistrict == '') {
@@ -106,8 +107,10 @@ export default function SignIn({ language }) {
             .then(response => {
                 // Xử lý kết quả từ server
                 console.log(response.data);
-                openNotificationSuccess('success')
-                handleMoveOnIn()
+                if (response.data.checkPhone != false) {
+                    openNotificationSuccess('success')
+                    handleMoveOnIn()
+                } else openNotificationErrorCheckPhone('error')
             })
             .catch(error => {
                 // Xử lý lỗi
@@ -138,6 +141,12 @@ export default function SignIn({ language }) {
             message: 'Không thành công',
             description:
                 'Bạn chưa điền hết thông tin cần thiết.',
+        });
+    };
+
+    const openNotificationErrorCheckPhone = (type) => {
+        api[type]({
+            message: 'Số điện thoại đã được đăng ký',
         });
     };
 
@@ -183,24 +192,24 @@ export default function SignIn({ language }) {
 
     return (
         <div className='SignIn flex justify-center items-center'>
-            <Card className="w-full max-w-[50rem] h-[600px] flex-row relative overflow-hidden">
-                <CardBody style={{ display: 'none' }} className='signUp flex justify-center items-center w-full py-6 pr-0 pl-6'>
-                    <Card className="w-96" style={{ boxShadow: 'none' }}>
+            <Card className="w-full md:max-w-[50rem] md:h-[600px] flex-row relative overflow-hidden">
+                <CardBody style={{ display: 'none' }} className='signUp flex justify-center items-center w-full py-6 pr-0 sm:pl-6 pl-0'>
+                    <Card className="md:w-96" style={{ boxShadow: 'none' }}>
                         <Typography className='translate-signUp_title' variant="h3">
                             {language == 1 ? 'Đăng Ký' : 'Sign Up'}
                         </Typography>
                         <CardBody className="p-0 flex flex-col gap-4">
                             <Input className='signUp_name' variant="standard" label={language == 1 ? 'Họ và tên' : 'Full name'} size="lg" required />
-                            <Select className='' variant="standard" label={language == 1 ? 'Tỉnh / Thành phố' : 'Province / City'}>
+                            <Select className='' variant="standard" selected={() => selectedCity} onChange={setSelectedCity} label={language == 1 ? 'Tỉnh / Thành phố' : 'Province / City'}>
                                 {city.map((item, index) =>
-                                    <Option key={index} onClick={() => {
+                                    <Option value={item.city} key={index} onClick={() => {
                                         getApiDistrict(item.id)
                                     }}>{item.city}</Option>
                                 )}
                             </Select>
-                            <Select onChange={setSelectedDistrict} className='district-selected' variant="standard" label={language == 1 ? 'Quận / Huyện' : 'District'}>
+                            <Select onChange={setSelectedDistrict} selected={() => selectedDistrict} className='district-selected' variant="standard" label={language == 1 ? 'Quận / Huyện' : 'District'}>
                                 {district.map((item, index) =>
-                                    <Option value={`${item.id}`} key={index}>{item.district}</Option>
+                                    <Option value={item.district} key={index} onClick={() => setSelectedDistrictID(item.id)}>{item.district}</Option>
                                 )}
                             </Select>
                             <Input className='signUp_address' variant="standard" label={language == 1 ? 'Địa chỉ (Xã, Thị trấn, Đường, Số nhà)' : 'Address (Town, street, house number)'} size="lg" required />
@@ -237,7 +246,7 @@ export default function SignIn({ language }) {
                     style={{ height: '545px' }}
                 />
                 <CardBody className='signIn flex justify-center items-center w-full'>
-                    <Card className="w-96" style={{ boxShadow: 'none' }}>
+                    <Card className="md:w-96" style={{ boxShadow: 'none' }}>
                         <Typography className='translate-signIn_title' variant="h3">
                             {language == 1 ? 'Đăng Nhập' : 'Sign In'}
                         </Typography>
@@ -270,7 +279,7 @@ export default function SignIn({ language }) {
                 <div
                     shadow={false}
                     floated={false}
-                    className='imgMove h-full'>
+                    className='imgMove md:w-[350px] w-[200px] h-full'>
                     <img
                         src={img}
                         alt="card-image"

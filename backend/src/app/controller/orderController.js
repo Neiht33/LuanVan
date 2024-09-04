@@ -69,12 +69,24 @@ class orderController {
             let newOrder = await orderService.findNewOrderByAccount(order.accountID)
             let cartID = await cartService.findOneByAccountID(order.accountID)
             product.forEach(async (item, index) => {
-                await orderService.createOrderDetail(newOrder[0].max, item.id, item.quantityCurrent)
-                await productService.updateQuantityProduct(item.quantityCurrent, item.id)
+                await orderService.createOrderDetail(newOrder[0].max, item.id, item.quantityCurrent, item.discount)
+                await productService.updateQuantityProductReduce(item.quantityCurrent, item.id)
             });
             await cartService.deleteCartDetail(cartID[0].id)
             res.json(result)
         } else res.json('Thất bại')
+    }
+
+    async cancelOrder(req, res) {
+        let order = req.body
+        let product = await orderService.findOrderDetailByAccountID(order.accountID)
+        product.forEach(async (item, index) => {
+            if (item.orderID == order.orderID) {
+                await productService.updateQuantityProductAdd(item.quantityCurrent, item.id)
+            }
+        });
+        let data = await orderService.updateStatus(order.orderID, order.status)
+        res.json(data)
     }
 
     async updateStatus(req, res) {

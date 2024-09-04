@@ -16,6 +16,7 @@ router.get('/statisticsOrderByDayInMonth', orderController.statisticsOrderByDayI
 router.get('/statisticsByDayOfWeek', orderController.statisticsByDayOfWeek)
 router.get('/statisticsOrderByDayOfWeek', orderController.statisticsOrderByDayOfWeek)
 router.put('/update', orderController.updateStatus)
+router.put('/cancel', orderController.cancelOrder)
 router.post('/', orderController.create)
 // router.delete('/:id', orderController.delete)
 

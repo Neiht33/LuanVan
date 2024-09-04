@@ -16,9 +16,9 @@ class productService {
         })
     }
 
-    create(name, group) {
+    create(name, group, img) {
         return new Promise((resolve, reject) => {
-            con.query(`INSERT INTO category(name, category.group) VALUES ('${name}', ${group});`, function (error, result, fields) {
+            con.query(`INSERT INTO category(name, category.group) VALUES ('${name}', ${group}, '${img}');`, function (error, result, fields) {
                 if (error) {
                     reject(error);
                     return;

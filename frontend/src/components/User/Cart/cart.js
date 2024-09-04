@@ -10,10 +10,11 @@ import {
     DialogFooter,
     Card
 } from "@material-tailwind/react";
-import { Col, Row, Flex, InputNumber, ConfigProvider, notification, Space, } from 'antd';
+import { Col, Row, Flex, InputNumber, ConfigProvider, notification, Space, Result, } from 'antd';
 import img1 from '../../../img/bearbrick.png'
 import { format } from 'date-fns-tz';
 import axios from 'axios';
+import Paypal from '../Paypal/paypal';
 
 export default function Cart({ language, cartDetail, getApiCartDetail }) {
 
@@ -114,14 +115,14 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
             });
     }
 
-    const handleOrderSubmit = () => {
+    const handleOrderSubmit = (paymentStatus) => {
 
         const formOrderSubmit = {
             total: cartDetail[0].totalFinal,
             statusID: 1,
             paymentMethod: methodPay,
             accountID: user.id,
-            paymentStatus: 0
+            paymentStatus: paymentStatus
         }
 
         axios.post(`http://localhost:8080/api/order/`, formOrderSubmit, {
@@ -161,42 +162,46 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                     {language == 1 ? 'Giỏ Hàng Của Bạn' : 'Your Cart'}
                 </Typography>
             </div>
-            <Row className='Cart-body px-8'>
-                <Col className='Cart-detail' xl={{ span: 16, offset: 0 }}>
+            {cartDetail.length != 0 && <Row className='Cart-body px-8'>
+                <Col className='Cart-detail' xl={{ span: 16, offset: 0 }} sm={{ span: 24, offset: 0 }}>
                     <div className='Cart-detail_container'>
-                        <Row className='Cart-detail_title'>
-                            <Col className='text-start' xl={{ span: 12, offset: 0 }}>
+                        <Row className='Cart-detail_title hidden md:flex'>
+                            <Col className='text-start' xl={{ span: 10, offset: 0 }} sm={{ span: 9, offset: 0 }}>
                                 {language == 1 ? 'SẢN PHẨM' : 'Product'}
                             </Col>
-                            <Col className='text-center' xl={{ span: 3, offset: 0 }}>
+                            <Col className='text-center' xl={{ span: 5, offset: 0 }} sm={{ span: 6, offset: 0 }}>
                                 {language == 1 ? 'Giá' : 'Price'}
                             </Col>
-                            <Col className='text-center' xl={{ span: 4, offset: 0 }}>
+                            <Col className='text-center' xl={{ span: 4, offset: 0 }} sm={{ span: 4, offset: 0 }}>
                                 {language == 1 ? 'Số lượng' : 'Quantity'}
                             </Col>
-                            <Col className='text-center' xl={{ span: 3, offset: 0 }}>
+                            <Col className='text-center' xl={{ span: 3, offset: 0 }} sm={{ span: 3, offset: 0 }}>
                                 {language == 1 ? 'Tổng cộng' : 'Total Price'}
                             </Col>
-                            <Col className='text-center' xl={{ span: 2, offset: 0 }}>
+                            <Col className='text-center' xl={{ span: 2, offset: 0 }} sm={{ span: 2, offset: 0 }}>
                             </Col>
                         </Row>
-                        <div className='Cart-detail_product'>
+                        <div className='Cart-detail_product sm:bg-transparent bg-white py-4'>
                             {cartDetail.map((item, index) => (
                                 <Row key={index} className='flex items-center my-8' style={{ height: '120px' }}>
-                                    <Col className='text-start w-full' xl={{ span: 12, offset: 0 }}>
+                                    <Col className='text-start w-full sm:border-0 border-t-2 border-t-gray-500' xl={{ span: 10, offset: 0 }} sm={{ span: 9, offset: 0 }} xs={{ span: 24, offset: 0 }}>
                                         <div className='product-info flex items-center'>
                                             <div className='product-info_img h-[100px] bg-white w-[100px] mr-4 p-1'>
                                                 <img className='w-full h-full m-auto' src={`http://localhost:8080/images/${item.img}`} alt='anh' />
                                             </div>
-                                            <Typography className='font-normal w-9/12' variant="h5">
+                                            <Typography className='font-normal w-9/12' variant="h6">
                                                 {item.name}
                                             </Typography>
                                         </div>
                                     </Col>
-                                    <Col className='text-center text-base' xl={{ span: 3, offset: 0 }}>
-                                        {formatNumber(item.price)} đ
+                                    <Col className='text-center text-base' xl={{ span: 5, offset: 0 }} sm={{ span: 6, offset: 0 }} xs={{ span: 0, offset: 0 }}>
+                                        <div className='text-center text-base flex items-center justify-center'>
+                                            {item.discount > 0 ? <div className='font-normal line-through mr-2 text-gray-500'>{formatNumber(item.price)} đ</div> : ''}
+                                            {formatNumber(Math.floor((item.price - (item.price * item.discount) / 100) / 1000) * 1000)} đ
+                                        </div>
+                                        {item.discount > 0 ? <span className='text-sm' style={{ color: 'red' }}>Giảm giá {item.discount}%</span> : ''}
                                     </Col>
-                                    <Col className='flex justify-center' xl={{ span: 4, offset: 0 }}>
+                                    <Col className='flex justify-center' xl={{ span: 4, offset: 0 }} sm={{ span: 4, offset: 0 }} xs={{ span: 8, offset: 5 }}>
                                         <ConfigProvider
                                             theme={{
                                                 components: {
@@ -209,21 +214,21 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                                             }}
                                         >
                                             <Flex vertical gap={12} >
-                                                <InputNumber min={1} max={item.quantity} defaultValue={item.quantityCurrent} onChange={(event) => {
+                                                <InputNumber min={1} max={item.wareHouse} defaultValue={item.quantityCurrent} onChange={(event) => {
                                                     formSubmit.current = {
                                                         ...formSubmit.current,
                                                         productID: item.id,
-                                                        price: item.price
+                                                        price: Math.floor((item.price - (item.price * item.discount) / 100) / 1000) * 1000
                                                     }
                                                     handleChangeQuantity(event)
                                                 }} />
                                             </Flex>
                                         </ConfigProvider>
                                     </Col>
-                                    <Col className='text-center text-base' xl={{ span: 3, offset: 0 }}>
+                                    <Col className='text-center text-base' xl={{ span: 3, offset: 0 }} sm={{ span: 3, offset: 0 }} xs={{ span: 8, offset: 1 }}>
                                         {formatNumber(item.total)} đ
                                     </Col>
-                                    <Col className='flex justify-center cursor-pointer' xl={{ span: 2, offset: 0 }} onClick={() => handleDeleteItemCart(item.id, JSON.parse(window.localStorage.getItem('User')).id)}>
+                                    <Col className='flex justify-center cursor-pointer' xl={{ span: 2, offset: 0 }} sm={{ span: 2, offset: 0 }} xs={{ span: 2, offset: 0 }} onClick={() => handleDeleteItemCart(item.id, JSON.parse(window.localStorage.getItem('User')).id)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 14 14"><path fill="#1f1f1f" fillRule="evenodd" d="M1.707.293A1 1 0 0 0 .293 1.707L5.586 7L.293 12.293a1 1 0 1 0 1.414 1.414L7 8.414l5.293 5.293a1 1 0 0 0 1.414-1.414L8.414 7l5.293-5.293A1 1 0 0 0 12.293.293L7 5.586z" clipRule="evenodd"></path></svg>
                                     </Col>
                                 </Row>
@@ -257,7 +262,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                         </div>
                     </div>
                 </Col>
-                <Col className='Cart-bill bg-white rounded px-4' xl={{ span: 7, offset: 1 }}>
+                <Col className='Cart-bill bg-white rounded px-4' xl={{ span: 7, offset: 1 }} sm={{ span: 24 }}>
                     <Typography className='font-normal my-8' variant="h5">
                         {language == 1 ? 'THÔNG TIN THANH TOÁN' : 'Payment Info.'}
                     </Typography>
@@ -340,7 +345,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                     </div>
                     <div className='pb-4'>
                         <>
-                            <Button onClick={handleOpen} color="blue" className='w-[300px] text-base' size='lg' variant="filled">
+                            <Button onClick={handleOpen} color="blue" className='w-full text-base' size='lg' variant="filled">
                                 {language == 1 ? 'Mua ngay' : 'Check out'}
                             </Button>
                             <Dialog open={open} handler={handleOpen} className='px-4'>
@@ -418,7 +423,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                                                         </td>
                                                         <td className="p-4 text-center">
                                                             <Typography variant="small" color="blue-gray" className="font-normal">
-                                                                {formatNumber(item.price)}
+                                                                {formatNumber(Math.floor((item.price - (item.price * item.discount) / 100) / 1000) * 1000)}
                                                             </Typography>
                                                         </td>
                                                         <td className="p-4 text-center">
@@ -477,15 +482,29 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                                     >
                                         <span>{language == 1 ? 'Hủy' : 'Cancel'}</span>
                                     </Button>
-                                    <Button className='w-[200px] text-base' color='blue' size='lg' variant="filled" onClick={handleOrderSubmit}>
+                                    {methodPay == 1 ? <Button className='w-[200px] text-base' color='blue' size='lg' variant="filled" onClick={() => handleOrderSubmit(0)}>
                                         <span>{language == 1 ? 'Đặt hàng' : 'Confirm'}</span>
-                                    </Button>
+                                    </Button> : <Paypal amount={cartDetail[0] ? Math.floor(cartDetail[0].totalFinal / 23500) : 0} payload={handleOrderSubmit} />}
                                 </DialogFooter>
                             </Dialog>
                         </>
                     </div>
                 </Col>
-            </Row>
+            </Row>}
+            {cartDetail.length == 0 && <div className=''>
+                <Result
+                    className='py-0 px-[48px]'
+                    status="404"
+                    title={language == 1 ? 'Giỏ Hàng Của Bạn Đang Trống' : 'Your Shopping Cart Is Empty'}
+                    extra={<Button className='w-60 h-14 my-4' type="primary" color='blue' onClick={() => window.location.href = 'http://localhost:3000/Product'}>
+                        <div className=' flex justify-center items-center text-lg'>
+                            <svg className='text-2xl mr-4' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#ffffff" d="m7.825 13l5.6 5.6L12 20l-8-8l8-8l1.425 1.4l-5.6 5.6H20v2z"></path></svg>
+                            Mua sắm ngay
+                        </div>
+                    </Button>}
+                />
+            </div>}
+
             <>
                 {contextHolder}
                 <Space className="hidden">

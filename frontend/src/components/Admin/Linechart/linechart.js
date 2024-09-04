@@ -363,7 +363,7 @@ export default function Linechart({ getDaysInCurrentMonth }) {
             >
                 <div className="flex justify-between items-center w-full">
                     <Typography variant="h6" color="blue-gray">
-                        Đơn Đặt Hàng
+                        Đơn Hàng
                     </Typography>
                     <Tabs value="Year">
                         <TabsHeader

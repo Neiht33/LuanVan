@@ -57,6 +57,20 @@ class customerService {
         })
     }
 
+    updateCustomer(customerID, phoneNumber, name, newPhoneNumber, districtID, address) {
+        return new Promise((resolve, reject) => {
+            con.query(`Update customer
+                Set name = '${name}', phoneNumber = '${newPhoneNumber}', address = '${address}', districtID = ${districtID}
+                where id = '${customerID}';`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
 }
 
 module.exports = new customerService()

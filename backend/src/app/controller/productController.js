@@ -13,10 +13,34 @@ class productController {
         res.json(data)
     }
 
+    async findBySeekAdminPage(req, res) {
+        let seek = req.query.seek
+        let data = await productService.findBySeekAdminPage(seek)
+        res.json(data)
+    }
+
+    async findBySeekPage(req, res) {
+        let seek = req.query.seek
+        let page = Number(req.query.page)
+        let data = await productService.findBySeekPage(seek, page * 12 - 11, page * 12)
+        let total = await productService.findBySeekAdminPage(seek)
+        if (data[0]) {
+            data[0].total = total.length
+        }
+        res.json(data)
+    }
+
     async findByCategoryID(req, res) {
         let id = Number(req.query.id)
         let page = Number(req.query.page)
         let data = await productService.findByCategoryID(id, page * 12 - 11, page * 12)
+        res.json(data)
+    }
+
+    async findByCategoryIDSeek(req, res) {
+        let id = Number(req.query.id)
+        let page = Number(req.query.page)
+        let data = await productService.findByCategoryIDSeek(req.query.seek, id, page * 12 - 11, page * 12)
         res.json(data)
     }
 
@@ -29,8 +53,8 @@ class productController {
         let age = Number(req.query.age)
         let gender = Number(req.query.gender)
         let page = Number(req.query.page)
-        let data = await productService.findByCategoryFilter(price1, price2, age, gender, Number(req.query.categoryID), page * 12 - 11, page * 12)
-        let total = await productService.getTotalByFilter(price1, price2, age, gender, Number(req.query.categoryID))
+        let data = await productService.findByCategoryFilter(price1, price2, age, gender, req.query.seek, Number(req.query.categoryID), page * 12 - 11, page * 12)
+        let total = await productService.getTotalByCategoryFilter(price1, price2, age, gender, req.query.seek, Number(req.query.categoryID))
         if (data.length != 0) {
             data[0] = {
                 ...data[0],
@@ -49,8 +73,8 @@ class productController {
         let age = Number(req.query.age)
         let gender = Number(req.query.gender)
         let page = Number(req.query.page)
-        let data = await productService.findByFilter(price1, price2, age, gender, page * 12 - 11, page * 12)
-        let total = await productService.getTotalByFilter(price1, price2, age, gender)
+        let data = await productService.findByFilter(price1, price2, age, gender, req.query.seek, page * 12 - 11, page * 12)
+        let total = await productService.getTotalByFilter(price1, price2, age, gender, req.query.seek)
         if (data.length != 0) {
             data[0] = {
                 ...data[0],
@@ -70,6 +94,11 @@ class productController {
         let id = req.params.id
         let data = await productService.findSupportImg(id)
         res.json(data)
+    }
+
+    async findProductDiscount(req, res) {
+        let data = await productService.findProductDiscount()
+        res.json(data.filter((product, index) => index < 10))
     }
 
     async create(req, res) {
@@ -96,6 +125,12 @@ class productController {
             }
             res.json(result)
         } else res.json('Thất bại')
+    }
+
+    async updateDiscount(req, res) {
+        let product = req.body
+        let data = await productService.updateDiscount(product.id, product.discount)
+        res.json(data)
     }
 }
 

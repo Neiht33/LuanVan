@@ -62,6 +62,7 @@
 
     100% {
         transform: translateX(151%);
+        ;
         border-top-right-radius: 10px;
         border-bottom-right-radius: 10px;
     }

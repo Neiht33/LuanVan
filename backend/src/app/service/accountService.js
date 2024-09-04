@@ -9,7 +9,24 @@ class accountService {
                 inner join customer c on c.id = a.customerID
                 inner join addressdistrict d on d.id = c.districtID
                 inner join addresscity t on t.id = d.cityID
+                where a.level = 1
                 group by a.id;`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
+    findByAccountID(accountID) {
+        return new Promise((resolve, reject) => {
+            con.query(`select a.date, c.*, d.district, t.city, t.id as cityID from account a
+                inner join customer c on c.id = a.customerID
+                inner join addressdistrict d on d.id = c.districtID
+                inner join addresscity t on t.id = d.cityID
+                where a.id = ${accountID};`, function (error, result, fields) {
                 if (error) {
                     reject(error);
                     return;

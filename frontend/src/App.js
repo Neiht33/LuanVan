@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import './App.css';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import Nav from './components/User/Nav/nav.js';
 import { Footer } from './components/User/Footer/footer.js';
 import { HomePage } from './components/User/HomePage/homepage';

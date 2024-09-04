@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -14,45 +14,37 @@ import { Link } from "react-router-dom";
 
 export default function Example({ language }) {
 
-  useEffect(() => {
-    const moreBtn = document.querySelectorAll('.more-btn')
-    if (language == 1) {
-      moreBtn.forEach((item) => {
-        item.textContent = 'Xem thêm'
-      },)
-    } else {
-      moreBtn.forEach((item) => {
-        item.textContent = 'More'
-      })
-    }
-  }, [language])
+  const [category, setCategory] = useState([])
 
-  const cardData = [
-    {
-      link: '/mbti/mbti/1',
-      imageSrc: "https://cdn-new.topcv.vn/unsafe/https://static.topcv.vn/v4/image/mbti/personalities/istj.png",
-      title: "ISTJ - Người Trách Nhiệm",
-      content: "Người tổ chức có trách nhiệm, biết sắp xếp trật tự",
-    },
-    {
-      link: '/mbti/mbti/2',
-      imageSrc: "https://cdn-new.topcv.vn/unsafe/https://static.topcv.vn/v4/image/mbti/personalities/isfp.png",
-      title: "ISFP - Người Nghệ Sĩ",
-      content: "Đam mê và trân trọng thực tại, biết lắng nghe và quan tâm",
-    },
-    {
-      link: '/mbti/mbti/3',
-      imageSrc: "https://cdn-new.topcv.vn/unsafe/https://static.topcv.vn/v4/image/mbti/personalities/infp.png",
-      title: "INFP - Người Lý Tưởng Hoá",
-      content: "Giàu trí tưởng tượng, đề cao giá trị và niềm tin của bản thân",
-    },
-    {
-      link: '/mbti/mbti/4',
-      imageSrc: "https://cdn-new.topcv.vn/unsafe/https://static.topcv.vn/v4/image/mbti/personalities/intj.png",
-      title: "INTJ -  Nhà Khoa Học",
-      content: "Phân tích - giải quyết vấn đề hiệu quả, có năng khiếu với cải thiện hệ thống và quy trình",
-    },
-  ];
+  useEffect(() => {
+    getApiCategory()
+  }, [])
+
+  const getApiCategory = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/category`);
+      const data = await response.json();
+      if (data) {
+        setCategory(data)
+      }
+    } catch (error) {
+      console.log('Đã xảy ra lỗi:', error);
+    }
+  }
+
+  const handleScrollUp = () => {
+    window.scrollTo({
+      top: 0
+    });
+  }
+
+  function removeVietnameseAccents(str) {
+    if (str) {
+      let withoutAccents = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      // Thay thế khoảng trắng bằng dấu gạch ngang
+      return withoutAccents.replace(/\s+/g, '-');
+    }
+  }
 
   const settings = {
     dots: false,
@@ -64,7 +56,7 @@ export default function Example({ language }) {
     cssEase: "linear", // Đảm bảo rằng cssEase được đặt thành "linear"
     responsive: [
       {
-        breakpoint: 1024,
+        breakpoint: 1280,
         settings: {
           slidesToShow: 3,
           slidesToScroll: 1,
@@ -73,7 +65,7 @@ export default function Example({ language }) {
         }
       },
       {
-        breakpoint: 600,
+        breakpoint: 1024,
         settings: {
           slidesToShow: 2,
           slidesToScroll: 1,
@@ -81,7 +73,7 @@ export default function Example({ language }) {
         }
       },
       {
-        breakpoint: 480,
+        breakpoint: 640,
         settings: {
           slidesToShow: 1,
           slidesToScroll: 1
@@ -92,16 +84,16 @@ export default function Example({ language }) {
 
 
   return (
-    <Slider {...settings} style={{ margin: '40px' }} >
-      {cardData.map((card, index) => (
+    <Slider {...settings} style={{ margin: '40px' }} className="overflow-hidden">
+      {category.map((category, index) => (
         <div key={index}>
-          <Link to={card.link} style={{ display: 'flex', justifyContent: 'center' }}>
-            <Card className="w-96 h-96">
-              <CardHeader shadow={false} floated={false} className="h-96">
+          <Link to={`http://localhost:3000/Product/${removeVietnameseAccents(category.name)}-${category.id}`} onClick={() => handleScrollUp()} style={{ display: 'flex', justifyContent: 'center' }}>
+            <Card className="max-w-96 h-96">
+              <CardHeader shadow={false} floated={false} className="h-96 w-[352px]">
                 <img
-                  src="https://images.unsplash.com/photo-1629367494173-c78a56567877?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=927&q=80"
+                  src={`http://localhost:8080/images/${category.img}`}
                   alt="card-image"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full"
                 />
               </CardHeader>
               <CardFooter className="pt-0 ">
@@ -110,13 +102,14 @@ export default function Example({ language }) {
                   fullWidth={true}
                   className="bg-blue-gray-900/10 text-blue-gray-900 shadow-none hover:scale-105 hover:shadow-none focus:scale-105 focus:shadow-none active:scale-100"
                 >
-                  <span className="more-btn">Xem thêm</span>
+                  <span className="more-btn">{category.name}</span>
                 </Button>
               </CardFooter>
             </Card>
           </Link>
         </div>
-      ))}
-    </Slider>
+      ))
+      }
+    </Slider >
   );
 }

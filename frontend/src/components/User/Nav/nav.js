@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import './nav.css'
 import {
   Navbar,
@@ -17,27 +17,20 @@ import { Link } from "react-router-dom";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 function Nav({ language, setLanguage, cartDetail }) {
-  const [openNav, setOpenNav] = React.useState(false);
-  const [openMenu, setOpenMenu] = React.useState(false);
-  const [openCart, setOpenCart] = React.useState(false);
-  const [openMenuAccount, setOpenMenuAccount] = React.useState(false);
-  const [userCurrent, setUserCurrent] = React.useState(false)
-  const [user, setUser] = React.useState({})
+  const [openNav, setOpenNav] = useState(false);
+  const [openMenu, setOpenMenu] = useState(false);
+  const [openCart, setOpenCart] = useState(false);
+  const [openMenuAccount, setOpenMenuAccount] = useState(false);
+  const [userCurrent, setUserCurrent] = useState(false)
+  const [user, setUser] = useState({})
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (window.localStorage.getItem('User')) {
       setUser(JSON.parse(window.localStorage.getItem('User')))
       setUserCurrent(true)
     }
   }, [])
 
-  React.useEffect(() => {
-    window.addEventListener(
-      "resize",
-      () => window.innerWidth >= 960 && setOpenNav(false),
-    );
-
-  }, []);
 
   function removeVietnameseAccents(str) {
     if (str) {
@@ -64,18 +57,17 @@ function Nav({ language, setLanguage, cartDetail }) {
     return formattedNumber.split('').reverse().join('');
   }
 
-  const navList = (
-    <ul className="mt-2 mb-4 flex gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6 text-sm">
+  const navList1 = (
+    <ul className="mt-2 mb-4 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6 pl-10">
       <Typography
         as="li"
         variant="small"
         color="blue-gray"
-        className="flex items-center gap-x-2 p-1 font-medium text-black"
+        className="flex items-center gap-x-2 p-1 font-medium text-black h-[40px]"
       >
         <button className="nav-btn">
-          {/* <svg className="text-xl mr-1 lg:text-xl sm:text-2xl" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M4 15q-1.25 0-2.125-.875T1 12t.875-2.125T4 9V5h5q0-1.25.875-2.125T12 2t2.125.875T15 5h5v4q1.25 0 2.125.875T23 12t-.875 2.125T20 15v6H4zm5-2q.625 0 1.063-.437T10.5 11.5t-.437-1.062T9 10t-1.062.438T7.5 11.5t.438 1.063T9 13m6 0q.625 0 1.063-.437T16.5 11.5t-.437-1.062T15 10t-1.062.438T13.5 11.5t.438 1.063T15 13m-7 4h8v-2H8z"></path></svg> */}
           <Link to={'/Product'} className="flex items-center text-base">
-            <span className='product-nav hidden lg:block'>
+            <span className='product-nav block'>
               {language == 1 ? 'Đồ chơi' : 'Toys'}
             </span>
           </Link>
@@ -85,10 +77,9 @@ function Nav({ language, setLanguage, cartDetail }) {
         as="li"
         variant="small"
         color="blue-gray"
-        className="flex items-center gap-x-2 p-1 font-medium text-black"
+        className="flex items-center gap-x-2 p-1 font-medium text-black h-[40px]"
       >
         <button className="nav-btn">
-          {/* <svg className="text-xl mr-1 lg:text-xl sm:text-2xl" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 13q1.45 0 2.475-1.025T15.5 9.5t-1.025-2.475T12 6T9.525 7.025T8.5 9.5t1.025 2.475T12 13m-7 8q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h14q.825 0 1.413.588T21 5v14q0 .825-.587 1.413T19 21zm0-2h14v-1.15q-1.35-1.325-3.137-2.087T12 15t-3.863.763T5 17.85z"></path></svg> */}
           <Link to={'/SignIn'} className="flex items-center text-base">
             <span className='login-nav lg:block'>
               {language == 1 ? 'Đăng nhập' : 'Sign In'}
@@ -100,7 +91,7 @@ function Nav({ language, setLanguage, cartDetail }) {
         as="li"
         variant="small"
         color="blue-gray"
-        className="flex items-center gap-x-2 p-1 font-medium text-black"
+        className="flex items-center gap-x-2 p-1 font-medium text-black h-[40px]"
       >
         <Menu open={openMenu} handler={setOpenMenu} allowHover>
           <MenuHandler>
@@ -110,6 +101,8 @@ function Nav({ language, setLanguage, cartDetail }) {
             >
               <svg className="text-lg" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="#050505" strokeWidth="1.5"><path d="M22 12a10 10 0 1 1-20.001 0A10 10 0 0 1 22 12z"></path><path d="M16 12c0 1.313-.104 2.614-.305 3.827c-.2 1.213-.495 2.315-.867 3.244c-.371.929-.812 1.665-1.297 2.168c-.486.502-1.006.761-1.531.761c-.525 0-1.045-.259-1.53-.761c-.486-.503-.927-1.24-1.298-2.168c-.372-.929-.667-2.03-.868-3.244A23.614 23.614 0 0 1 8 12c0-1.313.103-2.614.304-3.827s.496-2.315.868-3.244c.371-.929.812-1.665 1.297-2.168C10.955 2.26 11.475 2 12 2c.525 0 1.045.259 1.53.761c.486.503.927 1.24 1.298 2.168c.372.929.667 2.03.867 3.244C15.897 9.386 16 10.687 16 12z"></path><path strokeLinecap="round" d="M2 12h20"></path></g></svg>
               <span className="language">{language == 1 ? 'Tiếng Việt' : 'English'}</span>
+              {/* {language == 1 && <svg className="inline md:hidden text-2xl" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 64 64"><path fill="#ec1c24" d="M64 44c0 6.075-3.373 11-10 11H10C3.373 55 0 50.075 0 44V22c0-6.075 3.373-11 10-11h44c6.627 0 10 4.925 10 11z"></path><path fill="#f9cb38" d="m45.43 28.963l-9.997.015l-3.103-10.114l-3.08 10.114l-10.01-.015l8.106 6.157l-3.14 10.05l8.13-6.241l8.147 6.241l-3.147-10.05z"></path></svg>}
+              {language == 2 && <svg className="inline md:hidden text-2xl" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 36 36"><path fill="#00247D" d="M0 9.059V13h5.628zM4.664 31H13v-5.837zM23 25.164V31h8.335zM0 23v3.941L5.63 23zM31.337 5H23v5.837zM36 26.942V23h-5.631zM36 13V9.059L30.371 13zM13 5H4.664L13 10.837z"></path><path fill="#CF1B2B" d="m25.14 23l9.712 6.801a4 4 0 0 0 .99-1.749L28.627 23zM13 23h-2.141l-9.711 6.8c.521.53 1.189.909 1.938 1.085L13 23.943zm10-10h2.141l9.711-6.8a4 4 0 0 0-1.937-1.085L23 12.057zm-12.141 0L1.148 6.2a4 4 0 0 0-.991 1.749L7.372 13z"></path><path fill="#EEE" d="M36 21H21v10h2v-5.836L31.335 31H32a4 4 0 0 0 2.852-1.199L25.14 23h3.487l7.215 5.052c.093-.337.158-.686.158-1.052v-.058L30.369 23H36zM0 21v2h5.63L0 26.941V27c0 1.091.439 2.078 1.148 2.8l9.711-6.8H13v.943l-9.914 6.941c.294.07.598.116.914.116h.664L13 25.163V31h2V21zM36 9a3.98 3.98 0 0 0-1.148-2.8L25.141 13H23v-.943l9.915-6.942A4 4 0 0 0 32 5h-.663L23 10.837V5h-2v10h15v-2h-5.629L36 9.059zM13 5v5.837L4.664 5H4a4 4 0 0 0-2.852 1.2l9.711 6.8H7.372L.157 7.949A4 4 0 0 0 0 9v.059L5.628 13H0v2h15V5z"></path><path fill="#CF1B2B" d="M21 15V5h-6v10H0v6h15v10h6V21h15v-6z"></path></svg>} */}
               <ChevronDownIcon
                 strokeWidth={2.5}
                 className={`h-3.5 w-3.5 transition-transform ${openMenu ? "rotate-180" : ""
@@ -117,55 +110,46 @@ function Nav({ language, setLanguage, cartDetail }) {
               />
             </Button>
           </MenuHandler>
-          <MenuList>
+          {!openNav && <MenuList className="">
             <MenuItem className="text-black" onClick={() => {
               window.localStorage.setItem('language', '1')
               setLanguage(1)
+            }} onTouchEnd={() => {
             }}>Tiếng Việt</MenuItem>
             <MenuItem className="text-black" onClick={() => {
               window.localStorage.setItem('language', '2')
               setLanguage(2)
             }}>English</MenuItem>
-          </MenuList>
+          </MenuList>}
         </Menu>
       </Typography>
       <Typography
         as="li"
         variant="small"
         color="blue-gray"
-        className="flex items-center gap-x-2 p-1 font-medium text-black"
-      >
-        <button className="">
-          <div className="flex items-center">
-            <svg className="mr-1 sm:text-xs lg:text-2xl" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="#050505" d="M232.49 215.51L185 168a92.12 92.12 0 1 0-17 17l47.53 47.54a12 12 0 0 0 17-17ZM44 112a68 68 0 1 1 68 68a68.07 68.07 0 0 1-68-68"></path></svg>
-          </div>
-        </button>
-      </Typography>
-      <Typography
-        as="li"
-        variant="small"
-        color="blue-gray"
-        className="flex items-center gap-x-2 p-1 font-medium text-black"
+        className="flex items-center gap-x-2 p-1 font-medium text-black h-[40px]"
       >
         <Menu open={openCart} handler={setOpenCart} placement="bottom-end" allowHover>
           <MenuHandler>
             <Button
               variant="text"
-              className="flex items-center gap-3 text-base font-normal capitalize tracking-normal px-0 w-[50px] hover:bg-transparent outline-none"
+              className="flex items-center gap-3 text-base font-normal capitalize tracking-normal px-0 w-[50px] hover:bg-transparent outline-none py-0"
             >
-              <Badge content={cartDetail ? cartDetail.length : '0'}>
-                <svg className="w-full h-full mr-1 sm:text-xs lg:text-base" xmlns="http://www.w3.org/2000/svg" width="1.8em" height="1.8em" viewBox="0 0 24 24" onClick={(e) => {
-                  e.preventDefault()
-                  if (!window.localStorage.getItem('User')) {
-                    window.location.href = 'http://localhost:3000/SignIn';
-                  } else window.location.href = 'http://localhost:3000/Cart';
-                }}>
-                  <path fill="currentColor" d="M7 22q-.825 0-1.412-.587T5 20t.588-1.412T7 18t1.413.588T9 20t-.587 1.413T7 22m10 0q-.825 0-1.412-.587T15 20t.588-1.412T17 18t1.413.588T19 20t-.587 1.413T17 22M5.2 4h14.75q.575 0 .875.513t.025 1.037l-3.55 6.4q-.275.5-.737.775T15.55 13H8.1L7 15h12v2H7q-1.125 0-1.7-.987t-.05-1.963L6.6 11.6L3 4H1V2h3.25z" />
-                </svg>
-              </Badge>
+              <div className="h-full w-full py-3" onClick={(e) => {
+                e.preventDefault()
+                if (!window.localStorage.getItem('User')) {
+                  window.location.href = 'http://localhost:3000/SignIn';
+                } else window.location.href = 'http://localhost:3000/Cart';
+              }}>
+                <Badge content={cartDetail ? cartDetail.length : '0'}>
+                  <svg className="w-full h-full mr-1 text-xs md:text-base" xmlns="http://www.w3.org/2000/svg" width="1.8em" height="1.8em" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7 22q-.825 0-1.412-.587T5 20t.588-1.412T7 18t1.413.588T9 20t-.587 1.413T7 22m10 0q-.825 0-1.412-.587T15 20t.588-1.412T17 18t1.413.588T19 20t-.587 1.413T17 22M5.2 4h14.75q.575 0 .875.513t.025 1.037l-3.55 6.4q-.275.5-.737.775T15.55 13H8.1L7 15h12v2H7q-1.125 0-1.7-.987t-.05-1.963L6.6 11.6L3 4H1V2h3.25z" />
+                  </svg>
+                </Badge>
+              </div>
             </Button>
           </MenuHandler>
-          <MenuList className="max-h-[374px] overflow-y-scroll">
+          {!openNav && <MenuList className="max-h-[374px] overflow-y-scroll">
             <Typography className='font-normal cursor-default text-gray-400 outline-none' variant="h6">Sản phẩm vừa thêm</Typography>
             {cartDetail.length != 0 ? cartDetail.map((item, index) => (
               <MenuItem key={index} className="text-black" style={{ borderBottom: '1px solid #ccc' }} onClick={(e) => {
@@ -180,20 +164,20 @@ function Nav({ language, setLanguage, cartDetail }) {
                     <span className="w-9/12 cart-itemName">{item.name}</span>
                   </div>
                   <div className="cart-info text-end">
-                    <div className="flex text-red-500">{formatNumber(item.price)} đ</div>
+                    <div className="flex text-red-500">{formatNumber(Math.floor((item.price - (item.price * item.discount) / 100) / 1000) * 1000)} đ</div>
                     <div>SL: {item.quantityCurrent}</div>
                   </div>
                 </div>
               </MenuItem>
             )) : ''}
-          </MenuList>
+          </MenuList>}
         </Menu>
       </Typography>
       {userCurrent && <Typography
         as="li"
         variant="small"
         color="blue-gray"
-        className="flex items-center gap-x-2 p-1 font-medium text-black"
+        className="flex items-center gap-x-2 p-1 font-medium text-black h-[40px]"
       >
         <Menu open={openMenuAccount} handler={setOpenMenuAccount} allowHover>
           <MenuHandler>
@@ -204,7 +188,7 @@ function Nav({ language, setLanguage, cartDetail }) {
               <span className="language">{user.name}</span>
             </Button>
           </MenuHandler>
-          <MenuList>
+          {!openNav && <MenuList>
             <Link to='/Account' className="hover:border-none outline-none">
               <MenuItem className="text-black outline-none">
                 {language == 1 ? 'Tài khoản của tôi' : 'My account'}
@@ -216,66 +200,235 @@ function Nav({ language, setLanguage, cartDetail }) {
             }}>
               {language == 1 ? 'Đăng xuất' : 'Log out'}
             </MenuItem>
-          </MenuList>
+          </MenuList>}
         </Menu>
+      </Typography>}
+      {user.level == 2 && <Typography
+        as="li"
+        variant="small"
+        color="blue-gray"
+        className="flex items-center text-base gap-x-2 py-1 pr-1 pl-4 font-medium text-black border-l-2 border-l-gray-400 hover:cursor-pointer"
+        onClick={() => window.location.href = 'http://localhost:3000/Admin'}
+      >
+        Admin
+      </Typography>}
+    </ul>
+  );
+
+  const navList2 = (
+    <ul className="mt-2 mb-4 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6 pl-10">
+      <Typography
+        as="li"
+        variant="small"
+        color="blue-gray"
+        className="flex items-center gap-x-2 p-1 font-medium text-black h-[40px]"
+      >
+        <button className="nav-btn">
+          <Link to={'/Product'} className="flex items-center text-base">
+            <span className='product-nav block'>
+              {language == 1 ? 'Đồ chơi' : 'Toys'}
+            </span>
+          </Link>
+        </button>
+      </Typography>
+      {!userCurrent && <Typography
+        as="li"
+        variant="small"
+        color="blue-gray"
+        className="flex items-center gap-x-2 p-1 font-medium text-black h-[40px]"
+      >
+        <button className="nav-btn">
+          <Link to={'/SignIn'} className="flex items-center text-base">
+            <span className='login-nav lg:block'>
+              {language == 1 ? 'Đăng nhập' : 'Sign In'}
+            </span>
+          </Link>
+        </button>
+      </Typography>}
+      <Typography
+        as="li"
+        variant="small"
+        color="blue-gray"
+        className="flex items-center gap-x-2 p-1 font-medium text-black h-[40px]"
+      >
+        <Menu open={openMenu} handler={setOpenMenu} allowHover>
+          <MenuHandler>
+            <Button
+              variant="text"
+              className="flex items-center gap-3 text-base font-normal capitalize tracking-normal px-0 hover:bg-transparent outline-none"
+            >
+              <svg className="text-lg" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="#050505" strokeWidth="1.5"><path d="M22 12a10 10 0 1 1-20.001 0A10 10 0 0 1 22 12z"></path><path d="M16 12c0 1.313-.104 2.614-.305 3.827c-.2 1.213-.495 2.315-.867 3.244c-.371.929-.812 1.665-1.297 2.168c-.486.502-1.006.761-1.531.761c-.525 0-1.045-.259-1.53-.761c-.486-.503-.927-1.24-1.298-2.168c-.372-.929-.667-2.03-.868-3.244A23.614 23.614 0 0 1 8 12c0-1.313.103-2.614.304-3.827s.496-2.315.868-3.244c.371-.929.812-1.665 1.297-2.168C10.955 2.26 11.475 2 12 2c.525 0 1.045.259 1.53.761c.486.503.927 1.24 1.298 2.168c.372.929.667 2.03.867 3.244C15.897 9.386 16 10.687 16 12z"></path><path strokeLinecap="round" d="M2 12h20"></path></g></svg>
+              <span className="language">{language == 1 ? 'Tiếng Việt' : 'English'}</span>
+              {/* {language == 1 && <svg className="inline md:hidden text-2xl" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 64 64"><path fill="#ec1c24" d="M64 44c0 6.075-3.373 11-10 11H10C3.373 55 0 50.075 0 44V22c0-6.075 3.373-11 10-11h44c6.627 0 10 4.925 10 11z"></path><path fill="#f9cb38" d="m45.43 28.963l-9.997.015l-3.103-10.114l-3.08 10.114l-10.01-.015l8.106 6.157l-3.14 10.05l8.13-6.241l8.147 6.241l-3.147-10.05z"></path></svg>}
+              {language == 2 && <svg className="inline md:hidden text-2xl" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 36 36"><path fill="#00247D" d="M0 9.059V13h5.628zM4.664 31H13v-5.837zM23 25.164V31h8.335zM0 23v3.941L5.63 23zM31.337 5H23v5.837zM36 26.942V23h-5.631zM36 13V9.059L30.371 13zM13 5H4.664L13 10.837z"></path><path fill="#CF1B2B" d="m25.14 23l9.712 6.801a4 4 0 0 0 .99-1.749L28.627 23zM13 23h-2.141l-9.711 6.8c.521.53 1.189.909 1.938 1.085L13 23.943zm10-10h2.141l9.711-6.8a4 4 0 0 0-1.937-1.085L23 12.057zm-12.141 0L1.148 6.2a4 4 0 0 0-.991 1.749L7.372 13z"></path><path fill="#EEE" d="M36 21H21v10h2v-5.836L31.335 31H32a4 4 0 0 0 2.852-1.199L25.14 23h3.487l7.215 5.052c.093-.337.158-.686.158-1.052v-.058L30.369 23H36zM0 21v2h5.63L0 26.941V27c0 1.091.439 2.078 1.148 2.8l9.711-6.8H13v.943l-9.914 6.941c.294.07.598.116.914.116h.664L13 25.163V31h2V21zM36 9a3.98 3.98 0 0 0-1.148-2.8L25.141 13H23v-.943l9.915-6.942A4 4 0 0 0 32 5h-.663L23 10.837V5h-2v10h15v-2h-5.629L36 9.059zM13 5v5.837L4.664 5H4a4 4 0 0 0-2.852 1.2l9.711 6.8H7.372L.157 7.949A4 4 0 0 0 0 9v.059L5.628 13H0v2h15V5z"></path><path fill="#CF1B2B" d="M21 15V5h-6v10H0v6h15v10h6V21h15v-6z"></path></svg>} */}
+              <ChevronDownIcon
+                strokeWidth={2.5}
+                className={`h-3.5 w-3.5 transition-transform ${openMenu ? "rotate-180" : ""
+                  }`}
+              />
+            </Button>
+          </MenuHandler>
+          {openNav && <MenuList>
+            <MenuItem className="text-black" onClick={() => {
+              window.localStorage.setItem('language', '1')
+              setLanguage(1)
+            }}>Tiếng Việt</MenuItem>
+            <MenuItem className="text-black" onClick={() => {
+              window.localStorage.setItem('language', '2')
+              setLanguage(2)
+            }}>English</MenuItem>
+          </MenuList>}
+        </Menu>
+      </Typography>
+      <Typography
+        as="li"
+        variant="small"
+        color="blue-gray"
+        className="flex items-center gap-x-2 p-1 font-medium text-black h-[40px]"
+      >
+        <Menu open={openCart} handler={setOpenCart} placement="bottom-end" allowHover>
+          <MenuHandler>
+            <Button
+              variant="text"
+              className="flex items-center gap-3 text-base font-normal capitalize tracking-normal px-0 w-[50px] hover:bg-transparent outline-none py-0"
+            >
+              <div className="h-full w-full py-3" onClick={(e) => {
+                e.preventDefault()
+                if (!window.localStorage.getItem('User')) {
+                  window.location.href = 'http://localhost:3000/SignIn';
+                } else window.location.href = 'http://localhost:3000/Cart';
+              }}>
+                <Badge content={cartDetail ? cartDetail.length : '0'}>
+                  <svg className="w-full h-full mr-1 text-xs md:text-base" xmlns="http://www.w3.org/2000/svg" width="1.8em" height="1.8em" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M7 22q-.825 0-1.412-.587T5 20t.588-1.412T7 18t1.413.588T9 20t-.587 1.413T7 22m10 0q-.825 0-1.412-.587T15 20t.588-1.412T17 18t1.413.588T19 20t-.587 1.413T17 22M5.2 4h14.75q.575 0 .875.513t.025 1.037l-3.55 6.4q-.275.5-.737.775T15.55 13H8.1L7 15h12v2H7q-1.125 0-1.7-.987t-.05-1.963L6.6 11.6L3 4H1V2h3.25z" />
+                  </svg>
+                </Badge>
+              </div>
+            </Button>
+          </MenuHandler>
+          {openNav && <MenuList className="max-h-[374px] overflow-y-scroll">
+            <Typography className='font-normal cursor-default text-gray-400 outline-none' variant="h6">Sản phẩm vừa thêm</Typography>
+            {cartDetail.length != 0 ? cartDetail.map((item, index) => (
+              <MenuItem key={index} className="text-black" style={{ borderBottom: '1px solid #ccc' }} onClick={(e) => {
+                e.preventDefault()
+                window.location.href = `/Product/Productdetail/${removeVietnameseAccents(item.name)}-${item.id}`
+              }}>
+                <div className="flex items-center justify-between w-[450px]">
+                  <div className="flex items-center w-9/12">
+                    <div className="w-[70px] h-[70px] mr-2">
+                      <img className="w-full h-full" src={`http://localhost:8080/images/${item.img}`} />
+                    </div>
+                    <span className="w-9/12 cart-itemName">{item.name}</span>
+                  </div>
+                  <div className="cart-info text-end">
+                    <div className="flex text-red-500">{formatNumber(Math.floor((item.price - (item.price * item.discount) / 100) / 1000) * 1000)} đ</div>
+                    <div>SL: {item.quantityCurrent}</div>
+                  </div>
+                </div>
+              </MenuItem>
+            )) : ''}
+          </MenuList>}
+        </Menu>
+      </Typography>
+      {userCurrent && <Typography
+        as="li"
+        variant="small"
+        color="blue-gray"
+        className="flex items-center gap-x-2 p-1 font-medium text-black h-[40px]"
+      >
+        <Menu open={openMenuAccount} handler={setOpenMenuAccount} allowHover>
+          <MenuHandler>
+            <Button
+              variant="text"
+              className="flex items-center gap-3 text-base font-normal capitalize tracking-normal px-0 hover:bg-transparent"
+            >
+              <span className="language">{user.name}</span>
+            </Button>
+          </MenuHandler>
+          {openNav && <MenuList>
+            <Link to='/Account' className="hover:border-none outline-none">
+              <MenuItem className="text-black outline-none">
+                {language == 1 ? 'Tài khoản của tôi' : 'My account'}
+              </MenuItem>
+            </Link>
+            <MenuItem className="text-black" onClick={() => {
+              window.localStorage.removeItem('User')
+              window.location.href = 'http://localhost:3000/'
+            }}>
+              {language == 1 ? 'Đăng xuất' : 'Log out'}
+            </MenuItem>
+          </MenuList>}
+        </Menu>
+      </Typography>}
+      {user.level == 2 && <Typography
+        as="li"
+        variant="small"
+        color="blue-gray"
+        className="flex items-center text-base gap-x-2 py-1 pr-1 pl-4 font-medium text-black border-l-2 border-l-gray-400 hover:cursor-pointer"
+        onClick={() => window.location.href = 'http://localhost:3000/Admin'}
+      >
+        Admin
       </Typography>}
     </ul>
   );
 
   return (
-    <>
-      <div className="nav-main px-8 lg:px-8 w-full rounded-none">
-        <div className="w-full flex flex-wrap items-center sm:justify-between text-blue-gray-900">
+    <div className="w-full">
+      <Navbar className="max-w-full px-4 py-2 lg:px-8 lg:py-4 bg-transparent backdrop-blur-none rounded-none border-black shadow-none">
+        <div className="container min-w-full flex items-center justify-between text-blue-gray-900">
           <Typography
             as="a"
             href="/"
-            className="brand-name mr-4 cursor-pointer py-1.5 font-medium text-2xl"
+            className="brand-name mr-4 cursor-pointer py-1.5 font-medium text-2xl  leading-[50px]"
           >
             SkyWorld
           </Typography>
-          {/* <div className="hidden items-center gap-x-2 xl:flex">
-            <div className="relative flex w-full gap-2 md:w-max">
-              <Input
-                type="search"
-                placeholder="Nhập từ khóa để tìm kiếm sản phẩm"
-                containerProps={{
-                  className: "min-w-[288px]",
-                }}
-                className=" !border-t-blue-gray-300 pl-9 placeholder:text-blue-gray-300 focus:!border-blue-gray-300"
-                labelProps={{
-                  className: "before:content-none after:content-none",
-                }}
-              />
-              <div className="!absolute left-3 top-[13px]">
-                <svg
-                  width="13"
-                  height="14"
-                  viewBox="0 0 14 15"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M9.97811 7.95252C10.2126 7.38634 10.3333 6.7795 10.3333 6.16667C10.3333 4.92899 9.84167 3.742 8.9665 2.86683C8.09133 1.99167 6.90434 1.5 5.66667 1.5C4.42899 1.5 3.242 1.99167 2.36683 2.86683C1.49167 3.742 1 4.92899 1 6.16667C1 6.7795 1.12071 7.38634 1.35523 7.95252C1.58975 8.51871 1.93349 9.03316 2.36683 9.4665C2.80018 9.89984 3.31462 10.2436 3.88081 10.4781C4.447 10.7126 5.05383 10.8333 5.66667 10.8333C6.2795 10.8333 6.88634 10.7126 7.45252 10.4781C8.01871 10.2436 8.53316 9.89984 8.9665 9.4665C9.39984 9.03316 9.74358 8.51871 9.97811 7.95252Z"
-                    fill="#CFD8DC"
-                  />
-                  <path
-                    d="M13 13.5L9 9.5M10.3333 6.16667C10.3333 6.7795 10.2126 7.38634 9.97811 7.95252C9.74358 8.51871 9.39984 9.03316 8.9665 9.4665C8.53316 9.89984 8.01871 10.2436 7.45252 10.4781C6.88634 10.7126 6.2795 10.8333 5.66667 10.8333C5.05383 10.8333 4.447 10.7126 3.88081 10.4781C3.31462 10.2436 2.80018 9.89984 2.36683 9.4665C1.93349 9.03316 1.58975 8.51871 1.35523 7.95252C1.12071 7.38634 1 6.7795 1 6.16667C1 4.92899 1.49167 3.742 2.36683 2.86683C3.242 1.99167 4.42899 1.5 5.66667 1.5C6.90434 1.5 8.09133 1.99167 8.9665 2.86683C9.84167 3.742 10.3333 4.92899 10.3333 6.16667Z"
-                    stroke="#CFD8DC"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-            </div>
-            <Button size="md" className="rounded-lg bg-indigo-600" >
-              Tìm kiếm
-            </Button>
-          </div> */}
-          <div className="sm:block">{navList}</div>
+          <div className="hidden lg:block">{navList1}</div>
+          <IconButton
+            variant="text"
+            className="ml-auto h-6 w-6 text-inherit hover:bg-transparent focus:bg-transparent active:bg-transparent lg:hidden"
+            ripple={false}
+            onClick={() => setOpenNav(!openNav)}
+          >
+            {openNav ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                className="h-6 w-6"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            )}
+          </IconButton>
         </div>
-      </div>
-    </>
+        <MobileNav open={openNav}>
+          <div className="container ">
+            {navList2}
+          </div>
+        </MobileNav>
+      </Navbar>
+    </div>
   );
 }
 

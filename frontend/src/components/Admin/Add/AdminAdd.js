@@ -1,8 +1,8 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 import axios from 'axios';
 import { Breadcrumbs, Button, Card, Input, Option, Radio, Select, Textarea, Typography, IconButton } from "@material-tailwind/react";
-import { ArrowRightIcon, ArrowLeftIcon } from "@heroicons/react/24/outline"
-import { Col, Image, notification, Pagination, Row, Space, Upload } from "antd";
+import { ArrowRightIcon, ArrowLeftIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline"
+import { Col, Image, InputNumber, notification, Pagination, Row, Space, Upload } from "antd";
 import { Link } from "react-router-dom";
 
 export function AddProduct({ setCurrentTab, getAPIProduct, openNotificationSuccess, openNotificationError }) {
@@ -140,14 +140,16 @@ export function AddProduct({ setCurrentTab, getAPIProduct, openNotificationSucce
 
     return (
         <div className="w-full">
-            <Breadcrumbs>
-                <Link to={'/Admin/Product'} onClick={() => setCurrentTab('AllProduct')} className="opacity-60">
-                    Tất cả sản phẩm
-                </Link>
-                <Link to={'/Admin/Product'} className="opacity-60">
-                    Thêm sản phẩm
-                </Link>
-            </Breadcrumbs>
+            <div className="w-full bg-gray-200 rounded">
+                <Breadcrumbs className="bg-transparent">
+                    <Link to={'/Admin/Product'} onClick={() => setCurrentTab('AllProduct')} className="opacity-60">
+                        Tất cả sản phẩm
+                    </Link>
+                    <Link to={'/Admin/Product'} className="opacity-60">
+                        Thêm sản phẩm
+                    </Link>
+                </Breadcrumbs>
+            </div>
             <Row className="w-full bg-white rounded py-8">
                 <Col xl={{ span: 11, offset: 1 }}>
                     <div className="mb-8">
@@ -283,6 +285,9 @@ export function AddProduct({ setCurrentTab, getAPIProduct, openNotificationSucce
 export function AddCategory({ setCurrentTab }) {
     const TABLE_HEAD = ["Danh Mục", "Nhóm Danh Mục", "Tùy Chỉnh", ""];
 
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
+    const [fileIMG, setFileIMG] = useState([]);
     const [openSkeleton, setOpenSkeleton] = useState(true)
     const [selectedOption, setSelectedOption] = useState();
     const [category, setCategory] = useState([])
@@ -291,6 +296,7 @@ export function AddCategory({ setCurrentTab }) {
     var [categoryForm, setCategoryForm] = useState({
         name: '',
         group: '',
+        img: fileIMG
     })
 
 
@@ -310,6 +316,18 @@ export function AddCategory({ setCurrentTab }) {
         getApiDataCategory()
     }, [])
 
+    const handlePreview = async (file) => {
+        setPreviewImage(file.url || file.preview);
+        setPreviewOpen(true);
+    };
+
+    const handleChange = ({ fileList: newFileList }) => {
+        if (newFileList.length != 0) {
+            setFileIMG(newFileList[newFileList.length - 1].originFileObj);
+        }
+
+    };
+
     const openNotificationWithIconSuccess = (type) => {
         api[type]({
             message: 'Thêm thành công',
@@ -328,7 +346,6 @@ export function AddCategory({ setCurrentTab }) {
 
     const handleCategorySubmit = () => {
         const categoryName = document.querySelector('.categoryName')
-        console.log(selectedOption);
 
         for (var i = 0; i < category.length; i++) {
             if ((categoryName.value == '') || (categoryName.value.toUpperCase() === category[i].name.toUpperCase())) {
@@ -345,14 +362,18 @@ export function AddCategory({ setCurrentTab }) {
         fetch(`http://localhost:8080/api/category`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'multipart/form-data'
             },
             body: JSON.stringify(categoryForm)
         })
             .then(response => response.json())
             .then(result => {
                 getApiDataCategory()
-                setCategoryForm('')
+                setCategoryForm({
+                    name: '',
+                    group: '',
+                    img: fileIMG
+                })
                 categoryName.value = ''
                 setSelectedOption('')
                 document.querySelector('.notifyBoxSuccess').click()
@@ -380,14 +401,16 @@ export function AddCategory({ setCurrentTab }) {
 
     return (
         <div className="w-full">
-            <Breadcrumbs>
-                <Link to={'/Admin/Product'} onClick={() => setCurrentTab('AllProduct')} className="opacity-60">
-                    Tất cả sản phẩm
-                </Link>
-                <Link to={'/Admin/Product'} className="opacity-60">
-                    Thêm danh mục
-                </Link>
-            </Breadcrumbs>
+            <div className="w-full bg-gray-200 rounded">
+                <Breadcrumbs className="bg-transparent">
+                    <Link to={'/Admin/Product'} onClick={() => setCurrentTab('AllProduct')} className="opacity-60">
+                        Tất cả sản phẩm
+                    </Link>
+                    <Link to={'/Admin/Product'} className="opacity-60">
+                        Thêm danh mục
+                    </Link>
+                </Breadcrumbs>
+            </div>
             <Row className="w-full bg-white rounded py-8">
                 <Col xl={{ span: 11, offset: 1 }}>
                     <div className="mb-8">
@@ -398,6 +421,48 @@ export function AddCategory({ setCurrentTab }) {
                             <Option value="1">Đồ Chơi</Option>
                             <Option value="2">Phương Tiện Di Chuyển</Option>
                         </Select>
+                    </div>
+                    <div className="flex items-center my-4">
+                        Ảnh đại diện của thư mục:
+                        <>
+                            <Upload
+                                className="ml-4"
+                                maxCount={1}
+                                action='http://localhost:8080'
+                                listType="picture-card"
+                                onPreview={handlePreview}
+                                onChange={handleChange}
+                            >
+                                <button
+                                    style={{
+                                        border: 0,
+                                        background: 'none',
+                                    }}
+                                    type="button"
+                                >
+                                    <div
+                                        style={{
+                                            marginTop: 8,
+                                        }}
+                                    >
+                                        Tải ảnh lên
+                                    </div>
+                                </button>
+                            </Upload>
+                            {previewImage && (
+                                <Image
+                                    wrapperStyle={{
+                                        display: 'none',
+                                    }}
+                                    preview={{
+                                        visible: previewOpen,
+                                        onVisibleChange: (visible) => setPreviewOpen(visible),
+                                        afterOpenChange: (visible) => !visible && setPreviewImage(''),
+                                    }}
+                                    src={previewImage}
+                                />
+                            )}
+                        </>
                     </div>
                     <div className="float-end">
                         <Button className="w-[100px]" color="blue" onClick={() => handleCategorySubmit()}>Lưu</Button>
@@ -540,13 +605,43 @@ export function AddCategory({ setCurrentTab }) {
     );
 }
 
-export function Discount({ product, getAPIProduct }) {
+export function Discount({ product, getAPIProduct, openNotificationDiscountSuccess, setCurrentTab }) {
 
-    const TABLE_HEAD = ["Tên sản phẩm", "Danh mục", "Giá", ""];
+    const [productDiscount, setProductDiscount] = useState(product)
+
+    const TABLE_HEAD = ["Tên sản phẩm", "Danh mục", "Giá ban đầu", "Giảm %", "Giá sau khi giảm", " "];
     const [currentPage, setCurrentPage] = useState({
         page: 1,
         size: 10
     })
+
+    const handleUpdate = (index) => {
+        let parent = document.querySelector(`.input-${index}`)
+        const discount = parent.querySelector('.ant-input-number-input')
+        console.log(discount.value.replace('%', ''));
+
+        const formUpdate = {
+            id: product[index].id,
+            discount: Number(discount.value.replace('%', ''))
+        }
+
+        axios.put(`http://localhost:8080/api/products/updateDiscount`, formUpdate, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                // Xử lý kết quả từ server
+                getAPIProduct()
+                openNotificationDiscountSuccess('success')
+                console.log(response.data);
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error(error);
+            });
+
+    }
 
     function formatNumber(number) {
         // Chuyển số thành chuỗi và đảo ngược chuỗi
@@ -565,6 +660,39 @@ export function Discount({ product, getAPIProduct }) {
         return formattedNumber.split('').reverse().join('');
     }
 
+    const onChange = (index, value) => {
+        let priceAfter = document.querySelector(`.price-after-${index}`)
+        priceAfter.textContent = `${formatNumber(Math.floor((product[index].price - (product[index].price * value) / 100) / 1000) * 1000)} đ`
+    };
+
+    const getApiProductBySeekPage = async (seek) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/products/Adminseek/main?seek=${seek}`);
+            const data = await response.json();
+            if (data) {
+                setProductDiscount(data);
+            }
+        } catch (error) {
+            console.log('Đã xảy ra lỗi:', error);
+        }
+    }
+
+    const handleSearch = debounce((value) => {
+        setCurrentPage({
+            page: 1,
+            size: 10
+        })
+        getApiProductBySeekPage(value)
+    }, 500)
+
+    function debounce(func, delay) {
+        let timeout;
+        return function (...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
     const onChangePagination = (pageNumber, pageSize) => {
         setCurrentPage({
             page: pageNumber,
@@ -574,7 +702,26 @@ export function Discount({ product, getAPIProduct }) {
 
     return (
         <div className="w-full">
-            <Card className="h-full w-full overflow-scroll mt-8">
+            <div className="w-full bg-gray-200 rounded">
+                <Breadcrumbs className="w-full bg-transparent">
+                    <Link to={'/Admin/Product'} onClick={() => setCurrentTab('AllProduct')} className="opacity-60">
+                        Tất cả sản phẩm
+                    </Link>
+                    <Link to={'/Admin/Product'} className="opacity-60">
+                        Giảm giá
+                    </Link>
+                </Breadcrumbs>
+            </div>
+            <div className="flex justify-end w-full">
+                <div className="my-4 w-96">
+                    <Input
+                        icon={<MagnifyingGlassIcon className="h-5 w-5" />}
+                        label='Tìm kiếm'
+                        onChange={(e) => handleSearch(e.target.value)}
+                    />
+                </div>
+            </div>
+            <Card className="h-full w-full overflow-scroll">
                 <table className="w-full min-w-max table-auto text-left">
                     <thead>
                         <tr>
@@ -592,16 +739,16 @@ export function Discount({ product, getAPIProduct }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {product.map((product, index) => {
+                        {productDiscount.map((product, index) => {
                             if (index >= (currentPage.page * currentPage.size - currentPage.size) && index < (currentPage.page * currentPage.size)) {
                                 return (
                                     <tr key={index} className="even:bg-blue-gray-50/50">
-                                        <td className="p-4">
+                                        <td className="p-4 w-[500px]">
                                             <Typography variant="small" color="blue-gray" className="font-normal text-start flex justify-start items-center">
                                                 <div className='product-info_img h-full w-[50px] mr-2' >
                                                     <img className='h-[50px] m-auto' src={`http://localhost:8080/images/${product.img}`} alt='anh' />
                                                 </div>
-                                                {product.name}
+                                                <div className="w-[450px]">{product.name}</div>
                                             </Typography>
                                         </td>
                                         <td className="p-4">
@@ -615,11 +762,32 @@ export function Discount({ product, getAPIProduct }) {
                                             </Typography>
                                         </td>
                                         <td className="p-4 text-center">
-                                            <Typography as="a" href="#" variant="small" color="blue-gray" className="font-medium">
-
+                                            <Typography variant="small" color="blue-gray" className="font-medium">
+                                                <Space>
+                                                    <InputNumber
+                                                        className={`input-${index}`}
+                                                        defaultValue={product.discount ? product.discount : 0}
+                                                        min={0}
+                                                        max={100}
+                                                        formatter={(value) => `${value}%`}
+                                                        parser={(value) => value?.replace('%', '')}
+                                                        onChange={value => onChange(index, value)}
+                                                    />
+                                                </Space>
                                             </Typography>
                                         </td>
+                                        <td className="p-4 text-center">
+                                            <Typography variant="small" color="blue-gray" className={`font-medium price-after-${index} text-red-500`}>
+                                                {product.discount > 0 ? `${formatNumber(product.price - (product.price * product.discount) / 100)} đ` : ''}
+                                            </Typography>
+                                        </td>
+                                        <td className="py-4 text-center">
+                                            <Button color="green" onClick={() => handleUpdate(index)}>
+                                                Cập nhật
+                                            </Button>
+                                        </td>
                                     </tr>
+
                                 )
                             } else
                                 if (index >= (currentPage.page * currentPage.size)) return
@@ -627,7 +795,7 @@ export function Discount({ product, getAPIProduct }) {
                     </tbody>
                 </table>
                 <div className="flex justify-center">
-                    <Pagination className="py-4" showQuickJumper defaultCurrent={1} total={product.length} onChange={onChangePagination} pageSizeOptions={[10, 20, 30, 50]} />
+                    <Pagination className="py-4" showQuickJumper current={currentPage.page} defaultCurrent={1} total={productDiscount.length} onChange={onChangePagination} pageSizeOptions={[10, 20, 30, 50]} />
                 </div>
             </Card>
         </div>

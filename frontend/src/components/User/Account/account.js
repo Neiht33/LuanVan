@@ -20,7 +20,7 @@ import {
     PowerIcon,
 } from "@heroicons/react/24/solid";
 import { ChevronRightIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import { Col, Row } from "antd";
+import { Button, Col, notification, Row, Space } from "antd";
 import { Link, Route, Router, Routes } from "react-router-dom";
 import UserProfile from "./userProfile";
 import UserAddress from "./userAddress";
@@ -30,6 +30,7 @@ export default function Account({ language }) {
 
     const [open, setOpen] = useState(0);
     const [user, setUser] = useState(0);
+    const [api, contextHolder] = notification.useNotification();
 
     useEffect(() => {
         if (window.localStorage.getItem('User')) {
@@ -41,9 +42,21 @@ export default function Account({ language }) {
         setOpen(open === value ? 0 : value);
     };
 
+    const openNotificationSuccess = (type) => {
+        api[type]({
+            message: 'Cập nhật thành công',
+        });
+    };
+
+    const openNotificationErrorPhone = (type) => {
+        api[type]({
+            message: 'Số điện thoại đã được đăng ký',
+        });
+    };
+
     return (
         <Row className="p-8">
-            <Col className="flex justify-center" xl={{ span: 7, offset: 0 }} sm={{ span: 11, offset: 1 }} xs={{ span: 12 }}>
+            <Col className="flex justify-center" xl={{ span: 7, offset: 0 }} sm={{ span: 24, offset: 0 }} xs={{ span: 24, offset: 0 }}>
                 <Card className=" w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5 bg-transparent shadow-none">
                     <div className="mb-2 px-4 py-2">
                         <Typography variant="h5" color="blue-gray">
@@ -112,13 +125,20 @@ export default function Account({ language }) {
                     </List>
                 </Card>
             </Col>
-            <Col className="min-h-[200px] w-full rounded" xl={{ span: 17, offset: 0 }} sm={{ span: 11, offset: 1 }} xs={{ span: 12 }}>
+            <Col className="min-h-[200px] w-full rounded" xl={{ span: 17, offset: 0 }} sm={{ span: 24, offset: 0 }} xs={{ span: 24, offset: 0 }}>
                 <Routes>
-                    <Route path="/" element={<UserProfile user={user} language={language} />} />
+                    <Route path="/" element={<UserProfile user={user} language={language} openNotificationSuccess={openNotificationSuccess} openNotificationErrorPhone={openNotificationErrorPhone} />} />
                     <Route path="/address" element={<UserAddress user={user} language={language} />} />
                     <Route path="/order" element={<UserOrder user={user} language={language} />} />
                 </Routes>
             </Col>
+
+            <>
+                {contextHolder}
+                <Space>
+                    <Button className="hidden notifyBoxSuccess" onClick={() => openNotificationSuccess('success')}>Success</Button>
+                </Space>
+            </>
         </Row>
     );
 }

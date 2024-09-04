@@ -2,8 +2,8 @@ import { Typography } from "@material-tailwind/react";
 
 const LINKS = [
   {
-    title: "Product",
-    items: ["Overview", "Features", "Solutions", "Tutorials"],
+    title: "Contact",
+    items: ["Hotline: 0886409254", "Email: thienb2012259@student.ctu.edu.vn"],
   },
   {
     title: "Company",

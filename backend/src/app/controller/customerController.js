@@ -1,8 +1,8 @@
-const customerService = require('../service/customerService')
+const accountService = require('../service/accountService')
 
 class customerController {
     async findAll(req, res) {
-        let data = await categoryService.findAll()
+        let data = await customerService.findAll()
         res.json(data)
     }
 
@@ -14,6 +14,7 @@ class customerController {
             res.json(result)
         } else res.json('Thất bại')
     }
+
 }
 
 module.exports = new customerController()

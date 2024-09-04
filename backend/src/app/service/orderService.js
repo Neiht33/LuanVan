@@ -27,7 +27,8 @@ class orderService {
                 inner join addressdistrict d on d.id = c.districtID
                 inner join addresscity t on t.id = d.cityID
                 inner join status s on s.id = op.statusID
-                where a.id = ${accountID};`, function (error, result, fields) {
+                where a.id = ${accountID}
+                order by op.time desc;`, function (error, result, fields) {
                 if (error) {
                     reject(error);
                     return;
@@ -39,7 +40,7 @@ class orderService {
 
     findOrderDetailByOrderID(orderID) {
         return new Promise((resolve, reject) => {
-            con.query(`Select od.*, p.*, od.quantity as quantityCurrent from orderdetail od
+            con.query(`Select od.*, p.*, p.discount as discountCurrent, od.discount, od.quantity as quantityCurrent from orderdetail od
                 inner join orderproduct op on op.id = od.orderID
                 inner join product p on p.id = od.productID
                 inner join account a on a.id = op.accountID
@@ -167,7 +168,7 @@ class orderService {
                 SELECT 5 UNION ALL
                 SELECT 6) AS days
                 ORDER BY
-                i)
+                i) and statusID = 4
                 group by dayofweek(time);`, function (error, result, fields) {
                 if (error) {
                     reject(error);
@@ -192,7 +193,7 @@ class orderService {
                 SELECT 5 UNION ALL
                 SELECT 6) AS days
                 ORDER BY
-                i)
+                i) and statusID = 4
                 group by dayofweek(time);`, function (error, result, fields) {
                 if (error) {
                     reject(error);
@@ -215,9 +216,9 @@ class orderService {
         })
     }
 
-    createOrderDetail(orderID, productID, quantity) {
+    createOrderDetail(orderID, productID, quantity, discount) {
         return new Promise((resolve, reject) => {
-            con.query(`INSERT INTO orderdetail(orderID, productID, quantity) VALUES (${orderID}, ${productID}, ${quantity});`, function (error, result, fields) {
+            con.query(`INSERT INTO orderdetail(orderID, productID, quantity, discount) VALUES (${orderID}, ${productID}, ${quantity}, ${discount});`, function (error, result, fields) {
                 if (error) {
                     reject(error);
                     return;

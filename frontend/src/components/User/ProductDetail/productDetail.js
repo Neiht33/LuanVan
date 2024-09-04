@@ -278,7 +278,12 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                             Kiểm Tra Khi Nhận Hàng Và Hoàn Trả Nếu Sản Phẩm Lỗi
                         </div>
                     </div>
-                    <div className='product-price mb-6 font-bold text-2xl text-red-400'>{formatNumber(product.price)}đ</div>
+                    <div className='product-price mb-6 font-bold text-2xl text-red-400 flex items-center'>
+                        {formatNumber(Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000)} đ
+                        {product.discount > 0 ? <Typography variant="h5" color="red" className="font-normal line-through ml-4 text-gray-500" textGradient>
+                            {formatNumber(product.price)} đ
+                        </Typography> : ''}
+                    </div>
                     <div className='my-6 flex items-center'>
                         <span className='mr-2'>Số lượng:</span>
                         <ConfigProvider
@@ -293,7 +298,7 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                             }}
                         >
                             <Flex vertical gap={12}>
-                                <InputNumber onChange={setQuantity} min={1} max={product.quantity} defaultValue={1} mouseEnterDelay={0} />
+                                <InputNumber onChange={setQuantity} min={1} max={product.wareHouse} defaultValue={1} mouseEnterDelay={0} />
                             </Flex>
                         </ConfigProvider>
                         <span className='ml-4 text-gray-500'>{product.wareHouse} {language == 1 ? 'sản phẩm có sẵn' : 'pieces availabel'}</span>
@@ -302,16 +307,9 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                         <Button className='translate-add w-[170px]' variant="outlined" onClick={() => {
                             if (!window.localStorage.getItem('User')) {
                                 window.location.href = 'http://localhost:3000/SignIn'
-                            } else handleAddCart(product.id, quantity, quantity * product.price)
+                            } else handleAddCart(product.id, quantity, quantity * (Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000))
                         }}>
                             {language == 1 ? 'THÊM VÀO GIỎ HÀNG' : 'ADD TO CART'}
-                        </Button>
-                        <Button className='translate-buy' variant="filled" onClick={() => {
-                            if (!window.localStorage.getItem('User')) {
-                                window.location.href = 'http://localhost:3000/SignIn'
-                            }
-                        }}>
-                            {language == 1 ? 'MUA NGAY' : 'BUY NOW'}
                         </Button>
                     </div>
                 </div>
@@ -385,7 +383,7 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                             return (
                                 <Col className="" xl={{ span: 5, offset: 1 }} sm={{ span: 7, offset: 1 }} xs={{ span: 12 }}>
                                     <Link to={`/Product/Productdetail/${removeVietnameseAccents(product.name)}-${product.id}`} onClick={() => handleScrollUp()}>
-                                        <Card className="w-full" style={{ border: '3px solid black' }}>
+                                        <Card className="w-full relative" style={{ border: '3px solid black' }}>
                                             <CardHeader floated={false} className="h-[300px] p-4 flex">
                                                 <img className="h-full m-auto" src={`http://localhost:8080/images/${product.img}`} alt="profile-picture" />
                                             </CardHeader>
@@ -393,17 +391,29 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                                                 <Typography variant="h7" color="blue-gray" className="mb-2 text-gray-600 product-name">
                                                     {product.name}
                                                 </Typography>
-                                                <Typography variant="h5" color="red" className="font-semibold my-4" textGradient>
-                                                    {formatNumber(product.price)} đ
-                                                </Typography>
+                                                <div className="flex items-center">
+                                                    {product.discount > 0 ? <div className="flex items-center">
+                                                        <Typography variant="h5" color="red" className="font-semibold mb-4 mt-2 mr-3" textGradient>
+                                                            {formatNumber(Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000)} đ
+                                                        </Typography>
+                                                        <Typography variant="h6" className="font-normal line-through mb-4 mt-2 text-gray-500" textGradient>
+                                                            {formatNumber(product.price)} đ
+                                                        </Typography>
+                                                    </div> : <Typography variant="h5" color="red" className="font-semibold mb-4 mt-2" textGradient>
+                                                        {formatNumber(product.price)} đ
+                                                    </Typography>}
+                                                </div>
                                                 <Button color="red" className="w-[240px]" onClick={() => {
                                                     if (!window.localStorage.getItem('User')) {
                                                         window.location.href = 'http://localhost:3000/SignIn'
-                                                    } else handleAddCart(product.id, 1, product.price)
+                                                    } else handleAddCart(product.id, 1, Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000)
                                                 }}>
                                                     {language == 1 ? 'THÊM VÀO GIỎ HÀNG' : 'ADD TO CART'}
                                                 </Button>
                                             </CardBody>
+                                            {product.discount > 0 ? <div className="absolute top-4 right-0 w-[70px] h-[30px] bg-red-500 rounded-tl rounded-bl text-white text-base flex justify-center items-center">
+                                                -{product.discount}%
+                                            </div> : ''}
                                         </Card>
                                     </Link>
                                 </Col>

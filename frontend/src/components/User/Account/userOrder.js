@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button, Card, CardBody, Collapse, Input, Rating, Tab, Tabs, TabsHeader, Textarea, Typography } from "@material-tailwind/react";
-import { Col, Modal, Rate, Row } from "antd";
+import { Col, Modal, Rate, Row, Space } from "antd";
 import { format } from 'date-fns-tz';
 import axios from "axios";
 import TextArea from "antd/es/input/TextArea";
@@ -72,8 +72,6 @@ export default function UserOrder({ language, user }) {
     const handleCancel = () => {
         setIsModalOpen(false);
     };
-
-
 
     const getApiOrder = async (id) => {
         try {
@@ -199,10 +197,10 @@ export default function UserOrder({ language, user }) {
     return (
         <>
             <Row className="p-4 bg-white">
-                <Col xl={{ span: 24, offset: 0 }} sm={{ span: 11, offset: 1 }} xs={{ span: 12 }}>
+                <Col xl={{ span: 24, offset: 0 }} sm={{ span: 24 }} xs={{ span: 24 }}>
                     <Tabs value={activeTab}>
                         <TabsHeader
-                            className="rounded-none border-b border-blue-gray-50 bg-transparent p-0"
+                            className="rounded-none border-b border-blue-gray-50 bg-transparent p-0 w-full"
                             indicatorProps={{
                                 className:
                                     "bg-transparent border-b-2 border-blue-500 shadow-none rounded-none",
@@ -213,7 +211,7 @@ export default function UserOrder({ language, user }) {
                                     key={value}
                                     value={value}
                                     onClick={() => setActiveTab(value)}
-                                    className={`text-lg ${activeTab === value ? "text-blue-500" : ""}`}
+                                    className={`md:text-lg text-sm ${activeTab === value ? "text-blue-500" : ""}`}
                                 >
                                     {label}
                                 </Tab>
@@ -229,7 +227,34 @@ export default function UserOrder({ language, user }) {
                             {formatDate(item.time)}
                         </div>
                         <div className="flex items-center text-blue-700 text-base font-lg">
-                            {(item.statusID != 3 && item.statusID != 4) ? item.status : ''}
+                            {item.statusID == 1 && <div className="flex items-center text-base">
+                                <span className="pr-2">{item.status}</span>
+                                {item.paymentStatus === 0 && <>
+                                    <Space>
+                                        <Button
+                                            type="primary"
+                                            variant="text"
+                                            className='p-0 font-normal normal-case hover:bg-transparent rounded-none'
+                                            onClick={() => {
+                                                Modal.confirm({
+                                                    title: 'Confirm',
+                                                    content: `${language == 1 ? 'Xác nhận hủy đơn hàng?' : 'You want to cancel your order?'}`,
+                                                    onOk: () => handleReceived(item.orderID, 5, 0),
+                                                    footer: (_, { OkBtn, CancelBtn }) => (
+                                                        <>
+                                                            <CancelBtn />
+                                                            <OkBtn />
+                                                        </>
+                                                    ),
+                                                });
+                                            }}
+                                        >
+                                            <span className="text-red-500 text-base pl-2 border-l-2 border-l-gray-300 hover:cursor-pointer">Hủy đơn</span>
+                                        </Button>
+                                    </Space>
+                                </>}
+                            </div>}
+                            {(item.statusID == 2) ? item.status : ''}
                             {item.statusID == 3 && <Button color="blue" onClick={() => handleReceived(item.orderID, 4, 1)}>Đã nhận hàng</Button>}
                             {item.statusID == 4 && <>
                                 <Typography variant="h6" color="green" className="font-normal border-r-2 border-r-gray-300 px-2 mr-2">
@@ -239,6 +264,8 @@ export default function UserOrder({ language, user }) {
                                     Đánh giá
                                 </Button>
                             </>}
+                            {item.statusID == 5 ? <div className="text-red-500">{language == 1 ? 'Chờ duyệt yêu cầu hủy đơn' : 'Waiting for cancellation request approval'}</div> : ''}
+                            {item.statusID == 6 ? <div className="text-red-500">{language == 1 ? 'Đã hủy' : 'Canceled'}</div> : ''}
                         </div>
                     </div>
                     <div className="px-8">
@@ -251,10 +278,10 @@ export default function UserOrder({ language, user }) {
                                     }}>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center w-9/12">
-                                                <div className="w-[100px] h-[100px] mr-2">
+                                                <div className="md:w-[100px] md:h-[100px] w-[100px] h-[100px] mr-2">
                                                     <img className="w-full h-full" src={`http://localhost:8080/images/${product.img}`} />
                                                 </div>
-                                                <span className="cart-itemName">{product.name}</span>
+                                                <span className="cart-itemName w-9/12">{product.name}</span>
                                             </div>
                                             <div className="cart-info text-end">
                                                 <div className="flex text-red-500 text-lg">{formatNumber(product.price)} đ</div>
@@ -272,7 +299,7 @@ export default function UserOrder({ language, user }) {
                 </div>
             ))}
             {activeTab == 'wailAccept' && order.map((item, index) => {
-                if (item.statusID == 1) {
+                if (item.statusID == 1 || item.statusID == 5) {
                     return (
                         <div className="mb-4 bg-white px-4">
                             <div className="flex justify-between items-center py-4 border-y-zinc-950 border-b-2 my-2"  >
@@ -280,7 +307,34 @@ export default function UserOrder({ language, user }) {
                                     {formatDate(item.time)}
                                 </div>
                                 <div className="flex items-center text-blue-700 text-base font-lg">
-                                    {item.status}
+                                    {item.statusID == 1 && <div className="flex items-center text-base">
+                                        <span className="pr-2">{item.status}</span>
+                                        {item.paymentStatus === 0 && <>
+                                            <Space>
+                                                <Button
+                                                    type="primary"
+                                                    variant="text"
+                                                    className='p-0 font-normal normal-case hover:bg-transparent rounded-none'
+                                                    onClick={() => {
+                                                        Modal.confirm({
+                                                            title: 'Confirm',
+                                                            content: `${language == 1 ? 'Xác nhận hủy đơn hàng?' : 'You want to cancel your order?'}`,
+                                                            onOk: () => handleReceived(item.orderID, 5, 0),
+                                                            footer: (_, { OkBtn, CancelBtn }) => (
+                                                                <>
+                                                                    <CancelBtn />
+                                                                    <OkBtn />
+                                                                </>
+                                                            ),
+                                                        });
+                                                    }}
+                                                >
+                                                    <span className="text-red-500 text-base pl-2 border-l-2 border-l-gray-300 hover:cursor-pointer">Hủy đơn</span>
+                                                </Button>
+                                            </Space>
+                                        </>}
+                                    </div>}
+                                    {item.statusID == 5 ? <div className="text-red-500">{language == 1 ? 'Chờ duyệt yêu cầu hủy đơn' : 'Waiting for cancellation request approval'}</div> : ''}
                                 </div>
                             </div>
                             <div className="px-8">
@@ -418,6 +472,50 @@ export default function UserOrder({ language, user }) {
                                     {item.ratedStatus != 1 ? <Button className="bg-red-600" type="primary" onClick={() => showModal(item.orderID)}>
                                         Đánh giá
                                     </Button> : <div className="text-red-300">Đã đánh giá</div>}
+                                </div>
+                            </div>
+                            <div className="px-8">
+                                {orderDetail.map((product, index) => {
+                                    if (product.orderID == item.orderID) {
+                                        return (
+                                            <div key={index} className="text-black py-2 border-b-2 border-b-stone-950 hover:bg-gray-100 cursor-pointer" onClick={(e) => {
+                                                e.preventDefault()
+                                                window.location.href = `/Product/Productdetail/${removeVietnameseAccents(product.name)}-${product.id}`
+                                            }}>
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center w-9/12">
+                                                        <div className="w-[100px] h-[100px] mr-2">
+                                                            <img className="w-full h-full" src={`http://localhost:8080/images/${product.img}`} />
+                                                        </div>
+                                                        <span className="cart-itemName">{product.name}</span>
+                                                    </div>
+                                                    <div className="cart-info text-end">
+                                                        <div className="flex text-red-500 text-lg">{formatNumber(product.price)} đ</div>
+                                                        <div>x {product.quantityCurrent}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )
+                                    }
+                                })}
+                                <Typography variant="h5" className="text-red-500 px-2 text-end py-4">
+                                    Tổng tiền: {formatNumber(item.total)} đ
+                                </Typography>
+                            </div>
+                        </div>
+                    )
+                }
+            })}
+            {activeTab == 'canceled' && order.map((item, index) => {
+                if (item.statusID == 6) {
+                    return (
+                        <div className="mb-4 bg-white px-4">
+                            <div className="flex justify-between items-center py-4 border-y-zinc-950 border-b-2 my-2"  >
+                                <div>
+                                    {formatDate(item.time)}
+                                </div>
+                                <div className="flex items-center text-blue-700 text-base font-lg">
+                                    <div className="text-red-500">{language == 1 ? 'Đã hủy' : 'Canceled'}</div>
                                 </div>
                             </div>
                             <div className="px-8">
