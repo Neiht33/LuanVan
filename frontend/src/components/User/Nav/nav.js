@@ -114,7 +114,6 @@ function Nav({ language, setLanguage, cartDetail }) {
             <MenuItem className="text-black" onClick={() => {
               window.localStorage.setItem('language', '1')
               setLanguage(1)
-            }} onTouchEnd={() => {
             }}>Tiếng Việt</MenuItem>
             <MenuItem className="text-black" onClick={() => {
               window.localStorage.setItem('language', '2')

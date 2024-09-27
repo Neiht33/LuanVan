@@ -230,6 +230,44 @@ class productService {
         })
     }
 
+    updateProductIncrease(name, price, category, description, oldWareHouse, newWareHouse, id) {
+        return new Promise((resolve, reject) => {
+            con.query(`Update product
+                Set name = '${name}',
+                price = ${price},
+                category = ${category},
+                description = '${description}',
+                wareHouse = ${newWareHouse},
+                quantity = quantity + (${newWareHouse} - ${oldWareHouse})
+                where id = ${id};`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
+    updateProductDecrease(name, price, category, description, oldWareHouse, newWareHouse, id) {
+        return new Promise((resolve, reject) => {
+            con.query(`Update product
+                Set name = '${name}',
+                price = ${price},
+                category = ${category},
+                description = '${description}',
+                wareHouse = ${newWareHouse},
+                quantity = quantity - (${oldWareHouse} - ${newWareHouse})
+                where id = ${id};`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
     updateDiscount(id, discount) {
         return new Promise((resolve, reject) => {
             con.query(`Update product

@@ -127,6 +127,18 @@ class productController {
         } else res.json('Thất bại')
     }
 
+    async updateProduct(req, res) {
+        let product = req.body
+        let data
+        if (product.newWareHouse >= product.oldWareHouse) {
+            data = await productService.updateProductIncrease(product.name, product.price, product.category, product.description, product.oldWareHouse, product.newWareHouse, product.id)
+        } else
+            if (product.newWareHouse < product.oldWareHouse) {
+                data = await productService.updateProductDecrease(product.name, product.price, product.category, product.description, product.oldWareHouse, product.newWareHouse, product.id)
+            }
+        res.json(data)
+    }
+
     async updateDiscount(req, res) {
         let product = req.body
         let data = await productService.updateDiscount(product.id, product.discount)

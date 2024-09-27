@@ -1,27 +1,38 @@
-import { Col, notification, Pagination, Row, Space } from "antd";
+import { Col, InputNumber, notification, Pagination, Row, Space } from "antd";
 import { Breadcrumbs, Button, ButtonGroup, Dialog, DialogBody, DialogFooter, DialogHeader, Input, Option, Typography, Select, Textarea, Card, Radio } from "@material-tailwind/react"
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import img1 from '../../../img/bearbrick.png'
 import { Link } from "react-router-dom";
 import { AddCategory, AddProduct, Discount } from "../Add/AdminAdd";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import axios from "axios";
 
 export default function Product({ product, setProduct, getAPIProduct }) {
     const TABLE_HEAD = ["Tên sản phẩm", "Danh mục", "Giá", "Đã bán", "Số lượng tồn kho", ""];
+    const [open, setOpen] = useState(false);
+    const [category, setCategory] = useState([])
+    const [selectedOptionCategory, setSelectedOptionCategory] = useState();
     const [api, contextHolder] = notification.useNotification();
-    const [openDelete, setOpenDelete] = useState(false);
+    const [nameValue, setNameValue] = useState('');
+    const [descriptionValue, setDescriptionValue] = useState('');
+    const [priceValue, setPriceValue] = useState('');
+    const [wareHouse, setWareHouse] = useState('');
     const [currentTab, setCurrentTab] = useState('AllProduct')
     const [currentPage, setCurrentPage] = useState({
         page: 1,
         size: 10
     })
 
+    var productForm = useRef({})
+
     useLayoutEffect(() => {
         getAPIProduct()
+        getApiDataCategory()
     }, [])
 
     function formatNumber(number) {
         // Chuyển số thành chuỗi và đảo ngược chuỗi
+        number = String(number).replace(/[a-zA-Z.]/g, '');
         let reversedNumberString = String(number).split('').reverse().join('');
         let formattedNumber = '';
 
@@ -37,6 +48,51 @@ export default function Product({ product, setProduct, getAPIProduct }) {
         return formattedNumber.split('').reverse().join('');
     }
 
+    const handlePriceChange = (e) => {
+        const value = e.target.value
+        setPriceValue(formatNumber(value))
+    }
+
+    const handleChangeDescription = (e) => {
+        const value = e.target.value
+        setDescriptionValue(value)
+    }
+
+    const handleChangeWareHouse = (e) => {
+        const value = e.target.value
+        setWareHouse(formatNumber(value))
+    }
+
+    const handleUpdate = (oldWareHouse) => {
+        const formUpdate = {
+            id: productForm.current.id,
+            name: nameValue,
+            category: productForm.current.category,
+            price: priceValue.replace(/\./g, ''),
+            description: descriptionValue.replace(/\n/g, '<br>'),
+            oldWareHouse: oldWareHouse,
+            newWareHouse: wareHouse.replace(/\./g, '')
+        }
+
+        axios.put(`http://localhost:8080/api/products/updateProduct`, formUpdate, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                // Xử lý kết quả từ server
+                console.log(response.data);
+                openNotificationSuccessUpdate('success')
+                getAPIProduct()
+                setOpen(false)
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error(error);
+            });
+
+    }
+
     const getApiProductBySeekPage = async (seek) => {
         try {
             const response = await fetch(`http://localhost:8080/api/products/Adminseek/main?seek=${seek}`);
@@ -49,11 +105,29 @@ export default function Product({ product, setProduct, getAPIProduct }) {
         }
     }
 
-    const handleOpenDelete = () => setOpenDelete(!openDelete);
+    const getApiDataCategory = async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/category`);
+            const data = await response.json();
+            if (data) {
+                setCategory(data);
+            }
+        } catch (error) {
+            console.log('Đã xảy ra lỗi:', error);
+        }
+    };
 
     const openNotificationSuccess = (type) => {
         api[type]({
             message: 'Thêm thành công',
+            description:
+                'Sản phẩm đã được đăng lên trang',
+        });
+    };
+
+    const openNotificationSuccessUpdate = (type) => {
+        api[type]({
+            message: 'Cập nhật thành công',
             description:
                 'Sản phẩm đã được đăng lên trang',
         });
@@ -172,18 +246,28 @@ export default function Product({ product, setProduct, getAPIProduct }) {
                                                 </div> : ''}
                                             </td>
                                             <td className="p-4 text-center">
-                                                <Typography as="a" href="#" variant="small" color="blue-gray" className="font-medium">
+                                                <Typography variant="small" color="blue-gray" className="font-medium">
                                                     {product.quantity - product.wareHouse}
                                                 </Typography>
                                             </td>
                                             <td className="p-4 text-center">
-                                                <Typography as="a" href="#" variant="small" color="blue-gray" className="font-medium">
+                                                <Typography variant="small" color="blue-gray" className="font-medium">
                                                     {product.wareHouse}
                                                 </Typography>
                                             </td>
                                             <td className="p-4 text-center">
-                                                <Typography as="a" href="#" variant="small" color="blue-gray" className="font-medium">
-
+                                                <Typography variant="small" color="blue-gray" className="font-medium hover:cursor-pointer hover:text-blue-500">
+                                                    <svg onClick={() => {
+                                                        productForm.current = product
+                                                        setOpen(true)
+                                                        setNameValue(product.name)
+                                                        setSelectedOptionCategory(product.categoryName)
+                                                        setPriceValue(formatNumber(product.price))
+                                                        setWareHouse(formatNumber(product.wareHouse))
+                                                        setDescriptionValue(product.description.replace(/<br>/g, '\n'))
+                                                    }} className="text-2xl" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                                                        <path fill="#000000" d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2v-7h-2zM14 3v2h3.59l-9.83 9.83l1.41 1.41L19 6.41V10h2V3z"></path>
+                                                    </svg>
                                                 </Typography>
                                             </td>
                                         </tr>
@@ -197,6 +281,61 @@ export default function Product({ product, setProduct, getAPIProduct }) {
                         <Pagination className="py-4" showQuickJumper current={currentPage.page} defaultCurrent={1} total={product.length} onChange={onChangePagination} pageSizeOptions={[10, 20, 30, 50]} />
                     </div>
                 </Card>
+                <Dialog
+                    open={open}
+                    size={"md"}
+                    handler={setOpen}
+                >
+                    <DialogHeader>Thông tin sản phẩm</DialogHeader>
+                    <DialogBody>
+                        <div className="">
+                            Tên sản phẩm:
+                            <Input onChange={(e) => setNameValue(e.target.value)} value={nameValue}></Input>
+                        </div>
+                        <div className="flex flex-wrap items-center justify-between">
+                            <div className="text-base my-4 flex items-center">
+                                Danh mục:
+                                <div className="w-[100px] ml-2">
+                                    <Select selected={() => selectedOptionCategory} onChange={setSelectedOptionCategory}>
+                                        {category.map((item, index) => {
+                                            return (
+                                                <Option value={item.name} key={index} onClick={() => productForm.current.category = item.id}>{item.name}</Option>
+                                            )
+                                        })}
+                                    </Select>
+                                </div>
+                            </div>
+                            <div className="my-4">
+                                Giá:
+                                <input className="productPrice h-[40px] py-[10px] px-[12px] rounded-[7px] ml-2" value={priceValue} onChange={handlePriceChange} style={{ border: '1px solid #b0bec5' }} placeholder="Giá" />
+                            </div>
+                        </div>
+                        <div className="">
+                            Kho:
+                            <input className="w-[100px] h-[40px] py-[10px] px-[12px] rounded-[7px] ml-[50px]" value={wareHouse} onChange={handleChangeWareHouse} style={{ border: '1px solid #b0bec5' }} placeholder="Số lượng" />
+                        </div>
+                        <div className="my-4">
+                            <Textarea className="productDescription min-h-[200px]" value={descriptionValue} onChange={handleChangeDescription} label="Mô tả" />
+                        </div>
+                    </DialogBody>
+                    <DialogFooter>
+                        <Button
+                            variant="text"
+                            color="red"
+                            onClick={() => setOpen(false)}
+                            className="mr-1"
+                        >
+                            <span>Hủy</span>
+                        </Button>
+                        <Button
+                            variant="gradient"
+                            color="green"
+                            onClick={() => handleUpdate(productForm.current.wareHouse)}
+                        >
+                            <span>Cập nhật</span>
+                        </Button>
+                    </DialogFooter>
+                </Dialog>
             </>}
             {(currentTab == 'AddProduct') && <AddProduct setCurrentTab={setCurrentTab} getAPIProduct={getAPIProduct} openNotificationSuccess={openNotificationSuccess} openNotificationError={openNotificationError} />}
             {(currentTab == 'AddCategory') && <AddCategory setCurrentTab={setCurrentTab} />}

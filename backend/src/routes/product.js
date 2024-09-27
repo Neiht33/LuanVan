@@ -19,6 +19,7 @@ router.get('/Adminseek/main', productController.findBySeekAdminPage)
 router.get('/productDiscount', productController.findProductDiscount)
 router.get('/', productController.findAll)
 router.post('/', upload.fields([{ name: 'img', maxCount: 1 }, { name: 'img1', maxCount: 1 }, { name: 'img2', maxCount: 1 }, { name: 'img3', maxCount: 1 }, { name: 'img4', maxCount: 1 }, { name: 'img5', maxCount: 1 }]), productController.create)
+router.put('/updateProduct', productController.updateProduct)
 router.put('/updateDiscount', productController.updateDiscount)
 // router.delete('/:id', categoryController.delete)
 

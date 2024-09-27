@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import './productDetail.css'
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -29,6 +29,7 @@ export default function ProductDetail({ language, getApiCartDetail }) {
     const [quantity, setQuantity] = useState(1);
     const [feedback, setFeedback] = useState([]);
     const [displayImg, setDisplayImg] = useState(3)
+    var [checkProductRelate, setCheckProductRelate] = useState(false)
 
     useLayoutEffect(() => {
         getApiProductByID(id.match(/[^-]*$/)[0])
@@ -87,12 +88,18 @@ export default function ProductDetail({ language, getApiCartDetail }) {
         }
     }
 
-    const getApiProductRelated = async (id) => {
+    const getApiProductRelated = async (idCategory) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/products/catalog/main?page=1&id=${id}`);
+            const response = await fetch(`http://localhost:8080/api/products/catalog/main?page=1&id=${idCategory}`);
             const data = await response.json();
             if (data) {
-                setProductRelated(data);
+                var dataRelate
+                if (data.findIndex(item => item.id == id.match(/[^-]*$/)[0]) <= 3) {
+                    dataRelate = data.filter((item, index) => (item.id != id.match(/[^-]*$/)[0]) && (index < 5))
+                } else {
+                    dataRelate = data.filter((item, index) => index < 4)
+                }
+                setProductRelated(dataRelate);
             }
         } catch (error) {
             console.log('Đã xảy ra lỗi:', error);
@@ -188,8 +195,6 @@ export default function ProductDetail({ language, getApiCartDetail }) {
             }
         ]
     };
-
-    console.log(supportImg);
 
     return (
         <>
@@ -379,46 +384,44 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                 </Typography>
                 <Row className='pr-[58px]'>
                     {productRelated.map((product, index) => {
-                        if (product.id != id.match(/[^-]*$/) && index < 5) {
-                            return (
-                                <Col className="" xl={{ span: 5, offset: 1 }} sm={{ span: 7, offset: 1 }} xs={{ span: 12 }}>
-                                    <Link to={`/Product/Productdetail/${removeVietnameseAccents(product.name)}-${product.id}`} onClick={() => handleScrollUp()}>
-                                        <Card className="w-full relative" style={{ border: '3px solid black' }}>
-                                            <CardHeader floated={false} className="h-[300px] p-4 flex">
-                                                <img className="h-full m-auto" src={`http://localhost:8080/images/${product.img}`} alt="profile-picture" />
-                                            </CardHeader>
-                                            <CardBody className="p-4 text-start h-[182px]">
-                                                <Typography variant="h7" color="blue-gray" className="mb-2 text-gray-600 product-name">
-                                                    {product.name}
-                                                </Typography>
-                                                <div className="flex items-center">
-                                                    {product.discount > 0 ? <div className="flex items-center">
-                                                        <Typography variant="h5" color="red" className="font-semibold mb-4 mt-2 mr-3" textGradient>
-                                                            {formatNumber(Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000)} đ
-                                                        </Typography>
-                                                        <Typography variant="h6" className="font-normal line-through mb-4 mt-2 text-gray-500" textGradient>
-                                                            {formatNumber(product.price)} đ
-                                                        </Typography>
-                                                    </div> : <Typography variant="h5" color="red" className="font-semibold mb-4 mt-2" textGradient>
+                        return (
+                            <Col className="" xl={{ span: 5, offset: 1 }} sm={{ span: 7, offset: 1 }} xs={{ span: 12 }}>
+                                <Link to={`/Product/Productdetail/${removeVietnameseAccents(product.name)}-${product.id}`} onClick={() => handleScrollUp()}>
+                                    <Card className="w-full relative" style={{ border: '3px solid black' }}>
+                                        <CardHeader floated={false} className="h-[300px] p-4 flex">
+                                            <img className="h-full m-auto" src={`http://localhost:8080/images/${product.img}`} alt="profile-picture" />
+                                        </CardHeader>
+                                        <CardBody className="p-4 text-start h-[182px]">
+                                            <Typography variant="h7" color="blue-gray" className="mb-2 text-gray-600 product-name">
+                                                {product.name}
+                                            </Typography>
+                                            <div className="flex items-center">
+                                                {product.discount > 0 ? <div className="flex items-center">
+                                                    <Typography variant="h5" color="red" className="font-semibold mb-4 mt-2 mr-3" textGradient>
+                                                        {formatNumber(Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000)} đ
+                                                    </Typography>
+                                                    <Typography variant="h6" className="font-normal line-through mb-4 mt-2 text-gray-500" textGradient>
                                                         {formatNumber(product.price)} đ
-                                                    </Typography>}
-                                                </div>
-                                                <Button color="red" className="w-[240px]" onClick={() => {
-                                                    if (!window.localStorage.getItem('User')) {
-                                                        window.location.href = 'http://localhost:3000/SignIn'
-                                                    } else handleAddCart(product.id, 1, Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000)
-                                                }}>
-                                                    {language == 1 ? 'THÊM VÀO GIỎ HÀNG' : 'ADD TO CART'}
-                                                </Button>
-                                            </CardBody>
-                                            {product.discount > 0 ? <div className="absolute top-4 right-0 w-[70px] h-[30px] bg-red-500 rounded-tl rounded-bl text-white text-base flex justify-center items-center">
-                                                -{product.discount}%
-                                            </div> : ''}
-                                        </Card>
-                                    </Link>
-                                </Col>
-                            )
-                        } else if (index == 5) return
+                                                    </Typography>
+                                                </div> : <Typography variant="h5" color="red" className="font-semibold mb-4 mt-2" textGradient>
+                                                    {formatNumber(product.price)} đ
+                                                </Typography>}
+                                            </div>
+                                            <Button color="red" className="w-[240px]" onClick={() => {
+                                                if (!window.localStorage.getItem('User')) {
+                                                    window.location.href = 'http://localhost:3000/SignIn'
+                                                } else handleAddCart(product.id, 1, Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000)
+                                            }}>
+                                                {language == 1 ? 'THÊM VÀO GIỎ HÀNG' : 'ADD TO CART'}
+                                            </Button>
+                                        </CardBody>
+                                        {product.discount > 0 ? <div className="absolute top-4 right-0 w-[70px] h-[30px] bg-red-500 rounded-tl rounded-bl text-white text-base flex justify-center items-center">
+                                            -{product.discount}%
+                                        </div> : ''}
+                                    </Card>
+                                </Link>
+                            </Col>
+                        )
                     })}
                 </Row>
             </div>
