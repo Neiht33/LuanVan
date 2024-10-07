@@ -54,13 +54,6 @@ class productController {
         let gender = Number(req.query.gender)
         let page = Number(req.query.page)
         let data = await productService.findByCategoryFilter(price1, price2, age, gender, req.query.seek, Number(req.query.categoryID), page * 12 - 11, page * 12)
-        let total = await productService.getTotalByCategoryFilter(price1, price2, age, gender, req.query.seek, Number(req.query.categoryID))
-        if (data.length != 0) {
-            data[0] = {
-                ...data[0],
-                total: total.length
-            }
-        }
         res.json(data)
     }
 
@@ -74,13 +67,6 @@ class productController {
         let gender = Number(req.query.gender)
         let page = Number(req.query.page)
         let data = await productService.findByFilter(price1, price2, age, gender, req.query.seek, page * 12 - 11, page * 12)
-        let total = await productService.getTotalByFilter(price1, price2, age, gender, req.query.seek)
-        if (data.length != 0) {
-            data[0] = {
-                ...data[0],
-                total: total.length
-            }
-        }
         res.json(data)
     }
 

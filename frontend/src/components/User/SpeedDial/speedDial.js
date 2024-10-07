@@ -38,7 +38,7 @@ export default function SpeedDialWithTextInside({ openSpeedDial, language }) {
     }
 
     return (
-        <div className={`speedDial bottom-5 right-5 ${openSpeedDial ? 'block' : 'rotate-out-center'}`}>
+        <div className={`speedDial ${openSpeedDial ? 'block' : 'rotate-out-center'}`}>
             <SpeedDial>
                 <SpeedDialHandler>
                     <IconButton size="lg" className="rounded-full">

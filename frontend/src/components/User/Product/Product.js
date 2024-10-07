@@ -113,7 +113,7 @@ export default function Product({ language, getApiCartDetail }) {
             const data = await response.json();
             if (data) {
                 if (data.length != 0) {
-                    totalPage.current = data[0].total
+                    totalPage.current = data[0].count
                 } else totalPage.current = 0
                 setProduct(data);
                 setOpenSkeleton(false)

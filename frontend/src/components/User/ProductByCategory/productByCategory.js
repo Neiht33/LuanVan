@@ -191,7 +191,7 @@ export default function ProductByCategory({ language, getApiCartDetail }) {
             if (data) {
                 console.log(data);
                 if (data.length != 0) {
-                    totalPage.current = data[0].total
+                    totalPage.current = data[0].count
                 } else totalPage.current = 0
                 setProduct(data);
                 setOpenSkeleton(false)

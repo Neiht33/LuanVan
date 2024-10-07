@@ -42,7 +42,7 @@ export default function Sidebar() {
                         <ListItemPrefix>
                             <ShoppingBagIcon className="h-6 w-6" />
                         </ListItemPrefix>
-                        Order
+                        Đơn hàng
                     </ListItem>
                 </Link>
                 <Link to={'/Admin/Product'}>
