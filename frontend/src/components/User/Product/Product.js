@@ -175,7 +175,6 @@ export default function Product({ language, getApiCartDetail }) {
                 // Xử lý kết quả từ server
                 getApiCartDetail(JSON.parse(window.localStorage.getItem('User')).id)
                 openNotification('success')
-                console.log(response.data);
             })
             .catch(error => {
                 // Xử lý lỗi

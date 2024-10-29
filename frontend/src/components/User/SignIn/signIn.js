@@ -15,6 +15,7 @@ import {
 } from "@material-tailwind/react";
 import axios from 'axios';
 import { notification, Space } from 'antd';
+import { GoogleLogin } from '@react-oauth/google';
 
 export default function SignIn({ language }) {
 
@@ -118,6 +119,22 @@ export default function SignIn({ language }) {
             });
     }
 
+    const handleSubmitGoogle = (credential) => {
+        axios.post(`http://localhost:8080/api/account/google`, credential, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                window.localStorage.setItem('User', JSON.stringify(response.data))
+                window.location.href = 'http://localhost:3000/Account';
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error(error);
+            });
+    }
+
     const handleSignIn = () => {
         const SignIn_phone = document.querySelector('.SignIn_phone')
         const SignIn_pass = document.querySelector('.SignIn_pass')
@@ -177,6 +194,7 @@ export default function SignIn({ language }) {
         imgMove.classList.remove("move-right")
         imgMove.classList.add("move-left")
         signUp.style.display = 'none'
+        signUp.style.padding = 'none'
         signIn.style.display = 'flex'
     }
 
@@ -193,8 +211,8 @@ export default function SignIn({ language }) {
     return (
         <div className='SignIn flex justify-center items-center'>
             <Card className="w-full md:max-w-[50rem] md:h-[600px] flex-row relative overflow-hidden">
-                <CardBody style={{ display: 'none' }} className='signUp flex justify-center items-center w-full py-6 pr-0 sm:pl-6 pl-0'>
-                    <Card className="md:w-96" style={{ boxShadow: 'none' }}>
+                <CardBody style={{ display: 'none' }} className='signUp flex justify-center items-center w-full py-6 pr-0 sm:pl-6 pl-0 md:pr-[330px]'>
+                    <Card className="w-full px-4 md:w-96" style={{ boxShadow: 'none' }}>
                         <Typography className='translate-signUp_title' variant="h3">
                             {language == 1 ? 'Đăng Ký' : 'Sign Up'}
                         </Typography>
@@ -239,13 +257,13 @@ export default function SignIn({ language }) {
                         </CardFooter>
                     </Card>
                 </CardBody>
-                <CardHeader
+                {/* <CardHeader
                     shadow={false}
                     floated={false}
                     className='signIn-img m-0 w-2/5 shrink-0'
                     style={{ height: '545px' }}
-                />
-                <CardBody className='signIn flex justify-center items-center w-full'>
+                /> */}
+                <CardBody className='signIn flex justify-center items-center w-full md:pl-[350px] ml-18px'>
                     <Card className="md:w-96" style={{ boxShadow: 'none' }}>
                         <Typography className='translate-signIn_title' variant="h3">
                             {language == 1 ? 'Đăng Nhập' : 'Sign In'}
@@ -255,9 +273,18 @@ export default function SignIn({ language }) {
                             <Input className='SignIn_pass' variant="standard" label={language == 1 ? 'Mật khẩu' : 'Password'} type='password' size="lg" required />
                         </CardBody>
                         <CardFooter className="pt-0">
-                            <Button className='translate-signIn_title' variant="gradient" fullWidth onClick={() => handleSignIn()}>
+                            <Button className='translate-signIn_title mb-4' variant="gradient" fullWidth onClick={() => handleSignIn()}>
                                 {language == 1 ? 'Đăng Nhập' : 'Sign In'}
                             </Button>
+                            <div className=''>
+                                <GoogleLogin
+                                    onSuccess={credentialResponse => handleSubmitGoogle(credentialResponse)}
+                                    onError={() => {
+                                        console.log('Login Failed');
+                                    }}
+                                    width={335}
+                                />
+                            </div>
                             <Typography variant="small" className="mt-6 flex justify-center">
                                 <span className='translate-signIn_support'>
                                     {language == 1 ? 'Bạn chưa có tài khoản?' : "You don't have an account?"}
@@ -279,7 +306,7 @@ export default function SignIn({ language }) {
                 <div
                     shadow={false}
                     floated={false}
-                    className='imgMove md:w-[350px] w-[200px] h-full'>
+                    className='imgMove w-[1px] hidden md:block md:w-[350px] w-[200px] h-full'>
                     <img
                         src={img}
                         alt="card-image"

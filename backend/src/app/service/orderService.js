@@ -40,7 +40,7 @@ class orderService {
 
     findOrderDetailByOrderID(orderID) {
         return new Promise((resolve, reject) => {
-            con.query(`Select od.*, p.*, p.discount as discountCurrent, od.discount, od.quantity as quantityCurrent from orderdetail od
+            con.query(`Select od.*, p.*, p.discount as discountCurrent, od.price as price, od.discount, od.quantity as quantityCurrent from orderdetail od
                 inner join orderproduct op on op.id = od.orderID
                 inner join product p on p.id = od.productID
                 inner join account a on a.id = op.accountID
@@ -216,9 +216,9 @@ class orderService {
         })
     }
 
-    createOrderDetail(orderID, productID, quantity, discount) {
+    createOrderDetail(orderID, productID, quantity, discount, price) {
         return new Promise((resolve, reject) => {
-            con.query(`INSERT INTO orderdetail(orderID, productID, quantity, discount) VALUES (${orderID}, ${productID}, ${quantity}, ${discount});`, function (error, result, fields) {
+            con.query(`INSERT INTO orderdetail(orderID, productID, quantity, discount, price) VALUES (${orderID}, ${productID}, ${quantity}, ${discount}, ${price});`, function (error, result, fields) {
                 if (error) {
                     reject(error);
                     return;

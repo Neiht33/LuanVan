@@ -9,7 +9,7 @@ class accountService {
                 inner join customer c on c.id = a.customerID
                 inner join addressdistrict d on d.id = c.districtID
                 inner join addresscity t on t.id = d.cityID
-                where a.level = 1
+                where a.level = 1 and o.statusID = 4
                 group by a.id;`, function (error, result, fields) {
                 if (error) {
                     reject(error);
@@ -51,6 +51,42 @@ class accountService {
     createAccount(customerID, password, level) {
         return new Promise((resolve, reject) => {
             con.query(`INSERT INTO account(customerID, password, level) VALUES (${customerID}, '${password}', ${level});`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
+    createAccountWithGoogle(customerID, level) {
+        return new Promise((resolve, reject) => {
+            con.query(`INSERT INTO account(customerID, level) VALUES (${customerID}, ${level});`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
+    createGoogleAccount(gmail) {
+        return new Promise((resolve, reject) => {
+            con.query(`INSERT INTO googleaccount(gmail) VALUES ('${gmail}');`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
+    getIdByGmail(gmail) {
+        return new Promise((resolve, reject) => {
+            con.query(`Select * from googleaccount where gmail =  '${gmail}';`, function (error, result, fields) {
                 if (error) {
                     reject(error);
                     return;

@@ -93,6 +93,8 @@ export default function Order({ getApiOrder, order }) {
             const response = await fetch(`http://localhost:8080/api/order/orderID/${id}`);
             const data = await response.json();
             if (data) {
+                console.log(data);
+
                 setOrderDetail(data)
             }
         } catch (error) {
@@ -631,12 +633,12 @@ export default function Order({ getApiOrder, order }) {
                                             </td>
                                             <td className="p-4 text-center">
                                                 <Typography variant="small" color="blue-gray" className="font-normal">
-                                                    {formatNumber(Math.floor((item.price - (item.price * item.discount) / 100) / 1000) * 1000)}
+                                                    {formatNumber(item.price)}
                                                 </Typography>
                                             </td>
                                             <td className="p-4 text-center">
                                                 <Typography as="a" href="#" variant="small" color="blue-gray" className="font-medium">
-                                                    {formatNumber(item.quantityCurrent * Math.floor((item.price - (item.price * item.discount) / 100) / 1000) * 1000)}
+                                                    {formatNumber(item.quantityCurrent * item.price)}
                                                 </Typography>
                                             </td>
                                         </tr>

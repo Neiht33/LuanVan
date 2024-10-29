@@ -10,6 +10,7 @@ router.get('/customer', accountController.findAccountByPhone)
 router.get('/address', accountController.getCity)
 router.get('/address/district/:id', accountController.getDistrictFromCity)
 router.post('/', accountController.create)
+router.post('/google', accountController.createAccountByGoogle)
 router.put('/update', accountController.update)
 // router.delete('/:id', accountController.delete)
 

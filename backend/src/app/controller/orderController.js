@@ -69,7 +69,7 @@ class orderController {
             let newOrder = await orderService.findNewOrderByAccount(order.accountID)
             let cartID = await cartService.findOneByAccountID(order.accountID)
             product.forEach(async (item, index) => {
-                await orderService.createOrderDetail(newOrder[0].max, item.id, item.quantityCurrent, item.discount)
+                await orderService.createOrderDetail(newOrder[0].max, item.id, item.quantityCurrent, item.discount, item.total)
                 await productService.updateQuantityProductReduce(item.quantityCurrent, item.id)
             });
             await cartService.deleteCartDetail(cartID[0].id)

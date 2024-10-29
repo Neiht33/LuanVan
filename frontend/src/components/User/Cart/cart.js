@@ -11,7 +11,6 @@ import {
     Card
 } from "@material-tailwind/react";
 import { Col, Row, Flex, InputNumber, ConfigProvider, notification, Space, Result, } from 'antd';
-import img1 from '../../../img/bearbrick.png'
 import { format } from 'date-fns-tz';
 import axios from 'axios';
 import Paypal from '../Paypal/paypal';
@@ -125,22 +124,28 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
             paymentStatus: paymentStatus
         }
 
-        axios.post(`http://localhost:8080/api/order/`, formOrderSubmit, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => {
-                // Xử lý kết quả từ server
-                setOpen(!open)
-                getApiCartDetail(JSON.parse(window.localStorage.getItem('User')).id)
-                openNotification('success')
-                window.location.href = 'http://localhost:3000/Account/order'
+        const account = JSON.parse(window.localStorage.getItem('User'))
+        if (account.address != null || account.districtID != null || account.phoneNumber != null) {
+            axios.post(`http://localhost:8080/api/order/`, formOrderSubmit, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             })
-            .catch(error => {
-                // Xử lý lỗi
-                console.error(error);
-            });
+                .then(response => {
+                    // Xử lý kết quả từ server
+                    setOpen(!open)
+                    getApiCartDetail(JSON.parse(window.localStorage.getItem('User')).id)
+                    openNotification('success')
+                    window.location.href = 'http://localhost:3000/Account/order'
+                })
+                .catch(error => {
+                    // Xử lý lỗi
+                    console.error(error);
+                });
+        } else {
+            window.location.href = 'http://localhost:3000/Account'
+        }
+
     }
 
     const handleChangeQuantity = debounce((event) => {
@@ -329,7 +334,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                             className="font-normal text-start"
                             variant="h6"
                         >
-                            *** *** *{user.phoneNumber ? `${user.phoneNumber.slice(-3)}` : ''}
+                            {user.phoneNumber ? `*** *** *${user.phoneNumber.slice(-3)}` : ''}
                         </Typography>
                     </div>
                     <div className='mb-8'>
@@ -340,7 +345,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                             className="font-normal text-start"
                             variant="h6"
                         >
-                            {`${user.city} - ${user.district} - ${user.address}`}
+                            {`${user.district ? `${user.city} - ${user.district} ${user.address ? `- ${user.address}` : ''}` : ''} `}
                         </Typography>
                     </div>
                     <div className='pb-4'>
@@ -385,7 +390,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                                             className="font-normal text-start"
                                             variant="h6"
                                         >
-                                            {`${user.city} - ${user.district} - ${user.address}`}
+                                            {`${user.district ? `${user.city} - ${user.district} ${user.address ? `- ${user.address}` : ''}` : ''} `}
                                         </Typography>
                                     </div>
                                     <div className='timeOrder text-black my-2'>
@@ -484,7 +489,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                                     </Button>
                                     {methodPay == 1 ? <Button className='w-[200px] text-base' color='blue' size='lg' variant="filled" onClick={() => handleOrderSubmit(0)}>
                                         <span>{language == 1 ? 'Đặt hàng' : 'Confirm'}</span>
-                                    </Button> : <Paypal amount={cartDetail[0] ? Math.floor(cartDetail[0].totalFinal / 23500) : 0} payload={handleOrderSubmit} />}
+                                    </Button> : <Paypal amount={cartDetail[0] ? Math.floor(cartDetail[0].totalFinal / 23500) : 0} payload={handleOrderSubmit(1)} />}
                                 </DialogFooter>
                             </Dialog>
                         </>
@@ -508,9 +513,6 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
             <>
                 {contextHolder}
                 <Space className="hidden">
-                    <Button type="primary" onClick={() => openNotification('top')}>
-                        top
-                    </Button>
                 </Space>
             </>
         </div>

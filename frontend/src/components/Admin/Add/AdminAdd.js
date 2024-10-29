@@ -1,6 +1,6 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import axios from 'axios';
-import { Breadcrumbs, Button, Card, Input, Option, Radio, Select, Textarea, Typography, IconButton } from "@material-tailwind/react";
+import { Breadcrumbs, Button, Card, Dialog, DialogBody, DialogFooter, DialogHeader, Input, Option, Radio, Select, Textarea, Typography, IconButton } from "@material-tailwind/react";
 import { ArrowRightIcon, ArrowLeftIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline"
 import { Col, Image, InputNumber, notification, Pagination, Row, Space, Upload } from "antd";
 import { Link } from "react-router-dom";
@@ -285,6 +285,7 @@ export function AddProduct({ setCurrentTab, getAPIProduct, openNotificationSucce
 export function AddCategory({ setCurrentTab }) {
     const TABLE_HEAD = ["Danh Mục", "Nhóm Danh Mục", "Tùy Chỉnh", ""];
 
+    const [open, setOpen] = useState(false);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileIMG, setFileIMG] = useState([]);
@@ -321,11 +322,26 @@ export function AddCategory({ setCurrentTab }) {
         setPreviewOpen(true);
     };
 
-    const handleChange = ({ fileList: newFileList }) => {
+    const handleChangeIMG = ({ fileList: newFileList }) => {
         if (newFileList.length != 0) {
             setFileIMG(newFileList[newFileList.length - 1].originFileObj);
         }
 
+    };
+
+    const handleChange = (e, name) => {
+        setCategoryForm((prev) => ({
+            ...prev,
+            [`${name}`]: e.target.value
+        }))
+    };
+
+    const openNotificationUpdateSuccess = (type) => {
+        api[type]({
+            message: 'Cập nhật thành công',
+            description:
+                'Danh mục đã được đăng lên trang chủ',
+        });
     };
 
     const openNotificationWithIconSuccess = (type) => {
@@ -344,6 +360,22 @@ export function AddCategory({ setCurrentTab }) {
         });
     };
 
+    const openNotificationDeleteSuccess = (type) => {
+        api[type]({
+            message: 'Xóa thành công',
+            description:
+                'Danh mục đã được gỡ khỏi trang chủ',
+        });
+    };
+
+    const openNotificationDeleteError = (type) => {
+        api[type]({
+            message: 'Không thành công',
+            description:
+                'Danh mục đã có sản phẩm, chỉ có thể xóa danh mục trống',
+        });
+    };
+
     const handleCategorySubmit = () => {
         const categoryName = document.querySelector('.categoryName')
 
@@ -356,27 +388,28 @@ export function AddCategory({ setCurrentTab }) {
 
         categoryForm = {
             name: `${categoryName.value}`,
-            group: selectedOption
+            group: selectedOption,
+            img: fileIMG
         }
 
-        fetch(`http://localhost:8080/api/category`, {
-            method: 'POST',
+        console.log(categoryForm);
+
+
+        axios.post(`http://localhost:8080/api/category`, categoryForm, {
             headers: {
-                'Content-Type': 'multipart/form-data'
-            },
-            body: JSON.stringify(categoryForm)
+                'Content-Type': 'multipart/form-data', // Thiết lập header
+            }
         })
-            .then(response => response.json())
             .then(result => {
                 getApiDataCategory()
                 setCategoryForm({
                     name: '',
                     group: '',
-                    img: fileIMG
+                    img: ''
                 })
                 categoryName.value = ''
                 setSelectedOption('')
-                document.querySelector('.notifyBoxSuccess').click()
+                openNotificationWithIconSuccess('success')
             })
             .catch(error => {
                 // Xử lý lỗi
@@ -385,12 +418,50 @@ export function AddCategory({ setCurrentTab }) {
 
     }
 
+    const handleUpdate = async () => {
+        var findResult = category.find((item) => item.name.toUpperCase() == categoryForm.name.toUpperCase())
+
+        if (findResult.id != categoryForm.id) {
+            document.querySelector('.notifyUpdateErr').textContent = 'Danh mục đã tồn tại!'
+            return
+        }
+
+        await axios.put(`http://localhost:8080/api/category`, categoryForm, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                // Xử lý kết quả từ server
+                console.log(response.data);
+                getApiDataCategory()
+                openNotificationUpdateSuccess('success')
+                setOpen(false)
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error(error);
+            });
+    }
+
+    const handleDelete = async (id) => {
+        axios.delete(`http://localhost:8080/api/category/${id}`)
+            .then(function (reponse) {
+                if (reponse.data == true) {
+                    openNotificationDeleteSuccess('success')
+                    getApiDataCategory()
+                } else openNotificationDeleteError('error')
+            })
+            .catch(function (err) {
+                console.log(err);
+            })
+    }
+
     const getApiDataCategory = async () => {
         try {
             const response = await fetch(`http://localhost:8080/api/category`);
             const data = await response.json();
             if (data) {
-                console.log(data);
                 setOpenSkeleton(false)
                 setCategory(data);
             }
@@ -431,7 +502,7 @@ export function AddCategory({ setCurrentTab }) {
                                 action='http://localhost:8080'
                                 listType="picture-card"
                                 onPreview={handlePreview}
-                                onChange={handleChange}
+                                onChange={handleChangeIMG}
                             >
                                 <button
                                     style={{
@@ -527,7 +598,7 @@ export function AddCategory({ setCurrentTab }) {
                                         &nbsp;
                                     </Typography>
                                 </div>}
-                                {!openSkeleton && category.map(({ name, group }, index) => {
+                                {!openSkeleton && category.map(({ id, name, group }, index) => {
                                     const isLast = index === category.length - 1;
                                     const classes = isLast ? "p-4" : "p-4 border-b border-blue-gray-50";
                                     if (index >= (active * 5 - 5) && index < (active * 5)) {
@@ -553,13 +624,21 @@ export function AddCategory({ setCurrentTab }) {
                                                 </td>
                                                 <td className={classes}>
                                                     <Typography
-                                                        as="a"
-                                                        href="#"
                                                         variant="small"
                                                         color="blue-gray"
-                                                        className="font-medium"
+                                                        className="font-medium flex justify-center items-center"
                                                     >
-                                                        Edit
+                                                        <svg onClick={() => {
+                                                            setCategoryForm((prev) => ({
+                                                                ...prev,
+                                                                ['id']: id,
+                                                                ['name']: name,
+                                                                ['group']: group
+                                                            }))
+                                                            setSelectedOption(group == 1 ? 'Đồ Chơi' : 'Phương Tiện Di Chuyển')
+                                                            setOpen(true)
+                                                        }} className="text-xl hover:cursor-pointer mr-2" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#000000" d="M5 19h1.425L16.2 9.225L14.775 7.8L5 17.575zm-2 2v-4.25L16.2 3.575q.3-.275.663-.425t.762-.15t.775.15t.65.45L20.425 5q.3.275.438.65T21 6.4q0 .4-.137.763t-.438.662L7.25 21zM19 6.4L17.6 5zm-3.525 2.125l-.7-.725L16.2 9.225z"></path></svg>
+                                                        <svg onClick={() => handleDelete(id)} className="text-xl hover:cursor-pointer" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="#e45858" stroke-dasharray="24" stroke-dashoffset="24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M5 5l14 14"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="24;0"></animate></path><path d="M19 5l-14 14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.4s" dur="0.4s" values="24;0"></animate></path></g></svg>
                                                     </Typography>
                                                 </td>
                                             </tr>
@@ -594,10 +673,51 @@ export function AddCategory({ setCurrentTab }) {
                     </Card>
                 </Col>
             </Row>
+            <Dialog
+                open={open}
+                size={"md"}
+                handler={setOpen}
+            >
+                <DialogHeader>Thông tin danh mục</DialogHeader>
+                <DialogBody>
+                    <div className="">
+                        Tên danh mục:
+                        <Input onChange={(e) => handleChange(e, 'name')} value={categoryForm.name}></Input>
+                    </div>
+                    <div className="flex flex-wrap items-center justify-between">
+                        <div className="text-base my-4 flex items-center">
+                            Nhóm danh mục:
+                            <div className="w-[100px] ml-2">
+                                <Select className="categoryGroup" selected={() => selectedOption} onChange={setSelectedOption} aria-required>
+                                    <Option value="Đồ chơi" onClick={() => categoryForm.group = 1}>Đồ Chơi</Option>
+                                    <Option value="Phương tiện di chuyển" onClick={() => categoryForm.group = 2}>Phương Tiện Di Chuyển</Option>
+                                </Select>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="notifyUpdateErr text-red-300"></div>
+                </DialogBody>
+                <DialogFooter>
+                    <Button
+                        variant="text"
+                        color="red"
+                        onClick={() => setOpen(false)}
+                        className="mr-1"
+                    >
+                        <span>Hủy</span>
+                    </Button>
+                    <Button
+                        variant="gradient"
+                        color="green"
+                        onClick={() => handleUpdate()}
+                    >
+                        <span>Cập nhật</span>
+                    </Button>
+                </DialogFooter>
+            </Dialog>
             <>
                 {contextHolder}
                 <Space>
-                    <Button className="hidden notifyBoxSuccess" onClick={() => openNotificationWithIconSuccess('success')}>Success</Button>
                     <Button className="hidden notifyBoxError" onClick={() => openNotificationWithIconError('error')}>Error</Button>
                 </Space>
             </>
@@ -605,15 +725,32 @@ export function AddCategory({ setCurrentTab }) {
     );
 }
 
-export function Discount({ product, getAPIProduct, openNotificationDiscountSuccess, setCurrentTab }) {
+export function Discount({ openNotificationDiscountSuccess, setCurrentTab }) {
 
-    const [productDiscount, setProductDiscount] = useState(product)
+    const [product, setProduct] = useState([])
 
     const TABLE_HEAD = ["Tên sản phẩm", "Danh mục", "Giá ban đầu", "Giảm %", "Giá sau khi giảm", " "];
-    const [currentPage, setCurrentPage] = useState({
+    var [currentPage, setCurrentPage] = useState({
         page: 1,
         size: 10
     })
+
+    useLayoutEffect(() => {
+        getAPIProduct()
+    }, [])
+
+    const getAPIProduct = async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/products`);
+            const data = await response.json();
+            if (data) {
+                var temp = data.map(item => ({ ...item, statusDiscount: true, initDiscount: item.discount }))
+                setProduct(temp);
+            }
+        } catch (error) {
+            console.log('Đã xảy ra lỗi:', error);
+        }
+    }
 
     const handleUpdate = (index) => {
         let parent = document.querySelector(`.input-${index}`)
@@ -660,9 +797,18 @@ export function Discount({ product, getAPIProduct, openNotificationDiscountSucce
         return formattedNumber.split('').reverse().join('');
     }
 
-    const onChange = (index, value) => {
+    const onChange = (index, value, id) => {
         let priceAfter = document.querySelector(`.price-after-${index}`)
         priceAfter.textContent = `${formatNumber(Math.floor((product[index].price - (product[index].price * value) / 100) / 1000) * 1000)} đ`
+
+        setProduct(prev =>
+            prev.map(input => {
+
+                if (input.initDiscount != value && input.id == id) {
+                    return input.id === id ? { ...input, discount: value, statusDiscount: false } : input
+                } else return input.id === id ? { ...input, discount: value, statusDiscount: true } : input
+            })
+        );
     };
 
     const getApiProductBySeekPage = async (seek) => {
@@ -670,7 +816,8 @@ export function Discount({ product, getAPIProduct, openNotificationDiscountSucce
             const response = await fetch(`http://localhost:8080/api/products/Adminseek/main?seek=${seek}`);
             const data = await response.json();
             if (data) {
-                setProductDiscount(data);
+                var temp = data.map(item => ({ ...item, statusDiscount: true, initDiscount: item.discount }))
+                setProduct(temp);
             }
         } catch (error) {
             console.log('Đã xảy ra lỗi:', error);
@@ -683,6 +830,7 @@ export function Discount({ product, getAPIProduct, openNotificationDiscountSucce
             size: 10
         })
         getApiProductBySeekPage(value)
+
     }, 500)
 
     function debounce(func, delay) {
@@ -739,7 +887,7 @@ export function Discount({ product, getAPIProduct, openNotificationDiscountSucce
                         </tr>
                     </thead>
                     <tbody>
-                        {productDiscount.map((product, index) => {
+                        {product.map((product, index) => {
                             if (index >= (currentPage.page * currentPage.size - currentPage.size) && index < (currentPage.page * currentPage.size)) {
                                 return (
                                     <tr key={index} className="even:bg-blue-gray-50/50">
@@ -766,23 +914,23 @@ export function Discount({ product, getAPIProduct, openNotificationDiscountSucce
                                                 <Space>
                                                     <InputNumber
                                                         className={`input-${index}`}
-                                                        defaultValue={product.discount ? product.discount : 0}
+                                                        value={product.discount}
                                                         min={0}
                                                         max={100}
                                                         formatter={(value) => `${value}%`}
                                                         parser={(value) => value?.replace('%', '')}
-                                                        onChange={value => onChange(index, value)}
+                                                        onChange={value => onChange(index, value, product.id)}
                                                     />
                                                 </Space>
                                             </Typography>
                                         </td>
                                         <td className="p-4 text-center">
                                             <Typography variant="small" color="blue-gray" className={`font-medium price-after-${index} text-red-500`}>
-                                                {product.discount > 0 ? `${formatNumber(product.price - (product.price * product.discount) / 100)} đ` : ''}
+                                                {product.discount > 0 ? `${formatNumber(Math.floor(product.price - (product.price * product.discount) / 100))} đ` : ''}
                                             </Typography>
                                         </td>
                                         <td className="py-4 text-center">
-                                            <Button color="green" onClick={() => handleUpdate(index)}>
+                                            <Button color="green" onClick={() => handleUpdate(index)} disabled={product.statusDiscount}>
                                                 Cập nhật
                                             </Button>
                                         </td>
@@ -795,7 +943,7 @@ export function Discount({ product, getAPIProduct, openNotificationDiscountSucce
                     </tbody>
                 </table>
                 <div className="flex justify-center">
-                    <Pagination className="py-4" showQuickJumper current={currentPage.page} defaultCurrent={1} total={productDiscount.length} onChange={onChangePagination} pageSizeOptions={[10, 20, 30, 50]} />
+                    <Pagination className="py-4" showQuickJumper current={currentPage.page} defaultCurrent={1} total={product.length} onChange={onChangePagination} pageSizeOptions={[10, 20, 30, 50]} />
                 </div>
             </Card>
         </div>

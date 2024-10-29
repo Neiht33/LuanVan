@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useState } from "react";
 import './nav.css'
 import {
   Navbar,
-  MobileNav,
+  Collapse,
   Typography,
   Button,
   IconButton,
@@ -421,11 +421,11 @@ function Nav({ language, setLanguage, cartDetail }) {
             )}
           </IconButton>
         </div>
-        <MobileNav open={openNav}>
+        <Collapse open={openNav}>
           <div className="container ">
             {navList2}
           </div>
-        </MobileNav>
+        </Collapse>
       </Navbar>
     </div>
   );

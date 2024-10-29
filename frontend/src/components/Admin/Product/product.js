@@ -339,7 +339,7 @@ export default function Product({ product, setProduct, getAPIProduct }) {
             </>}
             {(currentTab == 'AddProduct') && <AddProduct setCurrentTab={setCurrentTab} getAPIProduct={getAPIProduct} openNotificationSuccess={openNotificationSuccess} openNotificationError={openNotificationError} />}
             {(currentTab == 'AddCategory') && <AddCategory setCurrentTab={setCurrentTab} />}
-            {(currentTab == 'Discount') && <Discount setCurrentTab={setCurrentTab} product={product} getAPIProduct={getAPIProduct} openNotificationDiscountSuccess={openNotificationDiscountSuccess} />}
+            {(currentTab == 'Discount') && <Discount setCurrentTab={setCurrentTab} openNotificationDiscountSuccess={openNotificationDiscountSuccess} />}
             <>
                 {contextHolder}
                 <Space>
