@@ -464,7 +464,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                                                 {language == 1 ? 'Thanh toán khi nhận hàng' : 'Cash'}
                                             </Typography>
                                         </Typography> : ''}
-                                        {methodPay != 1 ? <Typography
+                                        {methodPay == 2 ? <Typography
                                             color="blue-gray"
                                             className="flex font-medium text-blue-gray-500"
                                         >
@@ -489,7 +489,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                                     </Button>
                                     {methodPay == 1 ? <Button className='w-[200px] text-base' color='blue' size='lg' variant="filled" onClick={() => handleOrderSubmit(0)}>
                                         <span>{language == 1 ? 'Đặt hàng' : 'Confirm'}</span>
-                                    </Button> : <Paypal amount={cartDetail[0] ? Math.floor(cartDetail[0].totalFinal / 23500) : 0} payload={handleOrderSubmit(1)} />}
+                                    </Button> : <Paypal amount={cartDetail[0] ? Math.floor(cartDetail[0].totalFinal / 23500) : 0} handleOrderSubmit={handleOrderSubmit} />}
                                 </DialogFooter>
                             </Dialog>
                         </>

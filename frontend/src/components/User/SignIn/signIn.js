@@ -209,7 +209,7 @@ export default function SignIn({ language }) {
     }
 
     return (
-        <div className='SignIn flex justify-center items-center'>
+        <div className='SignIn flex justify-center items-center ml-[10px] mt-4'>
             <Card className="w-full md:max-w-[50rem] md:h-[600px] flex-row relative overflow-hidden">
                 <CardBody style={{ display: 'none' }} className='signUp flex justify-center items-center w-full py-6 pr-0 sm:pl-6 pl-0 md:pr-[330px]'>
                     <Card className="w-full px-4 md:w-96" style={{ boxShadow: 'none' }}>
@@ -263,7 +263,7 @@ export default function SignIn({ language }) {
                     className='signIn-img m-0 w-2/5 shrink-0'
                     style={{ height: '545px' }}
                 /> */}
-                <CardBody className='signIn flex justify-center items-center w-full md:pl-[350px] ml-18px'>
+                <CardBody className='signIn flex justify-center items-center w-full md:pl-[350px]'>
                     <Card className="md:w-96" style={{ boxShadow: 'none' }}>
                         <Typography className='translate-signIn_title' variant="h3">
                             {language == 1 ? 'Đăng Nhập' : 'Sign In'}

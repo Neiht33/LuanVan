@@ -916,7 +916,7 @@ export default function Product({ language, getApiCartDetail }) {
                                                         </Typography>}
                                                     </div>
                                                 </div>
-                                                <Button color="red" className="w-full text-[8px] sm:text-[12px]" onClick={(e) => {
+                                                <Button color="red" className="w-full text-[8px] sm:text-[12px]" disabled={product.wareHouse == 0} onClick={(e) => {
                                                     e.preventDefault()
                                                     if (!window.localStorage.getItem('User')) {
                                                         window.location.href = 'http://localhost:3000/SignIn';

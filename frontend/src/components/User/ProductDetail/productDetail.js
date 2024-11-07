@@ -309,7 +309,7 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                         <span className='ml-4 text-gray-500'>{product.wareHouse} {language == 1 ? 'sản phẩm có sẵn' : 'pieces availabel'}</span>
                     </div>
                     <div className="flex w-max gap-4">
-                        <Button className='translate-add w-[170px]' variant="outlined" onClick={() => {
+                        <Button className='translate-add w-[170px]' variant="outlined" disabled={product.wareHouse == 0} onClick={() => {
                             if (!window.localStorage.getItem('User')) {
                                 window.location.href = 'http://localhost:3000/SignIn'
                             } else handleAddCart(product.id, quantity, quantity * (Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000))
@@ -407,7 +407,7 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                                                     {formatNumber(product.price)} đ
                                                 </Typography>}
                                             </div>
-                                            <Button color="red" className="w-[240px]" onClick={() => {
+                                            <Button color="red" className="w-[240px]" disabled={product.wareHouse == 0} onClick={() => {
                                                 if (!window.localStorage.getItem('User')) {
                                                     window.location.href = 'http://localhost:3000/SignIn'
                                                 } else handleAddCart(product.id, 1, Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000)
