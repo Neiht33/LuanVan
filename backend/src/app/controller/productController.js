@@ -1,4 +1,8 @@
 const productService = require('../service/productService')
+const orderService = require('../service/orderService')
+const cartService = require('../service/cartService')
+const path = require('path')
+const fs = require('fs');
 
 class productController {
 
@@ -143,6 +147,43 @@ class productController {
         let product = req.body
         let data = await productService.updateDiscount(product.id, product.discount)
         res.json(data)
+    }
+
+    async deleteProduct(req, res) {
+        let id = req.params.id
+        var orderDetailByProductID = await orderService.findOrderDetailByProductID(id);
+        var cartDetailByProductID = await cartService.findAllByProductID(id);
+        var product = await productService.findOneByID(id);
+        var supportImg = await productService.findSupportImg(id);
+
+        if (orderDetailByProductID.length == 0 && cartDetailByProductID == 0) {
+            supportImg.forEach(async (item) => {
+                const filePath = path.join(__dirname, '../../public/uploads', item.supportImg); // Đường dẫn đến file
+
+                fs.unlink(filePath, (err) => {
+                    if (err) {
+                        console.error('Lỗi khi xóa file:', err);
+                        return;
+                    }
+                    console.log('File đã được xóa thành công:', item.supportImg);
+                });
+
+                await productService.deleteSupportProduct(item.id);
+            })
+
+            const filePath = path.join(__dirname, '../../public/uploads', product[0].img); // Đường dẫn đến file
+
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error('Lỗi khi xóa file:', err);
+                    return;
+                }
+                console.log('File đã được xóa thành công:', product[0].img);
+            });
+            let data = await productService.deleteProduct(id)
+            res.json(true);
+        } else res.json(false);
+
     }
 }
 

@@ -976,7 +976,7 @@ export default function ProductByCategory({ language, getApiCartDetail }) {
                                 <Col key={index} className="mb-8" xl={{ span: 7, offset: 1 }} sm={{ span: 11, offset: 1 }} xs={{ span: 11, offset: 1 }}>
                                     <Link to={`/Product/Productdetail/${removeVietnameseAccents(product.name)}-${product.id}`} onClick={() => handleScrollUp()}>
                                         <Card className="w-full relative" style={{ border: '3px solid black' }}>
-                                            <CardHeader floated={false} className="sm:h-[300px] sm:w-auto sm:p-4 w-[153px] h-[153px] p-1 flex">
+                                            <CardHeader floated={false} className="sm:h-[300px] sm:w-auto sm:p-4 h-[153px] p-1 flex">
                                                 <img className="h-full w-full sm:m-auto hover:scale-110" src={`http://localhost:8080/images/${product.img}`} alt="profile-picture" />
                                             </CardHeader>
                                             <CardBody className="p-4 text-start h-[182px]">

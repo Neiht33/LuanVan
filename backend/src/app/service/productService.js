@@ -208,7 +208,7 @@ class productService {
 
     findSupportImg(id) {
         return new Promise((resolve, reject) => {
-            con.query(`select * from supportproduct s where s.IDProduct = ${id};`, function (error, result, fields) {
+            con.query(`select * from supportproduct where IDProduct = ${id};`, function (error, result, fields) {
                 if (error) {
                     reject(error);
                     return;
@@ -323,6 +323,31 @@ class productService {
         })
     }
 
+    deleteProduct(productID) {
+        return new Promise((resolve, reject) => {
+            con.query(`Delete from product
+            where id = ${productID}`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
+    deleteSupportProduct(supportProductID) {
+        return new Promise((resolve, reject) => {
+            con.query(`Delete from supportproduct
+            where id = ${supportProductID}`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
 }
 
 module.exports = new productService()

@@ -84,6 +84,20 @@ class orderService {
         })
     }
 
+    findOrderDetailByProductID(productID) {
+        return new Promise((resolve, reject) => {
+            con.query(`select * from orderdetail o
+                inner join product p on p.id = o.productID
+                where p.id = ${productID};`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
     statisticsByDay() {
         return new Promise((resolve, reject) => {
             con.query(`select Sum(total) as total, Date(time) as time from orderproduct

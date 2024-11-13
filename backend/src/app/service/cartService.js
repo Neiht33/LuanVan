@@ -45,6 +45,20 @@ class cartService {
         })
     }
 
+    findAllByProductID(productID) {
+        return new Promise((resolve, reject) => {
+            con.query(`select * from cartdetail c
+                inner join product p on p.id = c.productID
+                where p.id = ${productID};`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
     create(accountID, total) {
         return new Promise((resolve, reject) => {
             con.query(`INSERT INTO cart(accountID, total) VALUES (${accountID}, ${total});`, function (error, result, fields) {

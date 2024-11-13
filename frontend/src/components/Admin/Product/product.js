@@ -1,8 +1,6 @@
 import { Col, InputNumber, notification, Pagination, Row, Space } from "antd";
 import { Breadcrumbs, Button, ButtonGroup, Dialog, DialogBody, DialogFooter, DialogHeader, Input, Option, Typography, Select, Textarea, Card, Radio } from "@material-tailwind/react"
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import img1 from '../../../img/bearbrick.png'
-import { Link } from "react-router-dom";
 import { AddCategory, AddProduct, Discount } from "../Add/AdminAdd";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
@@ -117,6 +115,20 @@ export default function Product({ product, setProduct, getAPIProduct }) {
         }
     };
 
+    const handleDeleteProduct = (id) => {
+
+        axios.delete(`http://localhost:8080/api/products/${id}`)
+            .then(function (reponse) {
+                if (reponse.data == true) {
+                    openNotificationDeleteSuccess('success')
+                    getAPIProduct()
+                } else openNotificationDeleteError('error')
+            })
+            .catch(function (err) {
+                console.log(err);
+            })
+    }
+
     const openNotificationSuccess = (type) => {
         api[type]({
             message: 'Thêm thành công',
@@ -144,6 +156,22 @@ export default function Product({ product, setProduct, getAPIProduct }) {
     const openNotificationDiscountSuccess = (type) => {
         api[type]({
             message: 'Sản phẩm đã được cập nhật'
+        });
+    };
+
+    const openNotificationDeleteSuccess = (type) => {
+        api[type]({
+            message: 'Xóa thành công',
+            description:
+                'Sản phẩm đã được gỡ khỏi trang chủ',
+        });
+    };
+
+    const openNotificationDeleteError = (type) => {
+        api[type]({
+            message: 'Không thành công',
+            description:
+                'Sản phẩm không thể xóa',
         });
     };
 
@@ -256,7 +284,12 @@ export default function Product({ product, setProduct, getAPIProduct }) {
                                                 </Typography>
                                             </td>
                                             <td className="p-4 text-center">
-                                                <Typography variant="small" color="blue-gray" className="font-medium hover:cursor-pointer hover:text-blue-500">
+                                                <Typography variant="small" color="blue-gray" className="text-2xl font-medium hover:cursor-pointer hover:text-blue-500 flex justify-center items-center">
+                                                    <svg
+                                                        onClick={() => handleDeleteProduct(product.id)}
+                                                        xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="#e50606" stroke-dasharray="24" stroke-dashoffset="24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                                            <path d="M5 5l14 14"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="24;0"></animate></path><path d="M19 5l-14 14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.4s" dur="0.4s" values="24;0"></animate></path></g>
+                                                    </svg>
                                                     <svg onClick={() => {
                                                         productForm.current = product
                                                         setOpen(true)
@@ -265,7 +298,7 @@ export default function Product({ product, setProduct, getAPIProduct }) {
                                                         setPriceValue(formatNumber(product.price))
                                                         setWareHouse(formatNumber(product.wareHouse))
                                                         setDescriptionValue(product.description.replace(/<br>/g, '\n'))
-                                                    }} className="text-2xl" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                                                    }} className="text-2xl ml-2" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
                                                         <path fill="#000000" d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2v-7h-2zM14 3v2h3.59l-9.83 9.83l1.41 1.41L19 6.41V10h2V3z"></path>
                                                     </svg>
                                                 </Typography>
