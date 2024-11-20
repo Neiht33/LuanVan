@@ -1,6 +1,7 @@
-import { Col, InputNumber, notification, Pagination, Row, Space } from "antd";
+import { Col, InputNumber, notification, Pagination, Row, Space, message, Popconfirm } from "antd";
 import { Breadcrumbs, Button, ButtonGroup, Dialog, DialogBody, DialogFooter, DialogHeader, Input, Option, Typography, Select, Textarea, Card, Radio } from "@material-tailwind/react"
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+
 import { AddCategory, AddProduct, Discount } from "../Add/AdminAdd";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
@@ -175,6 +176,10 @@ export default function Product({ product, setProduct, getAPIProduct }) {
         });
     };
 
+    const confirm = (id) => {
+        handleDeleteProduct(id)
+    };
+
     const handleSearch = debounce((value) => {
         setCurrentPage({
             page: 1,
@@ -285,11 +290,16 @@ export default function Product({ product, setProduct, getAPIProduct }) {
                                             </td>
                                             <td className="p-4 text-center">
                                                 <Typography variant="small" color="blue-gray" className="text-2xl font-medium hover:cursor-pointer hover:text-blue-500 flex justify-center items-center">
-                                                    <svg
-                                                        onClick={() => handleDeleteProduct(product.id)}
-                                                        xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="#e50606" stroke-dasharray="24" stroke-dashoffset="24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                                            <path d="M5 5l14 14"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="24;0"></animate></path><path d="M19 5l-14 14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.4s" dur="0.4s" values="24;0"></animate></path></g>
-                                                    </svg>
+                                                    <Popconfirm
+                                                        title="Xóa sản phẩm"
+                                                        description="Bạn có chắc chắn xóa sản phẩm này?"
+                                                        onConfirm={() => confirm(product.id)}
+                                                    >
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="#e50606" stroke-dasharray="24" stroke-dashoffset="24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                                                <path d="M5 5l14 14"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="24;0"></animate></path><path d="M19 5l-14 14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.4s" dur="0.4s" values="24;0"></animate></path></g>
+                                                        </svg>
+                                                    </Popconfirm>
                                                     <svg onClick={() => {
                                                         productForm.current = product
                                                         setOpen(true)

@@ -408,7 +408,7 @@ export default function Order({ getApiOrder, order }) {
                                             </Button>
                                         </Space>
                                     </>}
-                                    {item.statusID == 3 && <Tag className='rounded-full w-full flex justify-center py-1 px-2 text-sm border-none' color="processing">Chờ thanh toán</Tag>}
+                                    {item.statusID == 3 && <Tag className='rounded-full w-full flex justify-center py-1 px-2 text-sm border-none' color="processing">{item.paymentStatus == 0 ? 'Chờ thanh toán' : 'Chờ nhận hàng'}</Tag>}
                                     {item.statusID == 4 &&
                                         <Tooltip content="Xem chi tiết" placement="top">
                                             <Tag key={index} onClick={() => handleOpenConfirm(item.orderID, index)} className='rounded-full w-full flex justify-center py-1 px-2 text-sm border-none hover:cursor-pointer' color="success">Hoàn thành</Tag>
@@ -757,7 +757,7 @@ export default function Order({ getApiOrder, order }) {
                                 <Col className='text-center' xl={{ span: 4, offset: 0 }}>{formatDate(item.time)}</Col>
                                 <Col className='text-center' xl={{ span: 3, offset: 0 }}>{formatNumber(item.total)}</Col>
                                 <Col className='text-center' xl={{ span: 2, offset: 0 }}>
-                                    <Tag className='rounded-full w-full flex justify-center py-1 px-2 text-sm border-none' color="processing">Chờ thanh toán</Tag>
+                                    <Tag className='rounded-full w-full flex justify-center py-1 px-2 text-sm border-none' color="processing">{item.paymentStatus == 0 ? 'Chờ thanh toán' : 'Chờ nhận hàng'}</Tag>
                                 </Col>
                             </Row>
                         )

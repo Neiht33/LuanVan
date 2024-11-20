@@ -10,7 +10,7 @@ import {
     DialogFooter,
     Card
 } from "@material-tailwind/react";
-import { Col, Row, Flex, InputNumber, ConfigProvider, notification, Space, Result, } from 'antd';
+import { Col, Row, Flex, InputNumber, ConfigProvider, notification, Space, Result, message } from 'antd';
 import { format } from 'date-fns-tz';
 import axios from 'axios';
 import Paypal from '../Paypal/paypal';
@@ -40,6 +40,13 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
         });
     };
 
+    const openNotificationWarning = (type, item) => {
+        api[type]({
+            message: `Rất tiếc sản phẩm ${item} đã hết hàng.`,
+            placement: 'top'
+        });
+    };
+
     useLayoutEffect(() => {
         if (window.localStorage.getItem('User')) {
             setUser(JSON.parse(window.localStorage.getItem('User')))
@@ -48,8 +55,15 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
     }, [])
 
     const handleOpen = () => {
-        setOpen(!open)
-        setTimeCurrent(formatDate(new Date()));
+        var arrItem = cartDetail.filter((item) => item.wareHouse == 0);
+        if (arrItem.length == 0) {
+            setOpen(!open)
+            setTimeCurrent(formatDate(new Date()));
+        } else {
+            arrItem.forEach((item) => {
+                openNotificationWarning('warning', item.name);
+            })
+        }
     };
 
     const formatDate = (date) => {

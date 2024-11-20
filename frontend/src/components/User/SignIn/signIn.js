@@ -95,10 +95,14 @@ export default function SignIn({ language }) {
             openNotificationError('error')
             return
         } else
-            if (signUp_pass.value !== signUp_repass.value) {
-                openNotificationErrorNotMatch('error')
+            if (signUp_phoneNumber.value.length < 10) {
+                openNotificationErrorInvalidPhone('error')
                 return
-            }
+            } else
+                if (signUp_pass.value !== signUp_repass.value) {
+                    openNotificationErrorNotMatch('error')
+                    return
+                }
 
         axios.post(`http://localhost:8080/api/account`, formSubmit, {
             headers: {
@@ -170,6 +174,12 @@ export default function SignIn({ language }) {
     const openNotificationErrorPhone = (type) => {
         api[type]({
             message: 'Số điện thoại chưa được đăng ký',
+        });
+    };
+
+    const openNotificationErrorInvalidPhone = (type) => {
+        api[type]({
+            message: 'Số điện thoại không hợp lệ',
         });
     };
 
