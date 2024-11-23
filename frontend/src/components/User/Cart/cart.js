@@ -177,7 +177,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
     return (
         <div className='Cart'>
             <div className='Cart-title my-10'>
-                <Typography className='font-normal' variant="h1">
+                <Typography className='font-normal' style={{ fontFamily: 'cursive' }} variant="h1">
                     {language == 1 ? 'Giỏ Hàng Của Bạn' : 'Your Cart'}
                 </Typography>
             </div>

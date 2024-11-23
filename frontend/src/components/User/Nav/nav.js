@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import './nav.css'
+import { Tag } from 'antd';
 import {
   Navbar,
   Collapse,
@@ -22,11 +23,13 @@ function Nav({ language, setLanguage, cartDetail }) {
   const [openCart, setOpenCart] = useState(false);
   const [openMenuAccount, setOpenMenuAccount] = useState(false);
   const [userCurrent, setUserCurrent] = useState(false)
+  const [suggestCategory, setSuggestCategory] = useState([])
   const [user, setUser] = useState({})
 
   useLayoutEffect(() => {
     if (window.localStorage.getItem('User')) {
       setUser(JSON.parse(window.localStorage.getItem('User')))
+      getApiActionCategory(JSON.parse(window.localStorage.getItem('User')).id)
       setUserCurrent(true)
     }
   }, [])
@@ -55,6 +58,14 @@ function Nav({ language, setLanguage, cartDetail }) {
 
     // Đảo ngược lại chuỗi đã được định dạng
     return formattedNumber.split('').reverse().join('');
+  }
+
+  const getApiActionCategory = async (id) => {
+    const response = await fetch(`http://localhost:8080/api/action/${id}`);
+    const data = await response.json();
+    if (data) {
+      setSuggestCategory(data);
+    }
   }
 
   const navList1 = (
@@ -373,7 +384,7 @@ function Nav({ language, setLanguage, cartDetail }) {
 
   return (
     <div className="w-full">
-      <Navbar className="max-w-full px-4 py-2 lg:px-8 lg:py-4 bg-transparent backdrop-blur-none rounded-none border-black shadow-none">
+      <Navbar className="max-w-full px-4 py-2 lg:px-8 lg:pt-4 lg:pb-2 bg-transparent backdrop-blur-none rounded-none border-black shadow-none">
         <div className="container min-w-full flex items-center justify-between text-blue-gray-900">
           <Typography
             as="a"
@@ -420,6 +431,11 @@ function Nav({ language, setLanguage, cartDetail }) {
               </svg>
             )}
           </IconButton>
+        </div>
+        <div className="w-full justify-center items-center hidden lg:flex">
+          {suggestCategory.map((item, index) => (
+            <Tag color="blue" className="cursor-pointer" onClick={() => window.location.href = `http://localhost:3000/Product/${removeVietnameseAccents(item.name)}-${item.objectId}`}>{item.name}</Tag>
+          ))}
         </div>
         <Collapse open={openNav}>
           <div className="container ">

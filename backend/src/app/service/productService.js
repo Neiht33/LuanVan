@@ -32,6 +32,29 @@ class productService {
         })
     }
 
+    findByPageAction(first, last, accountID) {
+        return new Promise((resolve, reject) => {
+            con.query(`SELECT * FROM (
+                    SELECT ROW_NUMBER() OVER(ORDER BY actionTest.count DESC) AS inx, allproduct.*
+                    FROM (SELECT p.*, c.name AS categoryName, c.group, actionTest.count FROM product p
+                        INNER JOIN category c ON c.id = p.category
+                        LEFT JOIN (SELECT objectId, type, accountID, COUNT(objectId) AS count FROM action
+                            WHERE type = 1 and accountID = ${accountID}
+                            GROUP BY objectId, type, accountID
+                        ) AS actionTest ON actionTest.objectId = p.id
+                    ) AS allproduct
+                ) AS filterProduct
+                WHERE filterProduct.inx BETWEEN ${first} AND ${last};`,
+                function (error, result, fields) {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
+                    resolve(result);
+                });
+        })
+    }
+
     findBySeekAdminPage(seek) {
         return new Promise((resolve, reject) => {
             con.query(`select p.*, c.name as categoryName, c.group from product p 
@@ -71,6 +94,29 @@ class productService {
                 inner join category c on c.id = p.category
                 where p.category = ${id}) as allproduct
                 where inx between ${first} and ${last};`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
+    findByActionCategoryID(id, accountID, first, last) {
+        return new Promise((resolve, reject) => {
+            con.query(`SELECT * FROM (
+                    SELECT ROW_NUMBER() OVER(ORDER BY actionTest.count DESC) AS inx, allproduct.*
+                    FROM (SELECT p.*, c.name AS categoryName, c.group, actionTest.count FROM product p
+                        INNER JOIN category c ON c.id = p.category
+                        LEFT JOIN (SELECT objectId, type, accountID, COUNT(objectId) AS count FROM action
+                            WHERE type = 1 and accountID = ${accountID}
+                            GROUP BY objectId, type, accountID
+                        ) AS actionTest ON actionTest.objectId = p.id
+                        where p.category = ${id}
+                    ) AS allproduct
+                ) AS filterProduct
+                WHERE filterProduct.inx BETWEEN ${first} AND ${last};`, function (error, result, fields) {
                 if (error) {
                     reject(error);
                     return;
@@ -147,7 +193,22 @@ class productService {
     findProductDiscount() {
         return new Promise((resolve, reject) => {
             con.query(`Select * from product 
-                order by discount desc;`, function (error, result, fields) {
+                order by discount desc
+                limit 10;`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
+    findHotProduct() {
+        return new Promise((resolve, reject) => {
+            con.query(`select *, (p.quantity - p.wareHouse) as sold from product p
+                order by sold desc
+                limit 10;`, function (error, result, fields) {
                 if (error) {
                     reject(error);
                     return;

@@ -13,7 +13,11 @@ class productController {
 
     async findByPage(req, res) {
         let page = Number(req.query.page)
-        let data = await productService.findByPage(page * 12 - 11, page * 12)
+        let accountID = Number(req.query.accountID)
+        var data
+        if (accountID) {
+            data = await productService.findByPageAction(page * 12 - 11, page * 12, accountID)
+        } else data = await productService.findByPage(page * 12 - 11, page * 12, accountID)
         res.json(data)
     }
 
@@ -37,7 +41,11 @@ class productController {
     async findByCategoryID(req, res) {
         let id = Number(req.query.id)
         let page = Number(req.query.page)
-        let data = await productService.findByCategoryID(id, page * 12 - 11, page * 12)
+        let accountID = Number(req.query.accountID)
+        var data
+        if (accountID) {
+            data = await productService.findByActionCategoryID(id, accountID, page * 12 - 11, page * 12)
+        } else data = await productService.findByCategoryID(id, page * 12 - 11, page * 12)
         res.json(data)
     }
 
@@ -102,7 +110,12 @@ class productController {
 
     async findProductDiscount(req, res) {
         let data = await productService.findProductDiscount()
-        res.json(data.filter((product, index) => index < 10))
+        res.json(data)
+    }
+
+    async findHotProduct(req, res) {
+        let data = await productService.findHotProduct()
+        res.json(data)
     }
 
     async create(req, res) {

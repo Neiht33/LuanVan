@@ -223,7 +223,7 @@ export default function SignIn({ language }) {
             <Card className="w-full md:max-w-[50rem] md:h-[600px] flex-row relative overflow-hidden">
                 <CardBody style={{ display: 'none' }} className='signUp flex justify-center items-center w-full py-6 pr-0 sm:pl-6 pl-0 md:pr-[330px]'>
                     <Card className="w-full px-4 md:w-96" style={{ boxShadow: 'none' }}>
-                        <Typography className='translate-signUp_title' variant="h3">
+                        <Typography className='translate-signUp_title' variant="h3" style={{ fontFamily: 'cursive' }}>
                             {language == 1 ? 'Đăng Ký' : 'Sign Up'}
                         </Typography>
                         <CardBody className="p-0 flex flex-col gap-4">
@@ -275,7 +275,7 @@ export default function SignIn({ language }) {
                 /> */}
                 <CardBody className='signIn flex justify-center items-center w-full md:pl-[350px]'>
                     <Card className="md:w-96" style={{ boxShadow: 'none' }}>
-                        <Typography className='translate-signIn_title' variant="h3">
+                        <Typography className='translate-signIn_title' variant="h3" style={{ fontFamily: 'cursive' }}>
                             {language == 1 ? 'Đăng Nhập' : 'Sign In'}
                         </Typography>
                         <CardBody className="flex flex-col gap-4 mb-4">

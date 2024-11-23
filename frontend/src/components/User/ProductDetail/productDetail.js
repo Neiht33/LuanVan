@@ -135,6 +135,27 @@ export default function ProductDetail({ language, getApiCartDetail }) {
         }
     }
 
+    const handleAction = (accountID, objectID, type) => {
+        var formSubmit = {
+            accountID: accountID,
+            objectID: objectID,
+            type: type
+        }
+
+        axios.put(`http://localhost:8080/api/action`, formSubmit, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error(error);
+            });
+    }
+
     const handleScrollUp = () => {
         window.scrollTo({
             top: 0
@@ -390,7 +411,12 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                     {productRelated.map((product, index) => {
                         return (
                             <Col className="mb-8" xl={{ span: 5, offset: 1 }} sm={{ span: 11, offset: 1 }} xs={{ span: 11, offset: 1 }}>
-                                <Link to={`/Product/Productdetail/${removeVietnameseAccents(product.name)}-${product.id}`} onClick={() => handleScrollUp()}>
+                                <Link to={`/Product/Productdetail/${removeVietnameseAccents(product.name)}-${product.id}`} onClick={() => {
+                                    handleScrollUp()
+                                    if (window.localStorage.getItem('User')) {
+                                        handleAction(JSON.parse(window.localStorage.getItem('User')).id, product.id, 1);
+                                    }
+                                }}>
                                     <Card className="w-full relative" style={{ border: '3px solid black' }}>
                                         <CardHeader floated={false} className="max-h-[300px] p-4 flex">
                                             <img className="h-full w-full" src={`http://localhost:8080/images/${product.img}`} alt="profile-picture" />

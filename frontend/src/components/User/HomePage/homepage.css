@@ -9,7 +9,7 @@
 
 .introduce-title {
     text-align: left;
-    font-family: 'Courier New', Courier, monospace
+    font-family: cursive
 }
 
 .introduce-title2 {
@@ -19,11 +19,11 @@
 
 .introduce-content {
     text-align: left;
-    font-family: 'Courier New', Courier, monospace
+    font-family: cursive
 }
 
 .hotProduct-title {
-    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif
+    font-family: cursive
 }
 
 .introduce2 {
@@ -101,7 +101,6 @@
     -webkit-transition: all 0.5s;
     transition: all 0.5s;
 }
-
 
 .typing-text {
     overflow: hidden;
