@@ -13,7 +13,7 @@ export function HomePage({ language }) {
 
   const handleScrollType = () => {
     const typingPosition = document.querySelector('.introduce2')
-    const addtyping = document.querySelector('.introduce-title')
+    const addtyping = document.querySelector('.introduce-title-type')
     if (typingPosition && (typingPosition.getBoundingClientRect().top <= window.innerHeight / 2)) {
       if (window.innerWidth > 796) {
         addtyping.classList.add('typing-text')
@@ -82,7 +82,7 @@ export function HomePage({ language }) {
         </div>
       </div>
       <h1 className='hotProduct-title my-10'>{language == 1 ? 'SẢN PHẨM BÁN CHẠY' : 'HOT PRODUCTS'}</h1>
-      <div className='display-product relative h-[600px]'>
+      <div className='display-product relative h-screen'>
         <div className='absolute top-0 bottom-0 right-0 left-0 flex justify-center items-center' style={{ backgroundColor: '#191a1c' }}>
           <img className='h-full' src={img4}></img>
         </div>
@@ -217,8 +217,8 @@ export function HomePage({ language }) {
         <div className='GrapperOne flex justify-center p-2 xl:w-[512px] xl:h-[512px] lg:w-[350px] lg:h-[350px] w-[250px] h-[250px]'>
           <img className='w-[full] h-[full]' src={img1} />
         </div>
-        <div className='sm:pl-[84px] p-4 w-9/12'>
-          <div className='mb-6 introduce-title text-white xl:text-[42px] lg:text-[32px] sm:text-[24px] text-[20px]'>
+        <div className='sm:pl-[84px] p-4 w-9/12 text-start'>
+          <div className='mb-6 introduce-title-type text-white xl:text-[42px] lg:text-[32px] sm:text-[24px] text-[20px] '>
             {language == 1 ? 'Khám phá tiềm năng bên trong' : 'Discover the potential within'}
           </div>
           <div className='introduce-content text-white xl:text-[30px] lg:text-[22px]'>

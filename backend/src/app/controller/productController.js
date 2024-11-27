@@ -46,6 +46,10 @@ class productController {
         if (accountID) {
             data = await productService.findByActionCategoryID(id, accountID, page * 12 - 11, page * 12)
         } else data = await productService.findByCategoryID(id, page * 12 - 11, page * 12)
+        let total = await productService.findAllByCategoryID(id)
+        if (data[0]) {
+            data[0].total = total.length
+        }
         res.json(data)
     }
 

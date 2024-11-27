@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
 import { Button, Input, Option, Select, Typography } from "@material-tailwind/react";
 import { notification, Space } from "antd";
 import axios from "axios";
@@ -23,8 +23,11 @@ export default function UserProfile({ language, user, openNotificationSuccess, o
         address: userAddress
     })
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         getApiCity()
+        if (JSON.parse(window.localStorage.getItem('User')).cityID) {
+            getApiDistrict(JSON.parse(window.localStorage.getItem('User')).cityID)
+        }
     }, [])
 
     const getApiAccountProfile = async (id) => {
@@ -63,6 +66,8 @@ export default function UserProfile({ language, user, openNotificationSuccess, o
             if (data) {
                 setDistrict(data)
             }
+            console.log(id, data);
+
         } catch (error) {
             console.log('Đã xảy ra lỗi:', error);
         }
@@ -132,7 +137,7 @@ export default function UserProfile({ language, user, openNotificationSuccess, o
                             {language == 1 ? 'Địa chỉ' : 'Address'}:
                         </Typography>
                         <div className="w-4/5 mb-4">
-                            <Input className="text-sm md:text-base" label={`${user.district ? `${user.city} - ${user.district} ${user.address ? `- ${user.address}` : ''}` : ''} `} disabled />
+                            <Input className="text-sm md:text-base" label={`${user.district ? `${user.city} - ${user.district} ${user.address ? `- ${user.address}` : '0'}` : ''} `} disabled />
                         </div>
                     </div>
                     <Button color="blue" onClick={() => {

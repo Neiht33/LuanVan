@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import {
     Card,
     Typography,
@@ -29,10 +29,10 @@ import UserOrder from "./userOrder";
 export default function Account({ language }) {
 
     const [open, setOpen] = useState(0);
-    const [user, setUser] = useState(0);
+    const [user, setUser] = useState(JSON.parse(window.localStorage.getItem('User')));
     const [api, contextHolder] = notification.useNotification();
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (window.localStorage.getItem('User')) {
             setUser(JSON.parse(window.localStorage.getItem('User')))
         }
@@ -116,7 +116,10 @@ export default function Account({ language }) {
                             </ListItemPrefix>
                             Settings
                         </ListItem>
-                        <ListItem>
+                        <ListItem onClick={() => {
+                            window.localStorage.removeItem('User')
+                            window.location.href = 'http://localhost:3000/'
+                        }}>
                             <ListItemPrefix>
                                 <PowerIcon className="h-5 w-5" />
                             </ListItemPrefix>

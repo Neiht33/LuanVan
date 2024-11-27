@@ -14,6 +14,7 @@ import {
   MenuItem,
   Badge
 } from "@material-tailwind/react";
+import axios from 'axios';
 import { Link } from "react-router-dom";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
@@ -61,11 +62,15 @@ function Nav({ language, setLanguage, cartDetail }) {
   }
 
   const getApiActionCategory = async (id) => {
-    const response = await fetch(`http://localhost:8080/api/action/${id}`);
-    const data = await response.json();
-    if (data) {
-      setSuggestCategory(data);
-    }
+    axios.get(`http://localhost:8080/api/action/${id}`)
+      .then(response => {
+        setSuggestCategory(response.data);
+        return
+      })
+      .catch(error => {
+        // Xử lý lỗi
+        console.error(error);
+      })
   }
 
   const navList1 = (

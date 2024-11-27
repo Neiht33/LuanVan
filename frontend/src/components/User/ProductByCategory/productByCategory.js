@@ -178,6 +178,7 @@ export default function ProductByCategory({ language, getApiCartDetail }) {
             } else response = await fetch(`http://localhost:8080/api/products/catalog/main?id=${id}&page=${page}`);
             const data = await response.json();
             if (data) {
+                totalPage.current = data[0].total
                 setProduct(data);
                 setOpenSkeleton(false)
             }
@@ -192,7 +193,6 @@ export default function ProductByCategory({ language, getApiCartDetail }) {
             const response = await fetch(`http://localhost:8080/api/products/category/filter?${objectToQueryString(filter.current)}`);
             const data = await response.json();
             if (data) {
-                console.log(data);
                 if (data.length != 0) {
                     totalPage.current = data[0].total
                 } else totalPage.current = 0
@@ -1039,7 +1039,7 @@ export default function ProductByCategory({ language, getApiCartDetail }) {
                                                     if (!window.localStorage.getItem('User')) {
                                                         window.location.href = 'http://localhost:3000/SignIn';
                                                     } else handleAddCart(product.id, 1, Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000)
-                                                }}>Thêm vào giỏ hàng</Button>
+                                                }}>{language == 1 ? 'Thêm vào giỏ hàng' : 'Add to cart'}</Button>
                                             </CardBody>
                                             {product.discount > 0 ? <div className="absolute top-4 right-0 sm:w-[70px] sm:h-[30px] w-[50px] h-[14px]text-[14px] bg-red-500 rounded-tl rounded-bl text-white lg:text-base flex justify-center items-center">
                                                 -{product.discount}%

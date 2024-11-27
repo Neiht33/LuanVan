@@ -75,10 +75,9 @@ class accountController {
             await cartService.create(accountID[0].id, 0)
             res.json(result[0])
         } else {
-            const find = customerService.findOneByGmailHadAccount(payload.email)
-            find.length > 0 ? account = await customerService.findOneByGmailHadAccount(payload.email) : ''
+            const find = await customerService.findOneByGmailHadAccount(payload.email)
+            find.length > 0 ? res.json(find[0]) : res.json(account[0])
         }
-        res.json(account[0])
     }
 
     async getCity(req, res) {

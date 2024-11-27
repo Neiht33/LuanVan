@@ -132,6 +132,7 @@ export default function SignIn({ language }) {
             .then(response => {
                 window.localStorage.setItem('User', JSON.stringify(response.data))
                 window.location.href = 'http://localhost:3000/Account';
+                return;
             })
             .catch(error => {
                 // Xử lý lỗi

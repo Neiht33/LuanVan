@@ -955,7 +955,7 @@ export default function Product({ language, getApiCartDetail }) {
                                                         handleAddCart(product.id, 1, Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000)
                                                         handleAction(JSON.parse(window.localStorage.getItem('User')).id, product.id, 1)
                                                     }
-                                                }}>Thêm vào giỏ hàng</Button>
+                                                }}>{language == 1 ? 'Thêm vào giỏ hàng' : 'Add to cart'}</Button>
                                             </CardBody>
                                             {product.discount > 0 ? <div className="absolute top-4 right-0 sm:w-[70px] sm:h-[30px] w-[50px] h-[14px]text-[14px] bg-red-500 rounded-tl rounded-bl text-white lg:text-base flex justify-center items-center">
                                                 -{product.discount}%

@@ -103,6 +103,18 @@ class productService {
         })
     }
 
+    findAllByCategoryID(id) {
+        return new Promise((resolve, reject) => {
+            con.query(`select * from product where category = ${id};`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
     findByActionCategoryID(id, accountID, first, last) {
         return new Promise((resolve, reject) => {
             con.query(`SELECT * FROM (
@@ -148,7 +160,7 @@ class productService {
             con.query(`select * from (select ROW_NUMBER() OVER(ORDER BY p.id) as inx, p.* from product p where
                 ${price1 ? `(p.price - (p.price * p.discount) / 100) >= ${price1} and (p.price - (p.price * p.discount) / 100) <= ${price2}` : ''}
                 ${(price1 && age) ? `and p.age = ${age}` : (age ? `p.age = ${age}` : '')}
-                ${((price1 && gender) || (age && gender)) ? `and p.gender = ${gender}` : (gender ? `p.gender = ${gender}` : '')}
+                ${((price1 && gender) || (age && gender)) ? `and p.gender = ${gender} or p.gender = 0` : (gender ? `p.gender = ${gender} or p.gender = 0` : '')}
                 ${price1 ? 'and' : age ? 'and' : gender ? 'and' : ''} p.name like '%${seek}%'
                 and p.category = ${categoryID}) as allproduct
                 where inx between ${first} and ${last};`, function (error, result, fields) {
@@ -166,7 +178,7 @@ class productService {
             con.query(`select * from (select ROW_NUMBER() OVER(ORDER BY p.id) as inx, p.* from product p where
                 ${price1 ? `(p.price - (p.price * p.discount) / 100) >= ${price1} and (p.price - (p.price * p.discount) / 100) <= ${price2}` : ''}
                 ${(price1 && age) ? `and p.age = ${age}` : (age ? `p.age = ${age}` : '')}
-                ${((price1 && gender) || (age && gender)) ? `and p.gender = ${gender}` : (gender ? `p.gender = ${gender}` : '')}
+                ${((price1 && gender) || (age && gender)) ? `and p.gender = ${gender} or p.gender = 0` : (gender ? `p.gender = ${gender} or p.gender = 0` : '')}
                 ${price1 ? 'and' : age ? 'and' : gender ? 'and' : ''} p.name like '%${seek}%') as allproduct
                 where inx between ${first} and ${last};`, function (error, result, fields) {
                 if (error) {
@@ -223,7 +235,7 @@ class productService {
             con.query(`select p.* from product p where
                 ${price1 ? `p.price >= ${price1} and p.price <= ${price2}` : ''}
                 ${(price1 && age) ? `and p.age = ${age}` : (age ? `p.age = ${age}` : '')}
-                ${((price1 && gender) || (age && gender)) ? `and p.gender = ${gender}` : (gender ? `p.gender = ${gender}` : '')}
+                ${((price1 && gender) || (age && gender)) ? `and p.gender = ${gender} or p.gender = 0` : (gender ? `p.gender = ${gender} or p.gender = 0` : '')}
                 ${price1 ? 'and' : age ? 'and' : gender ? 'and' : ''} p.name like '%${seek}%';`,
                 function (error, result, fields) {
                     if (error) {
@@ -240,7 +252,7 @@ class productService {
             con.query(`select p.* from product p where
                 ${price1 ? `p.price >= ${price1} and p.price <= ${price2}` : ''}
                 ${(price1 && age) ? `and p.age = ${age}` : (age ? `p.age = ${age}` : '')}
-                ${((price1 && gender) || (age && gender)) ? `and p.gender = ${gender}` : (gender ? `p.gender = ${gender}` : '')}
+                ${((price1 && gender) || (age && gender)) ? `and p.gender = ${gender} or p.gender = 0` : (gender ? `p.gender = ${gender} or p.gender = 0` : '')}
                 ${price1 ? 'and' : age ? 'and' : gender ? 'and' : ''} p.name like '%${seek}%'
                 and p.category = ${categoryID};`,
                 function (error, result, fields) {
