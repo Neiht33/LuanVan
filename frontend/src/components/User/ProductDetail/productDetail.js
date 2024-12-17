@@ -98,7 +98,9 @@ export default function ProductDetail({ language, getApiCartDetail }) {
             const data = await response.json();
             if (data) {
                 var dataRelate
-                if (data.findIndex(item => item.id == id.match(/[^-]*$/)[0]) <= 3) {
+                console.log(id.match(/[^-]*$/)[0]);
+
+                if ((data.findIndex(item => item.id == id.match(/[^-]*$/)[0]) <= 3) && (data.findIndex(item => item.id == id.match(/[^-]*$/)[0]) != -1)) {
                     dataRelate = data.filter((item, index) => (item.id != id.match(/[^-]*$/)[0]) && (index < 5))
                 } else {
                     dataRelate = data.filter((item, index) => index < 4)

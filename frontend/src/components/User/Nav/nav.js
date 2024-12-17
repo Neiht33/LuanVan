@@ -439,7 +439,7 @@ function Nav({ language, setLanguage, cartDetail }) {
         </div>
         <div className="w-full justify-center items-center hidden lg:flex">
           {suggestCategory.map((item, index) => (
-            <Tag color="blue" className="cursor-pointer" onClick={() => window.location.href = `http://localhost:3000/Product/${removeVietnameseAccents(item.name)}-${item.objectId}`}>{item.name}</Tag>
+            <Tag color="gray" className="cursor-pointer" onClick={() => window.location.href = `http://localhost:3000/Product/${removeVietnameseAccents(item.name)}-${item.objectId}`}>{item.name}</Tag>
           ))}
         </div>
         <Collapse open={openNav}>

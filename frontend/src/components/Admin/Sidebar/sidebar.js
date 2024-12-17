@@ -61,12 +61,6 @@ export default function Sidebar() {
                         Khách hàng
                     </ListItem>
                 </Link>
-                <ListItem className="text-xl my-2">
-                    <ListItemPrefix>
-                        <Cog6ToothIcon className="h-6 w-6" />
-                    </ListItemPrefix>
-                    Settings
-                </ListItem>
                 <Link>
                     <ListItem className="text-xl my-2">
                         <ListItemPrefix>

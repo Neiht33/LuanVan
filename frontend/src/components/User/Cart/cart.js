@@ -518,7 +518,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                     extra={<Button className='w-60 h-14 my-4' type="primary" color='blue' onClick={() => window.location.href = 'http://localhost:3000/Product'}>
                         <div className=' flex justify-center items-center text-lg'>
                             <svg className='text-2xl mr-4' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#ffffff" d="m7.825 13l5.6 5.6L12 20l-8-8l8-8l1.425 1.4l-5.6 5.6H20v2z"></path></svg>
-                            Mua sắm ngay
+                            {language == 1 ? 'Mua Sắm Ngay' : "Let's shopping"}
                         </div>
                     </Button>}
                 />

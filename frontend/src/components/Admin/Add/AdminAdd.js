@@ -425,7 +425,7 @@ export function AddCategory({ setCurrentTab }) {
     const handleUpdate = async () => {
         var findResult = category.find((item) => item.name.toUpperCase() == categoryForm.name.toUpperCase())
 
-        if (findResult.id != categoryForm.id) {
+        if (findResult?.id == categoryForm.id) {
             document.querySelector('.notifyUpdateErr').textContent = 'Danh mục đã tồn tại!'
             return
         }
