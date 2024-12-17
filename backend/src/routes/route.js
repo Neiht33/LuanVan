@@ -5,6 +5,7 @@ const account = require('./account')
 const cart = require('./cart')
 const order = require('./order')
 const rated = require('./rated')
+const action = require('./action')
 
 function route(app) {
     app.use('/api/products', products)
@@ -13,6 +14,7 @@ function route(app) {
     app.use('/api/cart', cart)
     app.use('/api/order', order)
     app.use('/api/rated', rated)
+    app.use('/api/action', action)
 }
 
 module.exports = route

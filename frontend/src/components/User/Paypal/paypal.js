@@ -9,7 +9,7 @@ import { useEffect } from "react";
 const style = { "layout": "horizontal" };
 
 // Custom component to wrap the PayPalButtons and show loading spinner
-const ButtonWrapper = ({ currency, showSpinner, amount, payload }) => {
+const ButtonWrapper = ({ currency, showSpinner, amount, handleOrderSubmit }) => {
     const [{ isPending, options }, dispatch] = usePayPalScriptReducer();
 
     useEffect(() => {
@@ -27,7 +27,7 @@ const ButtonWrapper = ({ currency, showSpinner, amount, payload }) => {
             <PayPalButtons
                 style={style}
                 disabled={false}
-                forceReRender={[style]}
+                forceReRender={[currency, amount]}
                 fundingSource={undefined}
                 createOrder={(data, actions) => actions.order.create({
                     purchase_units: [
@@ -37,7 +37,7 @@ const ButtonWrapper = ({ currency, showSpinner, amount, payload }) => {
                 onApprove={(data, actions) => actions.order.capture().then(async (response) => {
                     console.log(response);
                     if (response.status === "COMPLETED") {
-                        payload(1)
+                        handleOrderSubmit(1)
                     }
                 })}
             />
@@ -45,11 +45,11 @@ const ButtonWrapper = ({ currency, showSpinner, amount, payload }) => {
     );
 }
 
-export default function Paypal({ amount, payload }) {
+export default function Paypal({ amount, handleOrderSubmit }) {
     return (
         <div className="w-full">
             <PayPalScriptProvider options={{ clientId: "test", components: "buttons", currency: "USD" }}>
-                <ButtonWrapper currency={'USD'} amount={amount} showSpinner={false} payload={payload} />
+                <ButtonWrapper currency={'USD'} amount={amount} showSpinner={false} handleOrderSubmit={handleOrderSubmit} />
             </PayPalScriptProvider>
         </div>
     );

@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import './App.css';
+import axios from 'axios';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Nav from './components/User/Nav/nav.js';
 import { Footer } from './components/User/Footer/footer.js';
@@ -17,6 +18,7 @@ function App() {
   const [language, setLanguage] = useState(JSON.parse(window.localStorage.getItem('language')))
   const [openSpeedDial, setOpenSpeedDial] = useState(false)
   const [cartDetail, setCartDetail] = useState([])
+
 
   useEffect(() => {
     if (!window.localStorage.getItem('language')) {

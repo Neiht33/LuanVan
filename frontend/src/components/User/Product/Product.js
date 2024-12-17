@@ -3,7 +3,6 @@ import './product.css'
 import { ConfigProvider, Layout, notification, Pagination, Space, theme } from 'antd';
 import { Breadcrumbs, CardFooter } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
-import { Slider } from 'antd';
 import { Col, Row } from 'antd';
 import {
     Card,
@@ -78,6 +77,27 @@ export default function Product({ language, getApiCartDetail }) {
         setOpenGender(openGender === true ? false : value);
     };
 
+    const handleAction = (accountID, objectID, type) => {
+        var formSubmit = {
+            accountID: accountID,
+            objectID: objectID,
+            type: type
+        }
+
+        axios.put(`http://localhost:8080/api/action`, formSubmit, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error(error);
+            });
+    }
+
     const getApiCategory = async () => {
         try {
             const response = await fetch(`http://localhost:8080/api/category`);
@@ -94,12 +114,14 @@ export default function Product({ language, getApiCartDetail }) {
     const getApiProductByPage = async (page) => {
         setOpenSkeleton(true)
         try {
-            const response = await fetch(`http://localhost:8080/api/products/main?page=${page}`);
+            var response
+            if (window.localStorage.getItem('User')) {
+                response = await fetch(`http://localhost:8080/api/products/main?page=${page}&accountID=${JSON.parse(window.localStorage.getItem('User')).id}`);
+            } else response = await fetch(`http://localhost:8080/api/products/main?page=${page}`);
             const data = await response.json();
             if (data) {
                 setProduct(data);
                 setOpenSkeleton(false)
-
             }
         } catch (error) {
             console.log('Đã xảy ra lỗi:', error);
@@ -175,7 +197,6 @@ export default function Product({ language, getApiCartDetail }) {
                 // Xử lý kết quả từ server
                 getApiCartDetail(JSON.parse(window.localStorage.getItem('User')).id)
                 openNotification('success')
-                console.log(response.data);
             })
             .catch(error => {
                 // Xử lý lỗi
@@ -256,7 +277,7 @@ export default function Product({ language, getApiCartDetail }) {
                 >
                     <Card className="hidden max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5 rounded-none lg:block" style={{ borderTopRightRadius: '10px', borderBottomRightRadius: '10px' }}>
                         <div className="mb-2 p-4">
-                            <Typography variant="h5" color="blue-gray">
+                            <Typography variant="h5" color="blue-gray" style={{ fontFamily: 'cursive' }}>
                                 {language == 1 ? 'Danh Mục' : 'Category'}
                             </Typography>
                         </div>
@@ -293,7 +314,11 @@ export default function Product({ language, getApiCartDetail }) {
                                             {category.map((category, index) => {
                                                 if (category.group == 1) {
                                                     return (
-                                                        <Link to={`http://localhost:3000/Product/${removeVietnameseAccents(category.name)}-${category.id}`}>
+                                                        <Link to={`http://localhost:3000/Product/${removeVietnameseAccents(category.name)}-${category.id}`} onClick={() => {
+                                                            if (window.localStorage.getItem('User')) {
+                                                                handleAction(JSON.parse(window.localStorage.getItem('User')).id, category.id, 2);
+                                                            }
+                                                        }}>
                                                             <ListItem>
                                                                 <ListItemPrefix>
                                                                     <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
@@ -334,7 +359,11 @@ export default function Product({ language, getApiCartDetail }) {
                                             {category.map((category, index) => {
                                                 if (category.group == 2) {
                                                     return (
-                                                        <Link to={`/Product/${removeVietnameseAccents(category.name)}-${category.id}`}>
+                                                        <Link to={`/Product/${removeVietnameseAccents(category.name)}-${category.id}`} onClick={() => {
+                                                            if (window.localStorage.getItem('User')) {
+                                                                handleAction(JSON.parse(window.localStorage.getItem('User')).id, category.id, 2);
+                                                            }
+                                                        }}>
                                                             <ListItem>
                                                                 <ListItemPrefix>
                                                                     <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
@@ -354,7 +383,7 @@ export default function Product({ language, getApiCartDetail }) {
                             </div>
                             <hr className="my-2 border-blue-gray-50" />
                             <div className="mb-2 p-4">
-                                <Typography variant="h5" color="blue-gray">
+                                <Typography variant="h5" color="blue-gray" style={{ fontFamily: 'cursive' }}>
                                     {language == 1 ? 'Bộ Lọc' : 'Filter'}
                                 </Typography>
                             </div>
@@ -375,15 +404,11 @@ export default function Product({ language, getApiCartDetail }) {
                                             </ListItemPrefix>
                                             <Typography color="blue-gray" className="mr-auto font-normal">
                                                 {language == 1 ? 'Giá' : 'Price'}
-                                                {/* <span className={`${priceValue <= 2000000 ? "text-green-600" : priceValue <= 5000000 ? "text-orange-500" : priceValue <= 10000000 ? "text-red-600" : "text-black"}`}>
-                                                    {`${priceValue.toLocaleString('vi-VN')}đ`}
-                                                </span> */}
                                             </Typography>
                                         </AccordionHeader>
                                     </ListItem>
                                     <AccordionBody className="py-1">
                                         <List className="p-0">
-                                            {/* <Slider style={{ margin: '10px' }} defaultValue={0} onChange={handleChangePrice} min={0} max={10000000} step={10000} /> */}
                                             <div className="flex flex-col gap-2">
                                                 <Radio
                                                     onClick={() => {
@@ -894,9 +919,14 @@ export default function Product({ language, getApiCartDetail }) {
                             }
                             {!openSkeleton && product.map((product, index) => (
                                 <Col key={index} className="mb-8 " xl={{ span: 7, offset: 1 }} sm={{ span: 11, offset: 1 }} xs={{ span: 11, offset: 1 }}>
-                                    <Link to={`/Product/Productdetail/${removeVietnameseAccents(product.name)}-${product.id}`} onClick={() => handleScrollUp()}>
+                                    <Link to={`/Product/Productdetail/${removeVietnameseAccents(product.name)}-${product.id}`} onClick={() => {
+                                        handleScrollUp()
+                                        if (window.localStorage.getItem('User')) {
+                                            handleAction(JSON.parse(window.localStorage.getItem('User')).id, product.id, 1);
+                                        }
+                                    }}>
                                         <Card className="w-full relative" style={{ border: '3px solid black' }}>
-                                            <CardHeader floated={false} className="sm:h-[300px] sm:w-auto sm:p-4 w-[153px] h-[153px] p-1 flex">
+                                            <CardHeader floated={false} className="sm:h-[300px] sm:w-auto sm:p-4 h-[153px] p-1 flex justify-center">
                                                 <img className="h-full w-full sm:m-auto hover:scale-110" src={`http://localhost:8080/images/${product.img}`} alt="profile-picture" />
                                             </CardHeader>
                                             <CardBody className="p-4 text-start h-[182px]">
@@ -917,12 +947,15 @@ export default function Product({ language, getApiCartDetail }) {
                                                         </Typography>}
                                                     </div>
                                                 </div>
-                                                <Button color="red" className="w-full text-[8px] sm:text-[12px]" onClick={(e) => {
+                                                <Button color="red" className="w-full text-[8px] sm:text-[12px]" disabled={product.wareHouse == 0} onClick={(e) => {
                                                     e.preventDefault()
                                                     if (!window.localStorage.getItem('User')) {
                                                         window.location.href = 'http://localhost:3000/SignIn';
-                                                    } else handleAddCart(product.id, 1, Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000)
-                                                }}>Thêm vào giỏ hàng</Button>
+                                                    } else {
+                                                        handleAddCart(product.id, 1, Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000)
+                                                        handleAction(JSON.parse(window.localStorage.getItem('User')).id, product.id, 1)
+                                                    }
+                                                }}>{language == 1 ? 'Thêm vào giỏ hàng' : 'Add to cart'}</Button>
                                             </CardBody>
                                             {product.discount > 0 ? <div className="absolute top-4 right-0 sm:w-[70px] sm:h-[30px] w-[50px] h-[14px]text-[14px] bg-red-500 rounded-tl rounded-bl text-white lg:text-base flex justify-center items-center">
                                                 -{product.discount}%
@@ -1004,7 +1037,11 @@ export default function Product({ language, getApiCartDetail }) {
                                                 {category.map((category, index) => {
                                                     if (category.group == 1) {
                                                         return (
-                                                            <Link to={`http://localhost:3000/Product/${removeVietnameseAccents(category.name)}-${category.id}`}>
+                                                            <Link to={`http://localhost:3000/Product/${removeVietnameseAccents(category.name)}-${category.id}`} onClick={() => {
+                                                                if (window.localStorage.getItem('User')) {
+                                                                    handleAction(JSON.parse(window.localStorage.getItem('User')).id, category.id, 2);
+                                                                }
+                                                            }}>
                                                                 <ListItem>
                                                                     <ListItemPrefix>
                                                                         <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
@@ -1045,7 +1082,11 @@ export default function Product({ language, getApiCartDetail }) {
                                                 {category.map((category, index) => {
                                                     if (category.group == 2) {
                                                         return (
-                                                            <Link to={`/Product/${removeVietnameseAccents(category.name)}-${category.id}`}>
+                                                            <Link to={`/Product/${removeVietnameseAccents(category.name)}-${category.id}`} onClick={() => {
+                                                                if (window.localStorage.getItem('User')) {
+                                                                    handleAction(JSON.parse(window.localStorage.getItem('User')).id, category.id, 2);
+                                                                }
+                                                            }}>
                                                                 <ListItem>
                                                                     <ListItemPrefix>
                                                                         <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
@@ -1086,15 +1127,11 @@ export default function Product({ language, getApiCartDetail }) {
                                                 </ListItemPrefix>
                                                 <Typography color="blue-gray" className="mr-auto font-normal">
                                                     {language == 1 ? 'Giá' : 'Price'}
-                                                    {/* <span className={`${priceValue <= 2000000 ? "text-green-600" : priceValue <= 5000000 ? "text-orange-500" : priceValue <= 10000000 ? "text-red-600" : "text-black"}`}>
-                                                    {`${priceValue.toLocaleString('vi-VN')}đ`}
-                                                </span> */}
                                                 </Typography>
                                             </AccordionHeader>
                                         </ListItem>
                                         <AccordionBody className="py-1">
                                             <List className="p-0">
-                                                {/* <Slider style={{ margin: '10px' }} defaultValue={0} onChange={handleChangePrice} min={0} max={10000000} step={10000} /> */}
                                                 <div className="flex flex-col gap-2">
                                                     <Radio
                                                         onClick={() => {

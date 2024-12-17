@@ -28,8 +28,7 @@ export default function ProductDetail({ language, getApiCartDetail }) {
     const [active, setActive] = useState("");
     const [quantity, setQuantity] = useState(1);
     const [feedback, setFeedback] = useState([]);
-    const [displayImg, setDisplayImg] = useState(3)
-    var [checkProductRelate, setCheckProductRelate] = useState(false)
+    const [displayImg, setDisplayImg] = useState(3);
 
     useLayoutEffect(() => {
         getApiProductByID(id.match(/[^-]*$/)[0])
@@ -68,7 +67,12 @@ export default function ProductDetail({ language, getApiCartDetail }) {
             const response = await fetch(`http://localhost:8080/api/products/supportImg/${id}`);
             const data = await response.json();
             if (data) {
-                if (data.length == 0 || data.length == 1) setDisplayImg(2)
+                if (data.length == 1) {
+                    setDisplayImg(2)
+                } else
+                    if (data.length == 0) {
+                        setDisplayImg(1)
+                    }
                 setSupportImg(data)
             }
         } catch (error) {
@@ -94,7 +98,9 @@ export default function ProductDetail({ language, getApiCartDetail }) {
             const data = await response.json();
             if (data) {
                 var dataRelate
-                if (data.findIndex(item => item.id == id.match(/[^-]*$/)[0]) <= 3) {
+                console.log(id.match(/[^-]*$/)[0]);
+
+                if ((data.findIndex(item => item.id == id.match(/[^-]*$/)[0]) <= 3) && (data.findIndex(item => item.id == id.match(/[^-]*$/)[0]) != -1)) {
                     dataRelate = data.filter((item, index) => (item.id != id.match(/[^-]*$/)[0]) && (index < 5))
                 } else {
                     dataRelate = data.filter((item, index) => index < 4)
@@ -129,6 +135,27 @@ export default function ProductDetail({ language, getApiCartDetail }) {
             // Thay thế khoảng trắng bằng dấu gạch ngang
             return withoutAccents.replace(/\s+/g, '-');
         }
+    }
+
+    const handleAction = (accountID, objectID, type) => {
+        var formSubmit = {
+            accountID: accountID,
+            objectID: objectID,
+            type: type
+        }
+
+        axios.put(`http://localhost:8080/api/action`, formSubmit, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error(error);
+            });
     }
 
     const handleScrollUp = () => {
@@ -198,7 +225,7 @@ export default function ProductDetail({ language, getApiCartDetail }) {
 
     return (
         <>
-            <div className="w-full bg-white" >
+            <div className="w-full bg-white hidden md:block" >
                 <Breadcrumbs style={{ backgroundColor: 'transparent' }}>
                     <Link to={'/'} className="opacity-60">
                         <svg
@@ -218,10 +245,10 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                     </Link>
                 </Breadcrumbs>
             </div>
-            <div className="ProductDetail">
-                <div className='img-container relative p-8'>
-                    <div className="grid gap-4">
-                        <div className='bg-white rounded-lg p-4 flex justify-center items-center h-[580px] w-[692px]'>
+            <Row className="ProductDetail">
+                <Col xl={{ span: 12, offset: 0 }} md={{ span: 12, offset: 0 }} sm={{ span: 24, offset: 0 }} className='img-container relative md:p-8 py-2'>
+                    <div className="w-full flex flex-wrap justify-center items-center">
+                        <div className='bg-white rounded-lg p-4 flex justify-center items-center xl:h-[580px] h-[360px] w-full'>
                             <img
                                 className="h-full rounded-lg object-center"
                                 src={active}
@@ -229,10 +256,10 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                             />
                         </div>
                         <div className="flex justify-center">
-                            <Slider {...settings} className='flex justify-center' style={{ margin: '40px', width: '600px' }} >
-                                <div>
+                            <Slider {...settings} className='flex justify-center xl:w-[600px] w-[480px] m-[40px]'>
+                                <div className='flex'>
                                     <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                        <div className={`bg-white rounded-lg p-1 flex justify-center items-center h-[160px] w-[160px] cursor-pointer ${active != `http://localhost:8080/images/${product.img}` ? 'opacity-50' : ''}`}>
+                                        <div className={`bg-white rounded-lg p-1 flex justify-center items-center xl:h-[160px] xl:w-[160px] h-[120px] w-[120px] cursor-pointer ${active != `http://localhost:8080/images/${product.img}` ? 'opacity-50' : ''}`}>
                                             <img
                                                 onClick={() => setActive(`http://localhost:8080/images/${product.img}`)}
                                                 src={`http://localhost:8080/images/${product.img}`}
@@ -245,7 +272,7 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                                 {supportImg.map((item, index) => (
                                     <div>
                                         <div style={{ display: 'flex', justifyContent: 'center' }} key={index}>
-                                            <div className={`bg-white rounded-lg p-1 flex justify-center items-center h-[160px] w-[160px] cursor-pointer ${active != `http://localhost:8080/images/${item.supportImg}` ? 'opacity-50' : ''}`}>
+                                            <div className={`bg-white rounded-lg p-1 flex justify-center items-center xl:h-[160px] xl:w-[160px] h-[120px] w-[120px] cursor-pointer ${active != `http://localhost:8080/images/${item.supportImg}` ? 'opacity-50' : ''}`}>
                                                 <img
                                                     onClick={() => setActive(`http://localhost:8080/images/${item.supportImg}`)}
                                                     src={`http://localhost:8080/images/${item.supportImg}`}
@@ -259,9 +286,9 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                             </Slider>
                         </div>
                     </div>
-                    <div className='img-container_absolute absolute'></div>
-                </div>
-                <div className='infomation-container rounded-tl-[200px]'>
+                    <div className='img-container_absolute absolute hidden md:block'></div>
+                </Col>
+                <Col xl={{ span: 12, offset: 0 }} md={{ span: 12, offset: 0 }} sm={{ span: 24, offset: 0 }} className='infomation-container rounded-tl-[200px]'>
                     <Typography className='mb-6 font-medium' variant="h2">{product.name}</Typography>
                     <div className='product-rate mb-6 flex items-center'>
                         <svg className='mr-2' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#ffeb0f" d="m7.625 6.4l2.8-3.625q.3-.4.713-.587T12 2t.863.188t.712.587l2.8 3.625l4.25 1.425q.65.2 1.025.738t.375 1.187q0 .3-.088.6t-.287.575l-2.75 3.9l.1 4.1q.025.875-.575 1.475t-1.4.6q-.05 0-.55-.075L12 19.675l-4.475 1.25q-.125.05-.275.063T6.975 21q-.8 0-1.4-.6T5 18.925l.1-4.125l-2.725-3.875q-.2-.275-.288-.575T2 9.75q0-.625.363-1.162t1.012-.763z"></path></svg>
@@ -309,7 +336,7 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                         <span className='ml-4 text-gray-500'>{product.wareHouse} {language == 1 ? 'sản phẩm có sẵn' : 'pieces availabel'}</span>
                     </div>
                     <div className="flex w-max gap-4">
-                        <Button className='translate-add w-[170px]' variant="outlined" onClick={() => {
+                        <Button className='translate-add w-[170px]' variant="outlined" disabled={product.wareHouse == 0} onClick={() => {
                             if (!window.localStorage.getItem('User')) {
                                 window.location.href = 'http://localhost:3000/SignIn'
                             } else handleAddCart(product.id, quantity, quantity * (Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000))
@@ -317,8 +344,8 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                             {language == 1 ? 'THÊM VÀO GIỎ HÀNG' : 'ADD TO CART'}
                         </Button>
                     </div>
-                </div>
-            </div>
+                </Col>
+            </Row>
             <div className='ProductSupport bg-white pb-10 min-h-80 mb-6'>
                 <Tabs value={activeTab}>
                     <TabsHeader
@@ -385,29 +412,34 @@ export default function ProductDetail({ language, getApiCartDetail }) {
                 <Row className='pr-[58px]'>
                     {productRelated.map((product, index) => {
                         return (
-                            <Col className="" xl={{ span: 5, offset: 1 }} sm={{ span: 7, offset: 1 }} xs={{ span: 12 }}>
-                                <Link to={`/Product/Productdetail/${removeVietnameseAccents(product.name)}-${product.id}`} onClick={() => handleScrollUp()}>
+                            <Col className="mb-8" xl={{ span: 5, offset: 1 }} sm={{ span: 11, offset: 1 }} xs={{ span: 11, offset: 1 }}>
+                                <Link to={`/Product/Productdetail/${removeVietnameseAccents(product.name)}-${product.id}`} onClick={() => {
+                                    handleScrollUp()
+                                    if (window.localStorage.getItem('User')) {
+                                        handleAction(JSON.parse(window.localStorage.getItem('User')).id, product.id, 1);
+                                    }
+                                }}>
                                     <Card className="w-full relative" style={{ border: '3px solid black' }}>
-                                        <CardHeader floated={false} className="h-[300px] p-4 flex">
-                                            <img className="h-full m-auto" src={`http://localhost:8080/images/${product.img}`} alt="profile-picture" />
+                                        <CardHeader floated={false} className="max-h-[300px] p-4 flex">
+                                            <img className="h-full w-full" src={`http://localhost:8080/images/${product.img}`} alt="profile-picture" />
                                         </CardHeader>
                                         <CardBody className="p-4 text-start h-[182px]">
-                                            <Typography variant="h7" color="blue-gray" className="mb-2 text-gray-600 product-name">
+                                            <Typography variant="h7" color="blue-gray" className="mb-2 text-gray-600 product-name xl:text-base md:text-sm sm:text-xs">
                                                 {product.name}
                                             </Typography>
                                             <div className="flex items-center">
                                                 {product.discount > 0 ? <div className="flex items-center">
-                                                    <Typography variant="h5" color="red" className="font-semibold mb-4 mt-2 mr-3" textGradient>
+                                                    <Typography variant="h5" color="red" className="font-semibold mb-4 mt-2 mr-3 xl:text-base md:text-sm text-sm" textGradient>
                                                         {formatNumber(Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000)} đ
                                                     </Typography>
-                                                    <Typography variant="h6" className="font-normal line-through mb-4 mt-2 text-gray-500" textGradient>
+                                                    <Typography variant="h6" className="font-normal line-through mb-4 mt-2 text-gray-500 xl:text-base md:text-sm text-sm" textGradient>
                                                         {formatNumber(product.price)} đ
                                                     </Typography>
-                                                </div> : <Typography variant="h5" color="red" className="font-semibold mb-4 mt-2" textGradient>
+                                                </div> : <Typography variant="h5" color="red" className="font-semibold mb-4 mt-2 xl:text-base md:text-sm text-sm" textGradient>
                                                     {formatNumber(product.price)} đ
                                                 </Typography>}
                                             </div>
-                                            <Button color="red" className="w-[240px]" onClick={() => {
+                                            <Button color="red" className="w-full xl:text-base md:text-sm text-xs" disabled={product.wareHouse == 0} onClick={() => {
                                                 if (!window.localStorage.getItem('User')) {
                                                     window.location.href = 'http://localhost:3000/SignIn'
                                                 } else handleAddCart(product.id, 1, Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000)

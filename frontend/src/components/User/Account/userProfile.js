@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
 import { Button, Input, Option, Select, Typography } from "@material-tailwind/react";
 import { notification, Space } from "antd";
 import axios from "axios";
@@ -23,8 +23,11 @@ export default function UserProfile({ language, user, openNotificationSuccess, o
         address: userAddress
     })
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         getApiCity()
+        if (JSON.parse(window.localStorage.getItem('User')).cityID) {
+            getApiDistrict(JSON.parse(window.localStorage.getItem('User')).cityID)
+        }
     }, [])
 
     const getApiAccountProfile = async (id) => {
@@ -63,6 +66,8 @@ export default function UserProfile({ language, user, openNotificationSuccess, o
             if (data) {
                 setDistrict(data)
             }
+            console.log(id, data);
+
         } catch (error) {
             console.log('Đã xảy ra lỗi:', error);
         }
@@ -132,7 +137,7 @@ export default function UserProfile({ language, user, openNotificationSuccess, o
                             {language == 1 ? 'Địa chỉ' : 'Address'}:
                         </Typography>
                         <div className="w-4/5 mb-4">
-                            <Input className="text-sm md:text-base" label={`${user.city} - ${user.district} - ${user.address}`} disabled />
+                            <Input className="text-sm md:text-base" label={`${user.district ? `${user.city} - ${user.district} ${user.address ? `- ${user.address}` : '0'}` : ''} `} disabled />
                         </div>
                     </div>
                     <Button color="blue" onClick={() => {
@@ -147,7 +152,7 @@ export default function UserProfile({ language, user, openNotificationSuccess, o
                         {language == 1 ? 'Hồ Sơ Của Tôi' : 'My Profile'}
                     </Typography>
                 </div>
-                <div className="p-6">
+                <form className="p-6" onSubmit={handleUpdateProfile}>
                     <div className="user-name">
                         <Typography variant="h6" className="pb-2 text-start font-normal">
                             {language == 1 ? 'Họ và tên' : 'Full name'}:
@@ -164,7 +169,7 @@ export default function UserProfile({ language, user, openNotificationSuccess, o
                             {language == 1 ? 'Số điện thoại' : 'Phone number'}:
                         </Typography>
                         <div className="w-3/5 mb-4">
-                            <Input value={userPhone} label="Số điện thoại" onChange={(e) => {
+                            <Input required value={userPhone} label="Số điện thoại" onChange={(e) => {
                                 setUserPhone(e.target.value)
                                 formUpdate.current['newPhoneNumber'] = e.target.value
                             }} />
@@ -172,7 +177,7 @@ export default function UserProfile({ language, user, openNotificationSuccess, o
                     </div>
                     <div className="user-address max-w-[568px] flex flex-wrap">
                         <div className="my-2 w-[284px]">
-                            <Select className='' variant="static" selected={() => selectedCity} onChange={setSelectedCity} label={language == 1 ? 'Tỉnh / Thành phố' : 'Province / City'}>
+                            <Select required className='' variant="static" selected={() => selectedCity} onChange={setSelectedCity} label={language == 1 ? 'Tỉnh / Thành phố' : 'Province / City'}>
                                 {city.map((item, index) =>
                                     <Option className="pt-0" value={item.city} key={index} onClick={() => {
                                         getApiDistrict(item.id)
@@ -181,7 +186,7 @@ export default function UserProfile({ language, user, openNotificationSuccess, o
                             </Select>
                         </div>
                         <div className="my-2 w-[284px]">
-                            <Select onChange={setSelectedDistrict} selected={() => selectedDistrict} className='district-selected' variant="static" label={language == 1 ? 'Quận / Huyện' : 'District'}>
+                            <Select required onChange={setSelectedDistrict} selected={() => selectedDistrict} className='district-selected' variant="static" label={language == 1 ? 'Quận / Huyện' : 'District'}>
                                 {district.map((item, index) =>
                                     <Option value={item.district} key={index} onClick={() => formUpdate.current['districtID'] = item.id}>{item.district}</Option>
                                 )}
@@ -189,13 +194,16 @@ export default function UserProfile({ language, user, openNotificationSuccess, o
                         </div>
                     </div>
                     <div className="my-2 max-w-[568px]">
-                        <Input className='signUp_address' variant="standard" value={userAddress} onChange={(e) => {
+                        <Input required className='signUp_address' variant="standard" value={userAddress} onChange={(e) => {
                             setUserAddress(e.target.value)
                             formUpdate.current['address'] = e.target.value
                         }} label={language == 1 ? 'Địa chỉ (Xã, Thị trấn, Đường, Số nhà)' : 'Address (Town, street, house number)'} size="lg" />
                     </div>
-                    <Button color="blue" className="w-[174px] mt-4" onClick={() => handleUpdateProfile()}>Lưu</Button>
-                </div>
+                    <div className="flex justify-start items-center mt-4">
+                        <Button color="gray" onClick={() => setUpdateProfile((prev) => !prev)}>Hủy</Button>
+                        <Button type="submit" color="blue" className="w-[174px] ml-4">Lưu</Button>
+                    </div>
+                </form>
             </div>}
         </>
     );

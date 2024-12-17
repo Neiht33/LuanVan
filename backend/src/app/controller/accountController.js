@@ -1,6 +1,7 @@
 const accountService = require('../service/accountService')
 const customerService = require('../service/customerService')
 const cartService = require('../service/cartService')
+const { OAuth2Client } = require('google-auth-library');
 
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -48,6 +49,35 @@ class accountController {
                 res.json(result)
             }
         } else res.json({ checkPhone: false })
+    }
+
+    async createAccountByGoogle(req, res) {
+        let googleAccount = req.body
+        const client = new OAuth2Client(googleAccount.clienId);
+
+        const ticket = await client.verifyIdToken({
+            idToken: googleAccount.credential,
+            audience: googleAccount.clienId,
+        });
+
+        const payload = ticket.getPayload();
+
+        var account = await customerService.findOneByGmailNoAddress(payload.email)
+
+        if (account.length == 0) {
+            await accountService.createGoogleAccount(payload.email)
+            const googleID = await accountService.getIdByGmail(payload.email)
+            await customerService.createCustomerByGoogle(payload.name, googleID[0].id)
+            const customer = await customerService.findOneByGmail(payload.email)
+            await accountService.createAccountWithGoogle(customer[0].id, 1)
+            const result = await customerService.findOneByGmailNoAddress(payload.email)
+            let accountID = await accountService.findOneByCustomerID(customer[0].id)
+            await cartService.create(accountID[0].id, 0)
+            res.json(result[0])
+        } else {
+            const find = await customerService.findOneByGmailHadAccount(payload.email)
+            find.length > 0 ? res.json(find[0]) : res.json(account[0])
+        }
     }
 
     async getCity(req, res) {

@@ -1,10 +1,11 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import './homepage.css'
-import { Carousel, Typography, Button } from "@material-tailwind/react";
+import { Typography, Button } from "@material-tailwind/react";
 import { Link } from 'react-router-dom';
-import CardMain from '../Card/Card.js'
+import { CardCategory, CardHotProduct } from '../Card/Card.js'
 import img1 from '../../../img/homepage.png'
 import img3 from '../../../img/bearbrick.png'
+import img4 from '../../../img/51d48cf5c3f87745e476ad3cbbb3fc4e.jpg'
 
 export function HomePage({ language }) {
 
@@ -12,9 +13,11 @@ export function HomePage({ language }) {
 
   const handleScrollType = () => {
     const typingPosition = document.querySelector('.introduce2')
-    const addtyping = document.querySelector('.introduce-title')
+    const addtyping = document.querySelector('.introduce-title-type')
     if (typingPosition && (typingPosition.getBoundingClientRect().top <= window.innerHeight / 2)) {
-      addtyping.classList.add('typing-text')
+      if (window.innerWidth > 796) {
+        addtyping.classList.add('typing-text')
+      }
     } else
       if (typingPosition && (typingPosition.getBoundingClientRect().top > window.innerHeight / 2)) {
         addtyping.classList.remove('typing-text')
@@ -22,10 +25,12 @@ export function HomePage({ language }) {
   }
 
   useLayoutEffect(() => {
-    // window.addEventListener(
-    //   "scroll",
-    //   () => handleScrollType(),
-    // );
+    window.addEventListener(
+      "scroll",
+      () => {
+        handleScrollType()
+      },
+    );
 
     getApiProductDiscount()
   }, []);
@@ -60,11 +65,11 @@ export function HomePage({ language }) {
     <div className="HomePage">
       <div className='introduce mb-12 mt-4 h-[70vh]'>
         <div className='md:mr-[40px] mr-[20px] w-11/12'>
-          <Typography className='introduce_title page-title text-start xl:text-8xl sm:min-h-[100px] font-semibold lg:text-7xl md:text-6xl text-[30px]'>
+          <Typography className='introduce-title page-title text-start xl:text-8xl xl:leading-tight sm:min-h-[100px] lg:text-7xl lg:leading-snug  md:text-6xl text-[30px]'>
             {language == 1 ? 'Đồ chơi chính hãng' : 'Genuine and high'} <br /> {language == 1 ? 'chất lượng cao' : 'quality toys'}
           </Typography>
-          <div className='md:text-[16px] text-[10px] text-left sm:my-8 my-2'>
-            {language == 1 ? 'Cung cấp tất cả các sản phẩm chất lượng, đa dạng, đẹp mắt' : "Providing all quality, diverse and beautiful products from the world's"} <br /> {language == 1 ? 'từ các nước trên thế giới thương hiệu uy tín hàng đầu. Giúp bạn giải trí mọi' : 'leading prestigious brands. Help your baby entertain anytime, anywhere, be'} <br />{language == 1 ? 'lúc, mọi nơi, trở nên sáng tạo hơn, tìm tòi hơn và phát triển bản thân hơn.' : 'creative, eager to learn and develop themselves.'}
+          <div className='introduce-title md:text-[16px] text-[10px] text-left sm:my-8 my-2'>
+            {language == 1 ? 'Cung cấp tất cả các sản phẩm chất lượng, đa dạng, đẹp mắt' : "Providing all quality, diverse and beautiful products from the world's"} <br /> {language == 1 ? 'từ các nước trên thế giới thương hiệu uy tín hàng đầu. Giúp bạn giải trí mọi' : 'leading prestigious brands. Help your baby entertain anytime, anywhere, be'} <br />{language == 1 ? 'lúc, mọi nơi, trở nên sáng tạo hơn, thông minh hơn và phát triển bản thân hơn.' : 'creative, intelligent and develop themselves.'}
           </div>
           <Link to={'/Product'}>
             <Button className='explore-btn sm:w-[210px] sm:h-[66px] w-[110px] h-[40px] sm:text-[20px] sm:uppercase normal-case text-[10px] rounded-none float-left flex justify-center items-center' size="lg" color="white" >
@@ -76,8 +81,17 @@ export function HomePage({ language }) {
           <img src={img3} alt='anh' />
         </div>
       </div>
+      <h1 className='hotProduct-title my-10'>{language == 1 ? 'SẢN PHẨM BÁN CHẠY' : 'HOT PRODUCTS'}</h1>
+      <div className='display-product relative h-screen'>
+        <div className='absolute top-0 bottom-0 right-0 left-0 flex justify-center items-center' style={{ backgroundColor: '#191a1c' }}>
+          <img className='h-full' src={img4}></img>
+        </div>
+        <div className='flex justify-center items-center w-full h-full px-[40px]' style={{ transform: 'translateY(-24px)' }}>
+          <CardHotProduct language={language} />
+        </div>
+      </div>
       <div className='breakPage'>
-        <h1 className='hotProduct-title my-10'>{language == 1 ? 'SẢN PHẨM NỔI BẬT' : 'HOT PRODUCTS'}</h1>
+        <h1 className='hotProduct-title my-10'>{language == 1 ? 'SẢN PHẨM ƯU ĐÃI' : 'PROMOTIONAL PRODUCTS'}</h1>
         <div className='xl:px-48 xl:py-24 lg:px-12 lg:py-12 sm:px-12 sm:py-12'>
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             <div className="grid gap-6 z-10">
@@ -203,8 +217,8 @@ export function HomePage({ language }) {
         <div className='GrapperOne flex justify-center p-2 xl:w-[512px] xl:h-[512px] lg:w-[350px] lg:h-[350px] w-[250px] h-[250px]'>
           <img className='w-[full] h-[full]' src={img1} />
         </div>
-        <div className='sm:pl-[84px] p-4 w-9/12'>
-          <div className='mb-6 introduce-title text-white xl:text-[42px] lg:text-[32px] sm:text-[24px] text-[20px]'>
+        <div className='sm:pl-[84px] p-4 w-9/12 text-start'>
+          <div className='mb-6 introduce-title-type text-white xl:text-[42px] lg:text-[32px] sm:text-[24px] text-[20px] '>
             {language == 1 ? 'Khám phá tiềm năng bên trong' : 'Discover the potential within'}
           </div>
           <div className='introduce-content text-white xl:text-[30px] lg:text-[22px]'>
@@ -214,7 +228,7 @@ export function HomePage({ language }) {
       </div>
       <div className='py-8'>
         <h1 className='hotProduct-title mb-5 py-20 '>{language == 1 ? 'DANH MỤC ĐỒ CHƠI' : 'TOY CATALOG'}</h1>
-        <CardMain language={language} />
+        <CardCategory language={language} />
       </div>
     </div>
   );

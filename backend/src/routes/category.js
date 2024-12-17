@@ -8,8 +8,8 @@ const upload = multer({ dest: './src/public/uploads' })
 
 router.get('/', categoryController.findAll)
 router.post('/', upload.single('img'), categoryController.create)
-// router.put('/:id', categoryController.update)
-// router.delete('/:id', categoryController.delete)
+router.put('/', categoryController.update)
+router.delete('/:id', categoryController.delete)
 
 
 

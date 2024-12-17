@@ -29,9 +29,38 @@ class customerService {
         })
     }
 
+    findOneByGmail(gmail) {
+        return new Promise((resolve, reject) => {
+            con.query(`Select c.*, g.gmail from customer c
+                inner join googleaccount g on g.id = c.googleAccountID
+                where g.gmail = '${gmail}'`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
+    findOneByGmailNoAddress(gmail) {
+        return new Promise((resolve, reject) => {
+            con.query(`Select c.*, a.*, g.gmail from customer c
+				inner join account a on a.customerID = c.id
+                inner join googleaccount g on g.id = c.googleAccountID
+                where g.gmail = '${gmail}'`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
     findOneByPhoneHadAccount(phoneNumber) {
         return new Promise((resolve, reject) => {
-            con.query(`Select c.*, a.*, d.district, t.city from customer c
+            con.query(`Select c.*, a.*, d.district, d.cityID, t.city from customer c
                 inner join account a on a.customerID = c.id 
                 inner join addressdistrict d on d.id = c.districtID
                 inner join addresscity t on t.id = d.cityID
@@ -45,9 +74,38 @@ class customerService {
         })
     }
 
+    findOneByGmailHadAccount(gmail) {
+        return new Promise((resolve, reject) => {
+            con.query(`Select c.*, a.*, d.district, d.cityID, t.city from customer c
+                inner join account a on a.customerID = c.id 
+                inner join addressdistrict d on d.id = c.districtID
+                inner join addresscity t on t.id = d.cityID
+                inner join googleaccount g on g.id = c.googleAccountID
+                where g.gmail = '${gmail}';`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
     createCustomer(name, phoneNumber, address, districtID) {
         return new Promise((resolve, reject) => {
             con.query(`INSERT INTO customer(name, phoneNumber, address, districtID) VALUES ('${name}', '${phoneNumber}', '${address}', ${districtID});`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
+    createCustomerByGoogle(name, googleID) {
+        return new Promise((resolve, reject) => {
+            con.query(`INSERT INTO customer(name, googleAccountID) VALUES ('${name}', '${googleID}');`, function (error, result, fields) {
                 if (error) {
                     reject(error);
                     return;

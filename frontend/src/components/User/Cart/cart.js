@@ -10,8 +10,7 @@ import {
     DialogFooter,
     Card
 } from "@material-tailwind/react";
-import { Col, Row, Flex, InputNumber, ConfigProvider, notification, Space, Result, } from 'antd';
-import img1 from '../../../img/bearbrick.png'
+import { Col, Row, Flex, InputNumber, ConfigProvider, notification, Space, Result, message } from 'antd';
 import { format } from 'date-fns-tz';
 import axios from 'axios';
 import Paypal from '../Paypal/paypal';
@@ -41,6 +40,13 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
         });
     };
 
+    const openNotificationWarning = (type, item) => {
+        api[type]({
+            message: `Rất tiếc sản phẩm ${item} đã hết hàng.`,
+            placement: 'top'
+        });
+    };
+
     useLayoutEffect(() => {
         if (window.localStorage.getItem('User')) {
             setUser(JSON.parse(window.localStorage.getItem('User')))
@@ -49,8 +55,15 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
     }, [])
 
     const handleOpen = () => {
-        setOpen(!open)
-        setTimeCurrent(formatDate(new Date()));
+        var arrItem = cartDetail.filter((item) => item.wareHouse == 0);
+        if (arrItem.length == 0) {
+            setOpen(!open)
+            setTimeCurrent(formatDate(new Date()));
+        } else {
+            arrItem.forEach((item) => {
+                openNotificationWarning('warning', item.name);
+            })
+        }
     };
 
     const formatDate = (date) => {
@@ -125,22 +138,28 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
             paymentStatus: paymentStatus
         }
 
-        axios.post(`http://localhost:8080/api/order/`, formOrderSubmit, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => {
-                // Xử lý kết quả từ server
-                setOpen(!open)
-                getApiCartDetail(JSON.parse(window.localStorage.getItem('User')).id)
-                openNotification('success')
-                window.location.href = 'http://localhost:3000/Account/order'
+        const account = JSON.parse(window.localStorage.getItem('User'))
+        if (account.address != null || account.districtID != null || account.phoneNumber != null) {
+            axios.post(`http://localhost:8080/api/order/`, formOrderSubmit, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             })
-            .catch(error => {
-                // Xử lý lỗi
-                console.error(error);
-            });
+                .then(response => {
+                    // Xử lý kết quả từ server
+                    setOpen(!open)
+                    getApiCartDetail(JSON.parse(window.localStorage.getItem('User')).id)
+                    openNotification('success')
+                    window.location.href = 'http://localhost:3000/Account/order'
+                })
+                .catch(error => {
+                    // Xử lý lỗi
+                    console.error(error);
+                });
+        } else {
+            window.location.href = 'http://localhost:3000/Account'
+        }
+
     }
 
     const handleChangeQuantity = debounce((event) => {
@@ -158,7 +177,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
     return (
         <div className='Cart'>
             <div className='Cart-title my-10'>
-                <Typography className='font-normal' variant="h1">
+                <Typography className='font-normal' style={{ fontFamily: 'cursive' }} variant="h1">
                     {language == 1 ? 'Giỏ Hàng Của Bạn' : 'Your Cart'}
                 </Typography>
             </div>
@@ -329,7 +348,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                             className="font-normal text-start"
                             variant="h6"
                         >
-                            *** *** *{user.phoneNumber ? `${user.phoneNumber.slice(-3)}` : ''}
+                            {user.phoneNumber ? `*** *** *${user.phoneNumber.slice(-3)}` : ''}
                         </Typography>
                     </div>
                     <div className='mb-8'>
@@ -340,7 +359,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                             className="font-normal text-start"
                             variant="h6"
                         >
-                            {`${user.city} - ${user.district} - ${user.address}`}
+                            {`${user.district ? `${user.city} - ${user.district} ${user.address ? `- ${user.address}` : ''}` : ''} `}
                         </Typography>
                     </div>
                     <div className='pb-4'>
@@ -385,7 +404,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                                             className="font-normal text-start"
                                             variant="h6"
                                         >
-                                            {`${user.city} - ${user.district} - ${user.address}`}
+                                            {`${user.district ? `${user.city} - ${user.district} ${user.address ? `- ${user.address}` : ''}` : ''} `}
                                         </Typography>
                                     </div>
                                     <div className='timeOrder text-black my-2'>
@@ -459,7 +478,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                                                 {language == 1 ? 'Thanh toán khi nhận hàng' : 'Cash'}
                                             </Typography>
                                         </Typography> : ''}
-                                        {methodPay != 1 ? <Typography
+                                        {methodPay == 2 ? <Typography
                                             color="blue-gray"
                                             className="flex font-medium text-blue-gray-500"
                                         >
@@ -484,7 +503,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                                     </Button>
                                     {methodPay == 1 ? <Button className='w-[200px] text-base' color='blue' size='lg' variant="filled" onClick={() => handleOrderSubmit(0)}>
                                         <span>{language == 1 ? 'Đặt hàng' : 'Confirm'}</span>
-                                    </Button> : <Paypal amount={cartDetail[0] ? Math.floor(cartDetail[0].totalFinal / 23500) : 0} payload={handleOrderSubmit} />}
+                                    </Button> : <Paypal amount={cartDetail[0] ? Math.floor(cartDetail[0].totalFinal / 23500) : 0} handleOrderSubmit={handleOrderSubmit} />}
                                 </DialogFooter>
                             </Dialog>
                         </>
@@ -499,7 +518,7 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
                     extra={<Button className='w-60 h-14 my-4' type="primary" color='blue' onClick={() => window.location.href = 'http://localhost:3000/Product'}>
                         <div className=' flex justify-center items-center text-lg'>
                             <svg className='text-2xl mr-4' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#ffffff" d="m7.825 13l5.6 5.6L12 20l-8-8l8-8l1.425 1.4l-5.6 5.6H20v2z"></path></svg>
-                            Mua sắm ngay
+                            {language == 1 ? 'Mua Sắm Ngay' : "Let's shopping"}
                         </div>
                     </Button>}
                 />
@@ -508,9 +527,6 @@ export default function Cart({ language, cartDetail, getApiCartDetail }) {
             <>
                 {contextHolder}
                 <Space className="hidden">
-                    <Button type="primary" onClick={() => openNotification('top')}>
-                        top
-                    </Button>
                 </Space>
             </>
         </div>

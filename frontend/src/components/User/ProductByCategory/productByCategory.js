@@ -172,9 +172,13 @@ export default function ProductByCategory({ language, getApiCartDetail }) {
     const getApiProductByCategoryID = async (id, page) => {
         setOpenSkeleton(true)
         try {
-            const response = await fetch(`http://localhost:8080/api/products/catalog/main?id=${id}&page=${page}`);
+            var response
+            if (window.localStorage.getItem('User')) {
+                response = await fetch(`http://localhost:8080/api/products/catalog/main?id=${id}&page=${page}&accountID=${JSON.parse(window.localStorage.getItem('User')).id}`);
+            } else response = await fetch(`http://localhost:8080/api/products/catalog/main?id=${id}&page=${page}`);
             const data = await response.json();
             if (data) {
+                totalPage.current = data[0].total
                 setProduct(data);
                 setOpenSkeleton(false)
             }
@@ -189,7 +193,6 @@ export default function ProductByCategory({ language, getApiCartDetail }) {
             const response = await fetch(`http://localhost:8080/api/products/category/filter?${objectToQueryString(filter.current)}`);
             const data = await response.json();
             if (data) {
-                console.log(data);
                 if (data.length != 0) {
                     totalPage.current = data[0].count
                 } else totalPage.current = 0
@@ -254,6 +257,27 @@ export default function ProductByCategory({ language, getApiCartDetail }) {
                 getApiCartDetail(JSON.parse(window.localStorage.getItem('User')).id)
                 openNotification('success')
                 console.log(response.data);
+            })
+            .catch(error => {
+                // Xử lý lỗi
+                console.error(error);
+            });
+    }
+
+    const handleAction = (accountID, objectID, type) => {
+        var formSubmit = {
+            accountID: accountID,
+            objectID: objectID,
+            type: type
+        }
+
+        axios.put(`http://localhost:8080/api/action`, formSubmit, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+
             })
             .catch(error => {
                 // Xử lý lỗi
@@ -373,7 +397,11 @@ export default function ProductByCategory({ language, getApiCartDetail }) {
                                             {category.map((category, index) => {
                                                 if (category.group == 1) {
                                                     return (
-                                                        <a href={`http://localhost:3000/Product/${removeVietnameseAccents(category.name)}-${category.id}`}>
+                                                        <a href={`http://localhost:3000/Product/${removeVietnameseAccents(category.name)}-${category.id}`} onClick={() => {
+                                                            if (window.localStorage.getItem('User')) {
+                                                                handleAction(JSON.parse(window.localStorage.getItem('User')).id, category.id, 2);
+                                                            }
+                                                        }}>
                                                             <ListItem>
                                                                 <ListItemPrefix>
                                                                     <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
@@ -414,7 +442,11 @@ export default function ProductByCategory({ language, getApiCartDetail }) {
                                             {category.map((category, index) => {
                                                 if (category.group == 2) {
                                                     return (
-                                                        <a href={`/Product/${removeVietnameseAccents(category.name)}-${category.id}`}>
+                                                        <a href={`/Product/${removeVietnameseAccents(category.name)}-${category.id}`} onClick={() => {
+                                                            if (window.localStorage.getItem('User')) {
+                                                                handleAction(JSON.parse(window.localStorage.getItem('User')).id, category.id, 2);
+                                                            }
+                                                        }}>
                                                             <ListItem>
                                                                 <ListItemPrefix>
                                                                     <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
@@ -974,9 +1006,14 @@ export default function ProductByCategory({ language, getApiCartDetail }) {
                             }
                             {!openSkeleton && product.map((product, index) => (
                                 <Col key={index} className="mb-8" xl={{ span: 7, offset: 1 }} sm={{ span: 11, offset: 1 }} xs={{ span: 11, offset: 1 }}>
-                                    <Link to={`/Product/Productdetail/${removeVietnameseAccents(product.name)}-${product.id}`} onClick={() => handleScrollUp()}>
+                                    <Link to={`/Product/Productdetail/${removeVietnameseAccents(product.name)}-${product.id}`} onClick={() => {
+                                        handleScrollUp()
+                                        if (window.localStorage.getItem('User')) {
+                                            handleAction(JSON.parse(window.localStorage.getItem('User')).id, product.id, 1);
+                                        }
+                                    }}>
                                         <Card className="w-full relative" style={{ border: '3px solid black' }}>
-                                            <CardHeader floated={false} className="sm:h-[300px] sm:w-auto sm:p-4 w-[153px] h-[153px] p-1 flex">
+                                            <CardHeader floated={false} className="sm:h-[300px] sm:w-auto sm:p-4 h-[153px] p-1 flex">
                                                 <img className="h-full w-full sm:m-auto hover:scale-110" src={`http://localhost:8080/images/${product.img}`} alt="profile-picture" />
                                             </CardHeader>
                                             <CardBody className="p-4 text-start h-[182px]">
@@ -997,12 +1034,12 @@ export default function ProductByCategory({ language, getApiCartDetail }) {
                                                         </Typography>}
                                                     </div>
                                                 </div>
-                                                <Button color="red" className="w-full text-[8px] sm:text-[12px]" onClick={(e) => {
+                                                <Button color="red" className="w-full text-[8px] sm:text-[12px]" disabled={product.wareHouse == 0} onClick={(e) => {
                                                     e.preventDefault()
                                                     if (!window.localStorage.getItem('User')) {
                                                         window.location.href = 'http://localhost:3000/SignIn';
                                                     } else handleAddCart(product.id, 1, Math.floor((product.price - (product.price * product.discount) / 100) / 1000) * 1000)
-                                                }}>Thêm vào giỏ hàng</Button>
+                                                }}>{language == 1 ? 'Thêm vào giỏ hàng' : 'Add to cart'}</Button>
                                             </CardBody>
                                             {product.discount > 0 ? <div className="absolute top-4 right-0 sm:w-[70px] sm:h-[30px] w-[50px] h-[14px]text-[14px] bg-red-500 rounded-tl rounded-bl text-white lg:text-base flex justify-center items-center">
                                                 -{product.discount}%
@@ -1084,7 +1121,11 @@ export default function ProductByCategory({ language, getApiCartDetail }) {
                                             {category.map((category, index) => {
                                                 if (category.group == 1) {
                                                     return (
-                                                        <Link to={`http://localhost:3000/Product/${removeVietnameseAccents(category.name)}-${category.id}`}>
+                                                        <Link to={`http://localhost:3000/Product/${removeVietnameseAccents(category.name)}-${category.id}`} onClick={() => {
+                                                            if (window.localStorage.getItem('User')) {
+                                                                handleAction(JSON.parse(window.localStorage.getItem('User')).id, category.id, 2);
+                                                            }
+                                                        }}>
                                                             <ListItem>
                                                                 <ListItemPrefix>
                                                                     <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
@@ -1125,7 +1166,11 @@ export default function ProductByCategory({ language, getApiCartDetail }) {
                                             {category.map((category, index) => {
                                                 if (category.group == 2) {
                                                     return (
-                                                        <Link to={`/Product/${removeVietnameseAccents(category.name)}-${category.id}`}>
+                                                        <Link to={`/Product/${removeVietnameseAccents(category.name)}-${category.id}`} onClick={() => {
+                                                            if (window.localStorage.getItem('User')) {
+                                                                handleAction(JSON.parse(window.localStorage.getItem('User')).id, category.id, 2);
+                                                            }
+                                                        }}>
                                                             <ListItem>
                                                                 <ListItemPrefix>
                                                                     <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />

@@ -14,7 +14,6 @@ import {
 } from "@material-tailwind/react";
 import { Col, Modal, Pagination, Row, Space, Tag } from "antd";
 import './order.css'
-import img1 from '../../../img/bearbrick.png'
 import { format } from 'date-fns-tz';
 import axios from 'axios';
 
@@ -157,6 +156,7 @@ export default function Order({ getApiOrder, order }) {
     }
 
     const formatDate = (date) => {
+        console.log(date);
         const formattedDate = format(date, 'dd-MM-yyyy HH:mm:ss', { timeZone: 'Asia/Ho_Chi_Minh' });
         return formattedDate
     }
@@ -180,13 +180,13 @@ export default function Order({ getApiOrder, order }) {
 
     const handleOpen = (orderID, index) => {
         setIsModalOpen(true);
+        setItem(order.find(item => item.orderID == orderID))
         getApiOrderDetail(orderID)
     };
 
     const handleOpenConfirm = (orderID, index) => {
         setIsConfirmOpen(true);
         setItem(order.find(item => item.orderID == orderID))
-
         getApiOrderDetail(orderID)
     };
 
@@ -254,133 +254,6 @@ export default function Order({ getApiOrder, order }) {
                                             <Button color='blue' type="primary" onClick={() => handleOpen(item.orderID)}>
                                                 Duyệt đơn
                                             </Button>
-                                            <Modal footer={null} title="" open={isModalOpen} onCancel={handleCancel}>
-                                                <DialogHeader className='flex justify-center'>
-                                                    HÓA ĐƠN THANH TOÁN
-                                                </DialogHeader>
-                                                <DialogBody>
-                                                    <div className='flex items-center justify-between'>
-                                                        <div className='flex items-center text-black'>
-                                                            <Typography className='font-normal text-start my-2 mr-2' variant="h6">
-                                                                Khách hàng
-                                                            </Typography>
-                                                            <Typography
-                                                                className="font-normal text-start"
-                                                                variant="h6"
-                                                            >
-                                                                {item.name}
-                                                            </Typography>
-                                                        </div>
-                                                        <div className='flex items-center text-black'>
-                                                            <Typography className='font-normal text-start my-2 mr-2' variant="h6">
-                                                                Số điện thoại
-                                                            </Typography>
-                                                            <Typography
-                                                                className="font-normal text-start"
-                                                                variant="h6"
-                                                            >
-                                                                {item.phoneNumber}
-                                                            </Typography>
-                                                        </div>
-                                                    </div>
-                                                    <div className='flex items-center text-black'>
-                                                        <Typography className='font-normal text-start my-2 mr-2' variant="h6">
-                                                            Địa chỉ
-                                                        </Typography>
-                                                        <Typography
-                                                            className="font-normal text-start"
-                                                            variant="h6"
-                                                        >
-                                                            {`${item.city} - ${item.district} - ${item.address}`}
-                                                        </Typography>
-                                                    </div>
-                                                    <div className='timeOrder text-black my-2'>
-                                                        Thời gian: {formatDate(item.time)}
-                                                    </div>
-                                                    <Card className="h-full w-full overflow-auto rounded-none shadow-none" style={{ border: '1px solid #000' }}>
-                                                        <table className="w-full min-w-max table-auto text-left">
-                                                            <thead>
-                                                                <tr>
-                                                                    {TABLE_HEAD.map((head, index) => (
-                                                                        <th key={head} className={`border-b border-blue-gray-100 bg-blue-gray-50 p-4 ${index == 0 ? 'w-[200px]' : 'text-center'}`}>
-                                                                            <Typography
-                                                                                variant="small"
-                                                                                color="blue-gray"
-                                                                                className="font-normal leading-none opacity-70"
-                                                                            >
-                                                                                {head}
-                                                                            </Typography>
-                                                                        </th>
-                                                                    ))}
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {orderDetail.map((item, index) => (
-                                                                    <tr key={index} className="even:bg-blue-gray-50/50">
-                                                                        <td className="p-4">
-                                                                            <Typography variant="small" color="blue-gray" className="font-normal">
-                                                                                {item.name}
-                                                                            </Typography>
-                                                                        </td>
-                                                                        <td className="p-4 text-center">
-                                                                            <Typography variant="small" color="blue-gray" className="font-normal">
-                                                                                {item.quantityCurrent}
-                                                                            </Typography>
-                                                                        </td>
-                                                                        <td className="p-4 text-center">
-                                                                            <Typography variant="small" color="blue-gray" className="font-normal">
-                                                                                {formatNumber(Math.floor((item.price - (item.price * item.discount) / 100) / 1000) * 1000)}
-                                                                            </Typography>
-                                                                        </td>
-                                                                        <td className="p-4 text-center">
-                                                                            <Typography as="a" href="#" variant="small" color="blue-gray" className="font-medium">
-                                                                                {formatNumber(item.quantityCurrent * Math.floor((item.price - (item.price * item.discount) / 100) / 1000) * 1000)}
-                                                                            </Typography>
-                                                                        </td>
-                                                                    </tr>
-                                                                ))}
-                                                            </tbody>
-                                                        </table>
-                                                    </Card>
-                                                    <div className='flex justify-between items-center my-2'>
-                                                        <Typography className='font-normal text-black ' variant="h4">
-                                                            Tổng thanh toán
-                                                        </Typography>
-                                                        <Typography className='font-normal text-black ' variant="h4">
-                                                            {formatNumber(item.total)} đ
-                                                        </Typography>
-                                                    </div>
-                                                    <div className="flex gap-2 mb-8">
-                                                        <Typography className='font-normal text-gray-600 text-start' variant="h6">
-                                                            Phương thức thanh toán
-                                                        </Typography>
-                                                        <Typography
-                                                            color="blue-gray"
-                                                            className="flex font-medium text-blue-gray-500 flex items-center"
-                                                        >
-                                                            <Typography
-                                                                color="blue-gray"
-                                                                className="hover:text-blueg-gray-900 font-medium transition-colors"
-                                                            >
-                                                                {item.paymentMethod == 1 ? 'Thanh toán khi nhận hàng' : 'Paypal'}
-                                                            </Typography>
-                                                        </Typography>
-                                                    </div>
-                                                </DialogBody>
-                                                <DialogFooter className='flex justify-center'>
-                                                    <Button
-                                                        variant="text"
-                                                        color="red"
-                                                        onClick={handleOpen}
-                                                        className="mr-1"
-                                                    >
-                                                        <span>Hủy</span>
-                                                    </Button>
-                                                    <Button onClick={() => handleUpdateStatus(item.orderID, 2)} className='w-[200px] text-base' color='blue' size='lg' variant="filled">
-                                                        Xác nhận
-                                                    </Button>
-                                                </DialogFooter>
-                                            </Modal>
                                         </>
                                     </div>}
                                     {item.statusID == 2 && <>
@@ -407,7 +280,7 @@ export default function Order({ getApiOrder, order }) {
                                             </Button>
                                         </Space>
                                     </>}
-                                    {item.statusID == 3 && <Tag className='rounded-full w-full flex justify-center py-1 px-2 text-sm border-none' color="processing">Chờ thanh toán</Tag>}
+                                    {item.statusID == 3 && <Tag className='rounded-full w-full flex justify-center py-1 px-2 text-sm border-none' color="processing">{item.paymentStatus == 0 ? 'Chờ thanh toán' : 'Chờ nhận hàng'}</Tag>}
                                     {item.statusID == 4 &&
                                         <Tooltip content="Xem chi tiết" placement="top">
                                             <Tag key={index} onClick={() => handleOpenConfirm(item.orderID, index)} className='rounded-full w-full flex justify-center py-1 px-2 text-sm border-none hover:cursor-pointer' color="success">Hoàn thành</Tag>
@@ -556,6 +429,133 @@ export default function Order({ getApiOrder, order }) {
                 <div className="flex justify-center">
                     <Pagination className="py-4" showQuickJumper defaultCurrent={1} total={order.length} onChange={onChangePagination} pageSizeOptions={[10, 20, 30, 50]} />
                 </div>
+                <Modal footer={null} title="" open={isModalOpen} onCancel={handleCancel}>
+                    <DialogHeader className='flex justify-center'>
+                        HÓA ĐƠN THANH TOÁN
+                    </DialogHeader>
+                    <DialogBody>
+                        <div className='flex items-center justify-between'>
+                            <div className='flex items-center text-black'>
+                                <Typography className='font-normal text-start my-2 mr-2' variant="h6">
+                                    Khách hàng
+                                </Typography>
+                                <Typography
+                                    className="font-normal text-start"
+                                    variant="h6"
+                                >
+                                    {item.name}
+                                </Typography>
+                            </div>
+                            <div className='flex items-center text-black'>
+                                <Typography className='font-normal text-start my-2 mr-2' variant="h6">
+                                    Số điện thoại
+                                </Typography>
+                                <Typography
+                                    className="font-normal text-start"
+                                    variant="h6"
+                                >
+                                    {item.phoneNumber}
+                                </Typography>
+                            </div>
+                        </div>
+                        <div className='flex items-center text-black'>
+                            <Typography className='font-normal text-start my-2 mr-2' variant="h6">
+                                Địa chỉ
+                            </Typography>
+                            <Typography
+                                className="font-normal text-start"
+                                variant="h6"
+                            >
+                                {`${item.city} - ${item.district} - ${item.address}`}
+                            </Typography>
+                        </div>
+                        <div className='timeOrder text-black my-2'>
+                            {/* Thời gian: {item.length > 0 ? formatDate(item.time) : ''} */}
+                        </div>
+                        <Card className="h-full w-full overflow-auto rounded-none shadow-none" style={{ border: '1px solid #000' }}>
+                            <table className="w-full min-w-max table-auto text-left">
+                                <thead>
+                                    <tr>
+                                        {TABLE_HEAD.map((head, index) => (
+                                            <th key={head} className={`border-b border-blue-gray-100 bg-blue-gray-50 p-4 ${index == 0 ? 'w-[200px]' : 'text-center'}`}>
+                                                <Typography
+                                                    variant="small"
+                                                    color="blue-gray"
+                                                    className="font-normal leading-none opacity-70"
+                                                >
+                                                    {head}
+                                                </Typography>
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {orderDetail.map((item, index) => (
+                                        <tr key={index} className="even:bg-blue-gray-50/50">
+                                            <td className="p-4">
+                                                <Typography variant="small" color="blue-gray" className="font-normal">
+                                                    {item.name}
+                                                </Typography>
+                                            </td>
+                                            <td className="p-4 text-center">
+                                                <Typography variant="small" color="blue-gray" className="font-normal">
+                                                    {item.quantityCurrent}
+                                                </Typography>
+                                            </td>
+                                            <td className="p-4 text-center">
+                                                <Typography variant="small" color="blue-gray" className="font-normal">
+                                                    {formatNumber(item.price / item.quantityCurrent)}
+                                                </Typography>
+                                            </td>
+                                            <td className="p-4 text-center">
+                                                <Typography as="a" href="#" variant="small" color="blue-gray" className="font-medium">
+                                                    {formatNumber(Math.floor((item.price - (item.price * item.discount) / 100) / 1000) * 1000)}
+                                                </Typography>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </Card>
+                        <div className='flex justify-between items-center my-2'>
+                            <Typography className='font-normal text-black ' variant="h4">
+                                Tổng thanh toán
+                            </Typography>
+                            <Typography className='font-normal text-black ' variant="h4">
+                                {formatNumber(item.total)} đ
+                            </Typography>
+                        </div>
+                        <div className="flex gap-2 mb-8">
+                            <Typography className='font-normal text-gray-600 text-start' variant="h6">
+                                Phương thức thanh toán
+                            </Typography>
+                            <Typography
+                                color="blue-gray"
+                                className="flex font-medium text-blue-gray-500 flex items-center"
+                            >
+                                <Typography
+                                    color="blue-gray"
+                                    className="hover:text-blueg-gray-900 font-medium transition-colors"
+                                >
+                                    {item.paymentMethod == 1 ? 'Thanh toán khi nhận hàng' : 'Paypal'}
+                                </Typography>
+                            </Typography>
+                        </div>
+                    </DialogBody>
+                    <DialogFooter className='flex justify-center'>
+                        <Button
+                            variant="text"
+                            color="red"
+                            onClick={handleOpen}
+                            className="mr-1"
+                        >
+                            <span>Hủy</span>
+                        </Button>
+                        <Button onClick={() => handleUpdateStatus(item.orderID, 2)} className='w-[200px] text-base' color='blue' size='lg' variant="filled">
+                            Xác nhận
+                        </Button>
+                    </DialogFooter>
+                </Modal>
                 <Modal footer={null} title="" open={isConfirmOpen} onCancel={handleCancel}>
                     <DialogHeader className='flex justify-center'>
                         HÓA ĐƠN THANH TOÁN
@@ -597,7 +597,7 @@ export default function Order({ getApiOrder, order }) {
                             </Typography>
                         </div>
                         <div className='timeOrder text-black my-2'>
-                            {/* Thời gian: {formatDate(item.time)} */}
+                            {/* Thời gian: {item.length > 0 ? formatDate(item.time) : ''} */}
                         </div>
                         <Card className="h-full w-full overflow-auto rounded-none shadow-none" style={{ border: '1px solid #000' }}>
                             <table className="w-full min-w-max table-auto text-left">
@@ -631,12 +631,12 @@ export default function Order({ getApiOrder, order }) {
                                             </td>
                                             <td className="p-4 text-center">
                                                 <Typography variant="small" color="blue-gray" className="font-normal">
-                                                    {formatNumber(Math.floor((item.price - (item.price * item.discount) / 100) / 1000) * 1000)}
+                                                    {formatNumber(item.price / item.quantityCurrent)}
                                                 </Typography>
                                             </td>
                                             <td className="p-4 text-center">
                                                 <Typography as="a" href="#" variant="small" color="blue-gray" className="font-medium">
-                                                    {formatNumber(item.quantityCurrent * Math.floor((item.price - (item.price * item.discount) / 100) / 1000) * 1000)}
+                                                    {formatNumber(item.price)}
                                                 </Typography>
                                             </td>
                                         </tr>
@@ -688,133 +688,6 @@ export default function Order({ getApiOrder, order }) {
                                             <Button color='blue' type="primary" onClick={() => handleOpen(item.orderID)}>
                                                 Duyệt đơn
                                             </Button>
-                                            <Modal footer={null} title="" open={isModalOpen} onCancel={handleCancel}>
-                                                <DialogHeader className='flex justify-center'>
-                                                    HÓA ĐƠN THANH TOÁN
-                                                </DialogHeader>
-                                                <DialogBody>
-                                                    <div className='flex items-center justify-between'>
-                                                        <div className='flex items-center text-black'>
-                                                            <Typography className='font-normal text-start my-2 mr-2' variant="h6">
-                                                                Khách hàng
-                                                            </Typography>
-                                                            <Typography
-                                                                className="font-normal text-start"
-                                                                variant="h6"
-                                                            >
-                                                                {item.name}
-                                                            </Typography>
-                                                        </div>
-                                                        <div className='flex items-center text-black'>
-                                                            <Typography className='font-normal text-start my-2 mr-2' variant="h6">
-                                                                Số điện thoại
-                                                            </Typography>
-                                                            <Typography
-                                                                className="font-normal text-start"
-                                                                variant="h6"
-                                                            >
-                                                                {item.phoneNumber}
-                                                            </Typography>
-                                                        </div>
-                                                    </div>
-                                                    <div className='flex items-center text-black'>
-                                                        <Typography className='font-normal text-start my-2 mr-2' variant="h6">
-                                                            Địa chỉ
-                                                        </Typography>
-                                                        <Typography
-                                                            className="font-normal text-start"
-                                                            variant="h6"
-                                                        >
-                                                            {`${item.city} - ${item.district} - ${item.address}`}
-                                                        </Typography>
-                                                    </div>
-                                                    <div className='timeOrder text-black my-2'>
-                                                        Thời gian: {formatDate(item.time)}
-                                                    </div>
-                                                    <Card className="h-full w-full overflow-auto rounded-none shadow-none" style={{ border: '1px solid #000' }}>
-                                                        <table className="w-full min-w-max table-auto text-left">
-                                                            <thead>
-                                                                <tr>
-                                                                    {TABLE_HEAD.map((head, index) => (
-                                                                        <th key={head} className={`border-b border-blue-gray-100 bg-blue-gray-50 p-4 ${index == 0 ? 'w-[200px]' : 'text-center'}`}>
-                                                                            <Typography
-                                                                                variant="small"
-                                                                                color="blue-gray"
-                                                                                className="font-normal leading-none opacity-70"
-                                                                            >
-                                                                                {head}
-                                                                            </Typography>
-                                                                        </th>
-                                                                    ))}
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {orderDetail.map((item, index) => (
-                                                                    <tr key={index} className="even:bg-blue-gray-50/50">
-                                                                        <td className="p-4">
-                                                                            <Typography variant="small" color="blue-gray" className="font-normal">
-                                                                                {item.name}
-                                                                            </Typography>
-                                                                        </td>
-                                                                        <td className="p-4 text-center">
-                                                                            <Typography variant="small" color="blue-gray" className="font-normal">
-                                                                                {item.quantityCurrent}
-                                                                            </Typography>
-                                                                        </td>
-                                                                        <td className="p-4 text-center">
-                                                                            <Typography variant="small" color="blue-gray" className="font-normal">
-                                                                                {formatNumber(Math.floor((item.price - (item.price * item.discount) / 100) / 1000) * 1000)}
-                                                                            </Typography>
-                                                                        </td>
-                                                                        <td className="p-4 text-center">
-                                                                            <Typography as="a" href="#" variant="small" color="blue-gray" className="font-medium">
-                                                                                {formatNumber(item.quantityCurrent * Math.floor((item.price - (item.price * item.discount) / 100) / 1000) * 1000)}
-                                                                            </Typography>
-                                                                        </td>
-                                                                    </tr>
-                                                                ))}
-                                                            </tbody>
-                                                        </table>
-                                                    </Card>
-                                                    <div className='flex justify-between items-center my-2'>
-                                                        <Typography className='font-normal text-black ' variant="h4">
-                                                            Tổng thanh toán
-                                                        </Typography>
-                                                        <Typography className='font-normal text-black ' variant="h4">
-                                                            {formatNumber(item.total)} đ
-                                                        </Typography>
-                                                    </div>
-                                                    <div className="flex gap-2 mb-8">
-                                                        <Typography className='font-normal text-gray-600 text-start' variant="h6">
-                                                            Phương thức thanh toán
-                                                        </Typography>
-                                                        <Typography
-                                                            color="blue-gray"
-                                                            className="flex font-medium text-blue-gray-500 flex items-center"
-                                                        >
-                                                            <Typography
-                                                                color="blue-gray"
-                                                                className="hover:text-blueg-gray-900 font-medium transition-colors"
-                                                            >
-                                                                {item.paymentMethod == 1 ? 'Thanh toán khi nhận hàng' : 'Paypal'}
-                                                            </Typography>
-                                                        </Typography>
-                                                    </div>
-                                                </DialogBody>
-                                                <DialogFooter className='flex justify-center'>
-                                                    <Button
-                                                        variant="text"
-                                                        color="red"
-                                                        onClick={handleOpen}
-                                                        className="mr-1"
-                                                    >
-                                                        <span>Hủy</span>
-                                                    </Button>
-                                                    <Button onClick={() => handleUpdateStatus(item.orderID, 2)} className='w-[200px] text-base' color='blue' size='lg' variant="filled">
-                                                        Xác nhận
-                                                    </Button>
-                                                </DialogFooter>
-                                            </Modal>
                                         </>
                                     </div>}
                                 </Col>
@@ -883,7 +756,7 @@ export default function Order({ getApiOrder, order }) {
                                 <Col className='text-center' xl={{ span: 4, offset: 0 }}>{formatDate(item.time)}</Col>
                                 <Col className='text-center' xl={{ span: 3, offset: 0 }}>{formatNumber(item.total)}</Col>
                                 <Col className='text-center' xl={{ span: 2, offset: 0 }}>
-                                    <Tag className='rounded-full w-full flex justify-center py-1 px-2 text-sm border-none' color="processing">Chờ thanh toán</Tag>
+                                    <Tag className='rounded-full w-full flex justify-center py-1 px-2 text-sm border-none' color="processing">{item.paymentStatus == 0 ? 'Chờ thanh toán' : 'Chờ nhận hàng'}</Tag>
                                 </Col>
                             </Row>
                         )

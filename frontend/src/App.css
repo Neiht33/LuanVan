@@ -7,6 +7,14 @@
   background-size: cover;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: cursive;
+}
+
 .hotProduct-title {
   font-size: 40px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

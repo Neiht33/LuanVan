@@ -54,7 +54,7 @@ export default function Admin() {
             const response = await fetch(`http://localhost:8080/api/products`);
             const data = await response.json();
             if (data) {
-                setProduct(data.reverse());
+                setProduct(data);
             }
         } catch (error) {
             console.log('Đã xảy ra lỗi:', error);

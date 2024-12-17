@@ -4,8 +4,9 @@ class productService {
 
     findAll() {
         return new Promise((resolve, reject) => {
-            con.query(`select p.*, c.name as categoryName, c.group from product p 
-                inner join category c on c.id = p.category;`,
+            con.query(`select p.*, c.name as categoryName, c.group, (p.quantity - p.wareHouse) as sold from product p 
+                inner join category c on c.id = p.category
+                order by sold desc;`,
                 function (error, result, fields) {
                     if (error) {
                         reject(error);
@@ -22,6 +23,29 @@ class productService {
                 Select ROW_NUMBER() OVER(ORDER BY p.id) as inx, p.*, c.name as categoryName, c.group from product p 
                 inner join category c on c.id = p.category) as allproduct
                 where inx between ${first} and ${last};`,
+                function (error, result, fields) {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
+                    resolve(result);
+                });
+        })
+    }
+
+    findByPageAction(first, last, accountID) {
+        return new Promise((resolve, reject) => {
+            con.query(`SELECT * FROM (
+                    SELECT ROW_NUMBER() OVER(ORDER BY actionTest.count DESC) AS inx, allproduct.*
+                    FROM (SELECT p.*, c.name AS categoryName, c.group, actionTest.count FROM product p
+                        INNER JOIN category c ON c.id = p.category
+                        LEFT JOIN (SELECT objectId, type, accountID, COUNT(objectId) AS count FROM action
+                            WHERE type = 1 and accountID = ${accountID}
+                            GROUP BY objectId, type, accountID
+                        ) AS actionTest ON actionTest.objectId = p.id
+                    ) AS allproduct
+                ) AS filterProduct
+                WHERE filterProduct.inx BETWEEN ${first} AND ${last};`,
                 function (error, result, fields) {
                     if (error) {
                         reject(error);
@@ -80,6 +104,41 @@ class productService {
         })
     }
 
+    findAllByCategoryID(id) {
+        return new Promise((resolve, reject) => {
+            con.query(`select * from product where category = ${id};`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
+    findByActionCategoryID(id, accountID, first, last) {
+        return new Promise((resolve, reject) => {
+            con.query(`SELECT * FROM (
+                    SELECT ROW_NUMBER() OVER(ORDER BY actionTest.count DESC) AS inx, allproduct.*
+                    FROM (SELECT p.*, c.name AS categoryName, c.group, actionTest.count FROM product p
+                        INNER JOIN category c ON c.id = p.category
+                        LEFT JOIN (SELECT objectId, type, accountID, COUNT(objectId) AS count FROM action
+                            WHERE type = 1 and accountID = ${accountID}
+                            GROUP BY objectId, type, accountID
+                        ) AS actionTest ON actionTest.objectId = p.id
+                        where p.category = ${id}
+                    ) AS allproduct
+                ) AS filterProduct
+                WHERE filterProduct.inx BETWEEN ${first} AND ${last};`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
     findByCategoryIDSeek(seek, id, first, last) {
         return new Promise((resolve, reject) => {
             con.query(`select * from (
@@ -101,8 +160,8 @@ class productService {
         return new Promise((resolve, reject) => {
             con.query(`select * from (select ROW_NUMBER() OVER(ORDER BY p.id) as inx, p.* from product p where
                 ${price1 ? `(p.price - (p.price * p.discount) / 100) >= ${price1} and (p.price - (p.price * p.discount) / 100) <= ${price2}` : ''}
-                ${(price1 && age) ? `and (p.age = ${age} or p.age = 0)` : (age ? `(p.age = ${age} or p.age = 0)` : '')}
-                ${((price1 && gender) || (age && gender)) ? `and (p.gender = ${gender} or p.gender = 0)` : (gender ? `(p.gender = ${gender} or p.gender = 0)` : '')}
+                ${(price1 && age) ? `and p.age = ${age}` : (age ? `p.age = ${age}` : '')}
+                ${((price1 && gender) || (age && gender)) ? `and p.gender = ${gender}` : (gender ? `p.gender = ${gender}` : '')}
                 ${price1 ? 'and' : age ? 'and' : gender ? 'and' : ''} p.name like '%${seek}%'
                 and p.category = ${categoryID}) as allproduct
                 CROSS JOIN (
@@ -128,8 +187,8 @@ class productService {
         return new Promise((resolve, reject) => {
             con.query(`select * from (select ROW_NUMBER() OVER(ORDER BY p.id) as inx, p.* from product p where
                 ${price1 ? `(p.price - (p.price * p.discount) / 100) >= ${price1} and (p.price - (p.price * p.discount) / 100) <= ${price2}` : ''}
-                ${(price1 && age) ? `and (p.age = ${age} or p.age = 0)` : (age ? `(p.age = ${age} or p.age = 0)` : '')}
-                ${((price1 && gender) || (age && gender)) ? `and (p.gender = ${gender} or p.gender = 0)` : (gender ? `(p.gender = ${gender} or p.gender = 0)` : '')}
+                ${(price1 && age) ? `and p.age = ${age}` : (age ? `p.age = ${age}` : '')}
+                ${((price1 && gender) || (age && gender)) ? `and p.gender = ${gender}` : (gender ? `p.gender = ${gender}` : '')}
                 ${price1 ? 'and' : age ? 'and' : gender ? 'and' : ''} p.name like '%${seek}%') as allproduct
                 CROSS JOIN (
                     SELECT COUNT(*) AS count
@@ -174,6 +233,41 @@ class productService {
         })
     }
 
+    getTotalByFilter(price1, price2, age, gender, seek) {
+        return new Promise((resolve, reject) => {
+            con.query(`select p.* from product p where
+                ${price1 ? `p.price >= ${price1} and p.price <= ${price2}` : ''}
+                ${(price1 && age) ? `and p.age = ${age}` : (age ? `p.age = ${age}` : '')}
+                ${((price1 && gender) || (age && gender)) ? `and p.gender = ${gender}` : (gender ? `p.gender = ${gender}` : '')}
+                ${price1 ? 'and' : age ? 'and' : gender ? 'and' : ''} p.name like '%${seek}%';`,
+                function (error, result, fields) {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
+                    resolve(result);
+                });
+        })
+    }
+
+    getTotalByCategoryFilter(price1, price2, age, gender, seek, categoryID) {
+        return new Promise((resolve, reject) => {
+            con.query(`select p.* from product p where
+                ${price1 ? `p.price >= ${price1} and p.price <= ${price2}` : ''}
+                ${(price1 && age) ? `and p.age = ${age}` : (age ? `p.age = ${age}` : '')}
+                ${((price1 && gender) || (age && gender)) ? `and p.gender = ${gender}` : (gender ? `p.gender = ${gender}` : '')}
+                ${price1 ? 'and' : age ? 'and' : gender ? 'and' : ''} p.name like '%${seek}%'
+                and p.category = ${categoryID};`,
+                function (error, result, fields) {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
+                    resolve(result);
+                });
+        })
+    }
+
     findOneByID(id) {
         return new Promise((resolve, reject) => {
             con.query(`select d.*, c.name as categoryName from product d
@@ -190,7 +284,7 @@ class productService {
 
     findSupportImg(id) {
         return new Promise((resolve, reject) => {
-            con.query(`select * from supportproduct s where s.IDProduct = ${id};`, function (error, result, fields) {
+            con.query(`select * from supportproduct where IDProduct = ${id};`, function (error, result, fields) {
                 if (error) {
                     reject(error);
                     return;
@@ -305,6 +399,31 @@ class productService {
         })
     }
 
+    deleteProduct(productID) {
+        return new Promise((resolve, reject) => {
+            con.query(`Delete from product
+            where id = ${productID}`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
+
+    deleteSupportProduct(supportProductID) {
+        return new Promise((resolve, reject) => {
+            con.query(`Delete from supportproduct
+            where id = ${supportProductID}`, function (error, result, fields) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            });
+        })
+    }
 }
 
 module.exports = new productService()
